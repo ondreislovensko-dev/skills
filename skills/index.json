@@ -671,6 +671,19 @@
       ]
     },
     {
+      "name": "n8n-self-host",
+      "slug": "n8n-self-host",
+      "description": "Self-host, configure, scale, and manage n8n instances. Use when a user asks to install n8n with Docker, set up n8n in production, configure n8n environment variables, scale n8n with workers, back up n8n workflows, restore n8n data, manage n8n via CLI or REST API, monitor n8n, troubleshoot n8n issues, set up n8n with PostgreSQL, or deploy n8n with a reverse proxy. For designing n8n workflows and nodes, see n8n-workflow.",
+      "category": "devops",
+      "tags": [
+        "n8n",
+        "self-hosting",
+        "docker",
+        "postgresql",
+        "infrastructure"
+      ]
+    },
+    {
       "name": "n8n-workflow",
       "slug": "n8n-workflow",
       "description": "Automate document workflows with n8n. Use when a user asks to create an n8n workflow, automate a process, connect services, build an integration pipeline, set up webhook triggers, or access n8n workflow templates. Covers workflow design, node configuration, and accessing 7800+ community templates.",
@@ -1126,5 +1139,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-08T22:33:45.639Z"
+  "updatedAt": "2026-02-08T23:15:14.888Z"
 }

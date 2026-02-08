@@ -31,45 +31,18 @@ When a user asks for help with n8n workflows, determine which task they need:
 
 ### Task A: Set up n8n locally
 
-1. Install n8n using one of these methods:
+Install n8n to start building workflows:
 
 ```bash
-# Option 1: npm (requires Node.js 18+)
+# Quick start with npm (requires Node.js 18+)
 npm install -g n8n
 n8n start
 
-# Option 2: Docker (recommended for production)
-docker run -d --name n8n \
-  -p 5678:5678 \
-  -v n8n_data:/home/node/.n8n \
-  n8nio/n8n:latest
-
-# Option 3: Docker Compose with persistent storage
+# Or with Docker
+docker run -d --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
 ```
 
-2. Create a `docker-compose.yml` for a production setup:
-
-```yaml
-version: "3.8"
-services:
-  n8n:
-    image: n8nio/n8n:latest
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=changeme
-      - WEBHOOK_URL=https://your-domain.com/
-    volumes:
-      - n8n_data:/home/node/.n8n
-    restart: unless-stopped
-
-volumes:
-  n8n_data:
-```
-
-3. Access the editor at `http://localhost:5678`
+Access the editor at `http://localhost:5678`. For production Docker Compose setups with PostgreSQL, scaling, and backups, see the `n8n-self-host` skill.
 
 ### Task B: Design a workflow from scratch
 
