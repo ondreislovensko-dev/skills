@@ -67,19 +67,6 @@
       ]
     },
     {
-      "name": "blender-addon-dev",
-      "slug": "blender-addon-dev",
-      "description": "Build custom Blender add-ons with Python. Use when the user wants to create a Blender add-on, register operators, build UI panels, add custom properties, create menus, package an add-on for distribution, or extend Blender with custom tools and workflows.",
-      "category": "development",
-      "tags": [
-        "blender",
-        "addon",
-        "plugin",
-        "operators",
-        "ui-panels"
-      ]
-    },
-    {
       "name": "blender-3d-modeling",
       "slug": "blender-3d-modeling",
       "description": "Create 3D models procedurally with Blender Python. Use when the user wants to generate meshes from code, build geometry with bmesh, apply modifiers, create parametric shapes, procedural landscapes, grids, curves, or any programmatic 3D modeling in Blender.",
@@ -90,6 +77,19 @@
         "procedural",
         "bmesh",
         "geometry"
+      ]
+    },
+    {
+      "name": "blender-addon-dev",
+      "slug": "blender-addon-dev",
+      "description": "Build custom Blender add-ons with Python. Use when the user wants to create a Blender add-on, register operators, build UI panels, add custom properties, create menus, package an add-on for distribution, or extend Blender with custom tools and workflows.",
+      "category": "development",
+      "tags": [
+        "blender",
+        "addon",
+        "plugin",
+        "operators",
+        "ui-panels"
       ]
     },
     {
@@ -846,7 +846,7 @@
     {
       "name": "railway-deploy",
       "slug": "railway-deploy",
-      "description": "Manage Railway deployments using the CLI. Use when a user asks to deploy to Railway, check deployment status, manage Railway services, set environment variables on Railway, view Railway logs, link a Railway project, add a database on Railway, scale Railway services, manage Railway environments, rollback a Railway deployment, or run commands with Railway env vars.",
+      "description": "Manage Railway deployments using the CLI. Use when a user asks to deploy to Railway, check deployment status, manage Railway services, set environment variables on Railway, view Railway logs, link a Railway project, add a database on Railway, scale Railway services, manage Railway environments, rollback a Railway deployment, or run commands with Railway env vars. Covers the full deploy lifecycle from project setup to production monitoring.",
       "category": "devops",
       "tags": [
         "railway",
@@ -1126,5 +1126,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-08T11:44:20.741Z"
+  "updatedAt": "2026-02-08T22:27:29.709Z"
 }
