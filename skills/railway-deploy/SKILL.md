@@ -26,7 +26,13 @@ Deploy, manage, and monitor applications on Railway using the CLI. Covers the fu
 
 ### Task A: Project Setup & Linking
 
-First check if already linked:
+First verify the CLI is installed. If `railway` is not found, install it:
+
+```bash
+npm i -g @railway/cli   # or: brew install railway
+```
+
+Check if already linked to a project:
 
 ```bash
 railway status
@@ -35,11 +41,8 @@ railway status
 If not linked, either create a new project or link to an existing one:
 
 ```bash
-# Create a new project
-railway init
-
-# Or link to an existing project
-railway link
+railway init    # Create a new project
+railway link    # Link to an existing project
 ```
 
 After linking, confirm with `railway status` to verify project, service, and environment context.
@@ -47,11 +50,8 @@ After linking, confirm with `railway status` to verify project, service, and env
 For CI/CD or headless environments, use token auth:
 
 ```bash
-# Project-scoped token (set in Railway dashboard)
-RAILWAY_TOKEN=xxx railway up
-
-# Account-scoped token
-RAILWAY_API_TOKEN=xxx railway up
+RAILWAY_TOKEN=xxx railway up       # Project-scoped token
+RAILWAY_API_TOKEN=xxx railway up   # Account-scoped token
 ```
 
 ### Task B: Deploy
@@ -88,17 +88,14 @@ To restart a service without rebuilding:
 railway restart
 ```
 
-### Task C: Manage Services
+### Task C: Manage Services & Resources
 
 ```bash
 # Add a service interactively
 railway add
 
 # Add a database
-railway add --database postgres
-railway add --database mysql
-railway add --database redis
-railway add --database mongo
+railway add --database postgres   # also: mysql, redis, mongo
 
 # Add a service from a GitHub repo
 railway add --repo user/repo
@@ -108,6 +105,15 @@ railway service
 
 # Scale a service
 railway scale
+
+# Generate a Railway subdomain or add a custom domain
+railway domain
+railway domain example.com
+
+# Manage persistent volumes
+railway volume list
+railway volume add
+railway volume delete
 
 # Delete the entire project
 railway delete
@@ -173,29 +179,6 @@ railway run python manage.py migrate
 
 # Open an interactive shell with Railway env vars
 railway shell
-```
-
-### Task H: Domains & Networking
-
-```bash
-# Generate a Railway subdomain
-railway domain
-
-# Add a custom domain
-railway domain example.com
-```
-
-### Task I: Volumes
-
-```bash
-# List volumes
-railway volume list
-
-# Add a persistent volume
-railway volume add
-
-# Delete a volume
-railway volume delete
 ```
 
 ## Examples
@@ -302,3 +285,5 @@ $ railway redeploy
 - Add `--json` to any command for machine-readable output in scripts.
 - Use `railway variable set` to update env vars, then `railway redeploy` to pick up the changes.
 - Use `railway environment new` to create staging/preview environments that mirror production config.
+- If `railway` command is not found, install via `npm i -g @railway/cli` or `brew install railway`.
+- If `railway login` fails or times out, use `railway login --browserless` for headless/SSH environments.
