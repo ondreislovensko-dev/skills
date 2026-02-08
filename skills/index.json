@@ -1,6 +1,13 @@
 {
   "skills": [
     {
+      "name": "ab-test-setup",
+      "slug": "ab-test-setup",
+      "description": "When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions \"A/B test,\" \"split test,\" \"experiment,\" \"test this change,\" \"variant copy,\" \"multivariate test,\" or \"hypothesis.\" For tracking implementation, see analytics-tracking.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "ai-slides",
       "slug": "ai-slides",
       "description": "Generate complete presentations with AI — from outline to polished slides. Use when a user asks to create a presentation, build slides, make a pitch deck, generate a slide deck, create a keynote, prepare a talk, build a demo presentation, or produce any slide-based content.",
@@ -12,6 +19,13 @@
         "keynote",
         "storytelling"
       ]
+    },
+    {
+      "name": "analytics-tracking",
+      "slug": "analytics-tracking",
+      "description": "When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions \"set up tracking,\" \"GA4,\" \"Google Analytics,\" \"conversion tracking,\" \"event tracking,\" \"UTM parameters,\" \"tag manager,\" \"GTM,\" \"analytics implementation,\" or \"tracking plan.\" For A/B test measurement, see ab-test-setup.",
+      "category": "marketing",
+      "tags": []
     },
     {
       "name": "api-tester",
@@ -50,6 +64,45 @@
         "bulk",
         "processing",
         "automation"
+      ]
+    },
+    {
+      "name": "blender-3d-modeling",
+      "slug": "blender-3d-modeling",
+      "description": "Create 3D models procedurally with Blender Python. Use when the user wants to generate meshes from code, build geometry with bmesh, apply modifiers, create parametric shapes, procedural landscapes, grids, curves, or any programmatic 3D modeling in Blender.",
+      "category": "design",
+      "tags": [
+        "blender",
+        "3d-modeling",
+        "procedural",
+        "bmesh",
+        "geometry"
+      ]
+    },
+    {
+      "name": "blender-render-automation",
+      "slug": "blender-render-automation",
+      "description": "Automate Blender rendering from the command line. Use when the user wants to set up renders, batch render scenes, configure Cycles or EEVEE, set up cameras and lights, render animations, create materials and shaders, or build a render pipeline with Blender Python scripting.",
+      "category": "automation",
+      "tags": [
+        "blender",
+        "rendering",
+        "cycles",
+        "eevee",
+        "3d"
+      ]
+    },
+    {
+      "name": "blender-scripting",
+      "slug": "blender-scripting",
+      "description": "Write and run Blender Python scripts for 3D automation. Use when the user wants to automate Blender tasks, run headless scripts, manipulate scenes, batch process .blend files, import/export 3D models, manage objects, or script Blender from the command line using the bpy API.",
+      "category": "automation",
+      "tags": [
+        "blender",
+        "3d",
+        "python",
+        "automation",
+        "scripting"
       ]
     },
     {
@@ -118,6 +171,20 @@
       ]
     },
     {
+      "name": "competitor-alternatives",
+      "slug": "competitor-alternatives",
+      "description": "When the user wants to create competitor comparison or alternative pages for SEO and sales enablement. Also use when the user mentions 'alternative page,' 'vs page,' 'competitor comparison,' 'comparison page,' '[Product] vs [Product],' '[Product] alternative,' or 'competitive landing pages.' Covers four formats: singular alternative, plural alternatives, you vs competitor, and competitor vs competitor. Emphasizes deep research, modular content architecture, and varied section types beyond feature tables.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "content-strategy",
+      "slug": "content-strategy",
+      "description": "When the user wants to plan a content strategy, decide what content to create, or figure out what topics to cover. Also use when the user mentions \"content strategy,\" \"what should I write about,\" \"content ideas,\" \"blog strategy,\" \"topic clusters,\" or \"content planning.\" For writing individual pieces, see copywriting. For SEO-specific audits, see seo-audit.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "content-writer",
       "slug": "content-writer",
       "description": "Research topics and write content like blog posts, articles, and marketing copy. Use when a user asks to write a blog post, create an article, draft marketing copy, write website content, create a newsletter, produce thought leadership content, or write any long-form or short-form copy.",
@@ -142,6 +209,20 @@
         "risk-analysis",
         "compliance"
       ]
+    },
+    {
+      "name": "copy-editing",
+      "slug": "copy-editing",
+      "description": "When the user wants to edit, review, or improve existing marketing copy. Also use when the user mentions 'edit this copy,' 'review my copy,' 'copy feedback,' 'proofread,' 'polish this,' 'make this better,' or 'copy sweep.' This skill provides a systematic approach to editing marketing copy through multiple focused passes.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "copywriting",
+      "slug": "copywriting",
+      "description": "When the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use when the user says \"write copy for,\" \"improve this copy,\" \"rewrite this page,\" \"marketing copy,\" \"headline help,\" or \"CTA copy.\" For email copy, see email-sequence. For popup copy, see popup-cro.",
+      "category": "marketing",
+      "tags": []
     },
     {
       "name": "cover-letter",
@@ -261,6 +342,13 @@
       ]
     },
     {
+      "name": "email-sequence",
+      "slug": "email-sequence",
+      "description": "When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions \"email sequence,\" \"drip campaign,\" \"nurture sequence,\" \"onboarding emails,\" \"welcome sequence,\" \"re-engagement emails,\" \"email automation,\" or \"lifecycle emails.\" For in-app onboarding, see onboarding-cro.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "excel-processor",
       "slug": "excel-processor",
       "description": "Read, transform, analyze, and generate Excel and CSV files. Use when a user asks to open a spreadsheet, process Excel data, merge CSVs, create pivot tables, clean up data, convert between Excel and CSV, add formulas, filter rows, or generate reports from tabular data. Handles .xlsx, .xls, and .csv.",
@@ -287,6 +375,19 @@
       ]
     },
     {
+      "name": "ffmpeg-video-editing",
+      "slug": "ffmpeg-video-editing",
+      "description": "Edit, convert, trim, merge, and process video files using ffmpeg. Use when the user wants to cut video clips, change format, resize, add watermarks, create GIFs, extract audio, adjust speed, concatenate videos, or compress video files from the command line.",
+      "category": "content",
+      "tags": [
+        "video",
+        "audio",
+        "ffmpeg",
+        "multimedia",
+        "conversion"
+      ]
+    },
+    {
       "name": "file-organizer",
       "slug": "file-organizer",
       "description": "Organize and rename files based on content analysis. Use when a user asks to sort files into folders, rename files by pattern, organize a messy directory, categorize documents by type or content, deduplicate files, or clean up a downloads folder. Handles smart renaming, content-based sorting, and duplicate detection.",
@@ -298,6 +399,20 @@
         "cleanup",
         "automation"
       ]
+    },
+    {
+      "name": "form-cro",
+      "slug": "form-cro",
+      "description": "When the user wants to optimize any form that is NOT signup/registration — including lead capture forms, contact forms, demo request forms, application forms, survey forms, or checkout forms. Also use when the user mentions \"form optimization,\" \"lead form conversions,\" \"form friction,\" \"form fields,\" \"form completion rate,\" or \"contact form.\" For signup/registration forms, see signup-flow-cro. For popups containing forms, see popup-cro.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "free-tool-strategy",
+      "slug": "free-tool-strategy",
+      "description": "When the user wants to plan, evaluate, or build a free tool for marketing purposes — lead generation, SEO value, or brand awareness. Also use when the user mentions \"engineering as marketing,\" \"free tool,\" \"marketing tool,\" \"calculator,\" \"generator,\" \"interactive tool,\" \"lead gen tool,\" \"build a tool for leads,\" or \"free resource.\" This skill bridges engineering and marketing — useful for founders and technical marketers.",
+      "category": "marketing",
+      "tags": []
     },
     {
       "name": "frontend-design",
@@ -364,6 +479,28 @@
       ]
     },
     {
+      "name": "kaggle-finetune",
+      "slug": "kaggle-finetune",
+      "description": "End-to-end workflow for fine-tuning LLMs using Kaggle datasets. Use when downloading datasets from Kaggle for model training, preparing conversation/customer service data for chatbot fine-tuning, or building domain-specific AI assistants. Covers dataset discovery, download, preprocessing into chat format, and integration with PEFT/LoRA training.",
+      "category": "data-ai",
+      "tags": [
+        "fine-tuning",
+        "kaggle",
+        "llm",
+        "peft",
+        "lora",
+        "chatbot",
+        "machine-learning"
+      ]
+    },
+    {
+      "name": "launch-strategy",
+      "slug": "launch-strategy",
+      "description": "When the user wants to plan a product launch, feature announcement, or release strategy. Also use when the user mentions 'launch,' 'Product Hunt,' 'feature release,' 'announcement,' 'go-to-market,' 'beta launch,' 'early access,' 'waitlist,' or 'product update.' This skill covers phased launches, channel strategy, and ongoing launch momentum.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "lead-qualification",
       "slug": "lead-qualification",
       "description": "Score and qualify sales leads based on criteria and fit. Use when a user asks to qualify leads, score prospects, prioritize sales leads, evaluate lead quality, rank leads by fit, assess sales pipeline, or determine which leads to pursue first. Supports BANT, MEDDIC, and custom scoring frameworks.",
@@ -380,7 +517,7 @@
       "name": "lm-studio-subagents",
       "slug": "lm-studio-subagents",
       "description": "Offload tasks to local LLMs via LM Studio. Use when a user asks to run local models with LM Studio, save API costs by using local LLMs, create subagents with local models, offload summarization or classification to a local model, or use LM Studio's API for batch processing. Covers local model inference, task delegation, and cost optimization.",
-      "category": "ml",
+      "category": "data-ai",
       "tags": [
         "lm-studio",
         "local-llm",
@@ -403,6 +540,20 @@
       ]
     },
     {
+      "name": "marketing-ideas",
+      "slug": "marketing-ideas",
+      "description": "When the user needs marketing ideas, inspiration, or strategies for their SaaS or software product. Also use when the user asks for 'marketing ideas,' 'growth ideas,' 'how to market,' 'marketing strategies,' 'marketing tactics,' 'ways to promote,' or 'ideas to grow.' This skill provides 139 proven marketing approaches organized by category.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "marketing-psychology",
+      "slug": "marketing-psychology",
+      "description": "When the user wants to apply psychological principles, mental models, or behavioral science to marketing. Also use when the user mentions 'psychology,' 'mental models,' 'cognitive bias,' 'persuasion,' 'behavioral science,' 'why people buy,' 'decision-making,' or 'consumer behavior.' This skill provides 70+ mental models organized for marketing application.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "meeting-notes",
       "slug": "meeting-notes",
       "description": "Transform raw meeting notes or transcripts into structured, actionable summaries. Use when a user asks to summarize meeting notes, organize a transcript, extract action items from a meeting, create meeting minutes, format discussion notes, or turn a call recording transcript into a summary.",
@@ -419,7 +570,7 @@
       "name": "model-router",
       "slug": "model-router",
       "description": "Smart routing between multiple LLMs based on task complexity, cost, and capabilities. Use when a user asks to route between models, optimize LLM costs, select the best model for a task, build a model gateway, create a multi-model pipeline, or balance cost vs quality across LLM providers. Covers routing strategies, fallback chains, and cost optimization.",
-      "category": "ml",
+      "category": "data-ai",
       "tags": [
         "routing",
         "llm",
@@ -471,7 +622,7 @@
       "name": "ollama-local",
       "slug": "ollama-local",
       "description": "Run open-source LLMs locally with Ollama. Use when a user asks to run a local language model, install Ollama, use Llama locally, run Mistral or DeepSeek on their machine, set up local AI inference, create a custom Modelfile, or serve models via a local API. Covers installation, model management, API usage, and custom model creation.",
-      "category": "ml",
+      "category": "data-ai",
       "tags": [
         "ollama",
         "local-llm",
@@ -479,6 +630,34 @@
         "inference",
         "self-hosted"
       ]
+    },
+    {
+      "name": "onboarding-cro",
+      "slug": "onboarding-cro",
+      "description": "When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. Also use when the user mentions \"onboarding flow,\" \"activation rate,\" \"user activation,\" \"first-run experience,\" \"empty states,\" \"onboarding checklist,\" \"aha moment,\" or \"new user experience.\" For signup/registration optimization, see signup-flow-cro. For ongoing email sequences, see email-sequence.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "page-cro",
+      "slug": "page-cro",
+      "description": "When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says \"CRO,\" \"conversion rate optimization,\" \"this page isn't converting,\" \"improve conversions,\" or \"why isn't this page working.\" For signup/registration flows, see signup-flow-cro. For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "paid-ads",
+      "slug": "paid-ads",
+      "description": "When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. Also use when the user mentions 'PPC,' 'paid media,' 'ad copy,' 'ad creative,' 'ROAS,' 'CPA,' 'ad campaign,' 'retargeting,' or 'audience targeting.' This skill covers campaign strategy, ad creation, audience targeting, and optimization.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "paywall-upgrade-cro",
+      "slug": "paywall-upgrade-cro",
+      "description": "When the user wants to create or optimize in-app paywalls, upgrade screens, upsell modals, or feature gates. Also use when the user mentions \"paywall,\" \"upgrade screen,\" \"upgrade modal,\" \"upsell,\" \"feature gate,\" \"convert free to paid,\" \"freemium conversion,\" \"trial expiration screen,\" \"limit reached screen,\" \"plan upgrade prompt,\" or \"in-app pricing.\" Distinct from public pricing pages (see page-cro) — this skill focuses on in-product upgrade moments where the user has already experienced value.",
+      "category": "marketing",
+      "tags": []
     },
     {
       "name": "pdf-analyzer",
@@ -523,7 +702,7 @@
       "name": "peft-fine-tuning",
       "slug": "peft-fine-tuning",
       "description": "Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when a user asks to fine-tune a language model, train a custom LLM, adapt a model to their data, use LoRA or QLoRA, fine-tune Llama or Mistral, or train a model on consumer GPUs. Covers PEFT methods for 7B-70B parameter models.",
-      "category": "ml",
+      "category": "data-ai",
       "tags": [
         "fine-tuning",
         "lora",
@@ -531,6 +710,34 @@
         "peft",
         "llm"
       ]
+    },
+    {
+      "name": "popup-cro",
+      "slug": "popup-cro",
+      "description": "When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. Also use when the user mentions \"exit intent,\" \"popup conversions,\" \"modal optimization,\" \"lead capture popup,\" \"email popup,\" \"announcement banner,\" or \"overlay.\" For forms outside of popups, see form-cro. For general page conversion optimization, see page-cro.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "pricing-strategy",
+      "slug": "pricing-strategy",
+      "description": "When the user wants help with pricing decisions, packaging, or monetization strategy. Also use when the user mentions 'pricing,' 'pricing tiers,' 'freemium,' 'free trial,' 'packaging,' 'price increase,' 'value metric,' 'Van Westendorp,' 'willingness to pay,' or 'monetization.' This skill covers pricing research, tier structure, and packaging strategy.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "product-marketing-context",
+      "slug": "product-marketing-context",
+      "description": "When the user wants to create or update their product marketing context document. Also use when the user mentions 'product context,' 'marketing context,' 'set up context,' 'positioning,' or wants to avoid repeating foundational information across marketing tasks. Creates `.claude/product-marketing-context.md` that other marketing skills reference.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "programmatic-seo",
+      "slug": "programmatic-seo",
+      "description": "When the user wants to create SEO-driven pages at scale using templates and data. Also use when the user mentions \"programmatic SEO,\" \"template pages,\" \"pages at scale,\" \"directory pages,\" \"location pages,\" \"[keyword] + [city] pages,\" \"comparison pages,\" \"integration pages,\" or \"building many pages for SEO.\" For auditing existing SEO issues, see seo-audit.",
+      "category": "marketing",
+      "tags": []
     },
     {
       "name": "proposal-writer",
@@ -572,6 +779,13 @@
       ]
     },
     {
+      "name": "referral-program",
+      "slug": "referral-program",
+      "description": "When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. Also use when the user mentions 'referral,' 'affiliate,' 'ambassador,' 'word of mouth,' 'viral loop,' 'refer a friend,' or 'partner program.' This skill covers program design, incentive structure, and growth optimization.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "remotion-video-toolkit",
       "slug": "remotion-video-toolkit",
       "description": "Programmatic video creation with React using Remotion. Use when a user asks to create videos with code, generate personalized videos, build animated data visualizations, add TikTok-style captions, render video programmatically, or automate video production. Supports CLI rendering, AWS Lambda, and Google Cloud Run deployment.",
@@ -611,10 +825,17 @@
       ]
     },
     {
+      "name": "schema-markup",
+      "slug": "schema-markup",
+      "description": "When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions \"schema markup,\" \"structured data,\" \"JSON-LD,\" \"rich snippets,\" \"schema.org,\" \"FAQ schema,\" \"product schema,\" \"review schema,\" or \"breadcrumb schema.\" For broader SEO issues, see seo-audit.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
       "name": "senior-computer-vision",
       "slug": "senior-computer-vision",
       "description": "Object detection, image segmentation, and visual AI. Use when a user asks to detect objects in images, segment images, run YOLO inference, build a computer vision pipeline, use Faster R-CNN or SAM, deploy a vision model with TensorRT, or perform image classification. Covers YOLO, SAM, Mask R-CNN, and TensorRT optimization.",
-      "category": "ml",
+      "category": "data-ai",
       "tags": [
         "computer-vision",
         "yolo",
@@ -622,6 +843,27 @@
         "detection",
         "tensorrt"
       ]
+    },
+    {
+      "name": "seo-audit",
+      "slug": "seo-audit",
+      "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" or \"SEO health check.\" For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "signup-flow-cro",
+      "slug": "signup-flow-cro",
+      "description": "When the user wants to optimize signup, registration, account creation, or trial activation flows. Also use when the user mentions \"signup conversions,\" \"registration friction,\" \"signup form optimization,\" \"free trial signup,\" \"reduce signup dropoff,\" or \"account creation flow.\" For post-signup onboarding, see onboarding-cro. For lead capture forms (not account creation), see form-cro.",
+      "category": "marketing",
+      "tags": []
+    },
+    {
+      "name": "social-content",
+      "slug": "social-content",
+      "description": "When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, Facebook, or other platforms. Also use when the user mentions 'LinkedIn post,' 'Twitter thread,' 'social media,' 'content calendar,' 'social scheduling,' 'engagement,' or 'viral content.' This skill covers content creation, repurposing, and platform-specific strategies.",
+      "category": "marketing",
+      "tags": []
     },
     {
       "name": "sql-optimizer",
@@ -702,6 +944,19 @@
       ]
     },
     {
+      "name": "voice-to-text",
+      "slug": "voice-to-text",
+      "description": "Transcribe voice and audio to text using OpenAI Whisper. Use when the user wants to convert speech to text, transcribe audio files, record voice memos, dictate text, create meeting transcripts, or convert MP3/WAV/M4A recordings to written text. Supports both local Whisper and OpenAI API.",
+      "category": "productivity",
+      "tags": [
+        "voice",
+        "transcription",
+        "whisper",
+        "speech-to-text",
+        "audio"
+      ]
+    },
+    {
       "name": "web-research",
       "slug": "web-research",
       "description": "Deep web research with Brave Search API. Find sources, extract content, and compile comprehensive reports. Use when a user asks to research a topic on the web, find information online, compile a research report, search the internet for sources, do a deep dive on a subject, gather web sources for a report, or investigate a topic thoroughly using multiple online sources.",
@@ -739,6 +994,19 @@
         "team-management",
         "productivity"
       ]
+    },
+    {
+      "name": "youtube-transcription",
+      "slug": "youtube-transcription",
+      "description": "Transcribe YouTube videos to text using OpenAI Whisper and yt-dlp. Use when the user wants to get a transcript from a YouTube video, generate subtitles, convert video speech to text, create SRT/VTT captions, or extract spoken content from YouTube URLs.",
+      "category": "content",
+      "tags": [
+        "youtube",
+        "transcription",
+        "whisper",
+        "subtitles",
+        "speech-to-text"
+      ]
     }
   ],
   "categories": [
@@ -750,9 +1018,9 @@
     "development",
     "devops",
     "documents",
-    "ml",
+    "marketing",
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-02T21:25:48.616Z"
+  "updatedAt": "2026-02-08T11:44:20.741Z"
 }
