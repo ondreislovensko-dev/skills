@@ -67,6 +67,19 @@
       ]
     },
     {
+      "name": "blender-addon-dev",
+      "slug": "blender-addon-dev",
+      "description": "Build custom Blender add-ons with Python. Use when the user wants to create a Blender add-on, register operators, build UI panels, add custom properties, create menus, package an add-on for distribution, or extend Blender with custom tools and workflows.",
+      "category": "development",
+      "tags": [
+        "blender",
+        "addon",
+        "plugin",
+        "operators",
+        "ui-panels"
+      ]
+    },
+    {
       "name": "blender-3d-modeling",
       "slug": "blender-3d-modeling",
       "description": "Create 3D models procedurally with Blender Python. Use when the user wants to generate meshes from code, build geometry with bmesh, apply modifiers, create parametric shapes, procedural landscapes, grids, curves, or any programmatic 3D modeling in Blender.",
@@ -77,6 +90,45 @@
         "procedural",
         "bmesh",
         "geometry"
+      ]
+    },
+    {
+      "name": "blender-compositing",
+      "slug": "blender-compositing",
+      "description": "Automate Blender compositing and post-processing with Python. Use when the user wants to set up compositor nodes, add post-processing effects, color correct renders, combine render passes, apply blur or glare, key green screens, create node-based VFX pipelines, or script the Blender compositor.",
+      "category": "automation",
+      "tags": [
+        "blender",
+        "compositing",
+        "vfx",
+        "post-processing",
+        "nodes"
+      ]
+    },
+    {
+      "name": "blender-grease-pencil",
+      "slug": "blender-grease-pencil",
+      "description": "Create 2D art and animation in Blender using Grease Pencil and Python. Use when the user wants to draw strokes programmatically, create 2D animations, build Grease Pencil objects from code, manage GP layers and frames, apply GP modifiers, set up drawing guides, or script any Grease Pencil workflow in Blender.",
+      "category": "design",
+      "tags": [
+        "blender",
+        "grease-pencil",
+        "2d-animation",
+        "drawing",
+        "strokes"
+      ]
+    },
+    {
+      "name": "blender-motion-capture",
+      "slug": "blender-motion-capture",
+      "description": "Automate motion capture and tracking workflows in Blender with Python. Use when the user wants to import BVH or FBX mocap data, retarget motion to armatures, track camera or object motion from video, solve camera motion, clean up motion capture data, or script any tracking pipeline in Blender.",
+      "category": "automation",
+      "tags": [
+        "blender",
+        "motion-capture",
+        "tracking",
+        "mocap",
+        "animation"
       ]
     },
     {
@@ -103,6 +155,19 @@
         "python",
         "automation",
         "scripting"
+      ]
+    },
+    {
+      "name": "blender-vse-pipeline",
+      "slug": "blender-vse-pipeline",
+      "description": "Automate video editing in Blender's Video Sequence Editor with Python. Use when the user wants to add video, image, or audio strips, create transitions, apply effects, build edit timelines, batch assemble footage, estimate render times, or script any VSE workflow from the command line.",
+      "category": "automation",
+      "tags": [
+        "blender",
+        "video-editing",
+        "vse",
+        "timeline",
+        "pipeline"
       ]
     },
     {
