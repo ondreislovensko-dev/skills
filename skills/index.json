@@ -276,6 +276,19 @@
       ]
     },
     {
+      "name": "coolify",
+      "slug": "coolify",
+      "description": "Deploy and manage applications, databases, and services on Coolify. Use when a user asks to deploy an app to Coolify, manage Coolify deployments, check deployment logs, sync environment variables, create or manage databases on Coolify, trigger a deployment, manage Coolify servers, or troubleshoot Coolify issues. Covers the Coolify CLI and REST API. For infrastructure provisioning on Hetzner, see hetzner-cloud.",
+      "category": "devops",
+      "tags": [
+        "coolify",
+        "paas",
+        "deployment",
+        "self-hosting",
+        "docker"
+      ]
+    },
+    {
       "name": "copy-editing",
       "slug": "copy-editing",
       "description": "When the user wants to edit, review, or improve existing marketing copy. Also use when the user mentions 'edit this copy,' 'review my copy,' 'copy feedback,' 'proofread,' 'polish this,' 'make this better,' or 'copy sweep.' This skill provides a systematic approach to editing marketing copy through multiple focused passes.",
@@ -515,6 +528,19 @@
         "issues",
         "ci-cd",
         "git"
+      ]
+    },
+    {
+      "name": "hetzner-cloud",
+      "slug": "hetzner-cloud",
+      "description": "Manage Hetzner Cloud infrastructure from the terminal. Use when a user asks to create a Hetzner server, manage VPS instances, set up firewalls, configure networks, manage volumes, create snapshots, handle SSH keys, or provision infrastructure on Hetzner. Covers the hcloud CLI for all resource types. For deploying applications on top of Hetzner servers, see coolify.",
+      "category": "devops",
+      "tags": [
+        "hetzner",
+        "cloud",
+        "vps",
+        "infrastructure",
+        "hosting"
       ]
     },
     {
@@ -815,6 +841,19 @@
         "writing",
         "sales",
         "pitch"
+      ]
+    },
+    {
+      "name": "railway-deploy",
+      "slug": "railway-deploy",
+      "description": "Manage Railway deployments using the CLI. Use when a user asks to deploy to Railway, check deployment status, manage Railway services, set environment variables on Railway, view Railway logs, link a Railway project, add a database on Railway, scale Railway services, manage Railway environments, rollback a Railway deployment, or run commands with Railway env vars.",
+      "category": "devops",
+      "tags": [
+        "railway",
+        "deploy",
+        "cloud",
+        "hosting",
+        "paas"
       ]
     },
     {
