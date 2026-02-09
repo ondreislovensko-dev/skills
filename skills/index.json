@@ -93,6 +93,19 @@
       ]
     },
     {
+      "name": "blender-animation",
+      "slug": "blender-animation",
+      "description": "Animate 3D objects and characters in Blender with Python. Use when the user wants to keyframe properties, create armatures and rigs, set up IK/FK chains, animate shape keys for facial animation, edit F-Curves, use the NLA editor to blend actions, add drivers for expression-based animation, or script any animation workflow in Blender.",
+      "category": "design",
+      "tags": [
+        "blender",
+        "animation",
+        "rigging",
+        "keyframes",
+        "armature"
+      ]
+    },
+    {
       "name": "blender-compositing",
       "slug": "blender-compositing",
       "description": "Automate Blender compositing and post-processing with Python. Use when the user wants to set up compositor nodes, add post-processing effects, color correct renders, combine render passes, apply blur or glare, key green screens, create node-based VFX pipelines, or script the Blender compositor.",
@@ -1139,5 +1152,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-08T23:15:14.888Z"
+  "updatedAt": "2026-02-09T09:12:07.880Z"
 }
