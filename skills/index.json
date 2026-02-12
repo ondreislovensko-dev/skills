@@ -420,6 +420,19 @@
       ]
     },
     {
+      "name": "doppler",
+      "slug": "doppler",
+      "description": "Manage secrets and environment variables using the Doppler CLI. Use when the user wants to set up Doppler, inject secrets into processes, manage projects and configs, upload or download secrets, create service tokens, use secret templates, or integrate Doppler with Docker, Kubernetes, or CI/CD pipelines. Trigger words: doppler, secrets manager, env vars, secret injection, doppler run, doppler setup, service token, secret rotation.",
+      "category": "devops",
+      "tags": [
+        "doppler",
+        "secrets",
+        "environment-variables",
+        "devops",
+        "security"
+      ]
+    },
+    {
       "name": "email-drafter",
       "slug": "email-drafter",
       "description": "Draft professional emails for various business scenarios with appropriate tone and structure. Use when a user asks to write an email, compose a message, draft a reply, write a follow-up, create an outreach email, respond to a client, write a cold email, or craft any professional correspondence.",
@@ -1165,5 +1178,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-09T21:53:13.298Z"
+  "updatedAt": "2026-02-12T22:57:59.287Z"
 }
