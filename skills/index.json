@@ -557,6 +557,19 @@
       ]
     },
     {
+      "name": "google-indexing",
+      "slug": "google-indexing",
+      "description": "Submit URLs to Google for indexing using the Google Indexing API and bulk-submit from sitemaps. Use when a user asks to index pages on Google, submit URLs to Google Search Console, speed up Google indexing, request crawling, bulk index pages, submit a sitemap's URLs for indexing, or check indexing status. Also use when the user mentions \"Google Indexing API\", \"request indexing\", \"submit to Google\", or \"pages not indexed\".",
+      "category": "automation",
+      "tags": [
+        "google",
+        "indexing",
+        "seo",
+        "search-console",
+        "sitemap"
+      ]
+    },
+    {
       "name": "hetzner-cloud",
       "slug": "hetzner-cloud",
       "description": "Manage Hetzner Cloud infrastructure from the terminal. Use when a user asks to create a Hetzner server, manage VPS instances, set up firewalls, configure networks, manage volumes, create snapshots, handle SSH keys, or provision infrastructure on Hetzner. Covers the hcloud CLI for all resource types. For deploying applications on top of Hetzner servers, see coolify.",
@@ -1178,5 +1191,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-12T22:57:59.287Z"
+  "updatedAt": "2026-02-13T10:26:27.893Z"
 }
