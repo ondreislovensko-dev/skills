@@ -782,6 +782,19 @@
       "tags": []
     },
     {
+      "name": "openclaw",
+      "slug": "openclaw",
+      "description": "Deploy and manage OpenClaw, a self-hosted gateway bridging messaging platforms to AI coding agents. Use when a user asks to set up OpenClaw, connect WhatsApp or Telegram or Discord to an AI agent, configure multi-agent routing, schedule cron jobs in OpenClaw, set up webhooks, manage OpenClaw channels, pair a messaging account, configure heartbeats, spawn sub-agents, or troubleshoot OpenClaw gateway issues. Covers installation, channel setup, agent configuration, cron scheduling, webhooks, and sub-agents.",
+      "category": "automation",
+      "tags": [
+        "openclaw",
+        "messaging",
+        "ai-agents",
+        "gateway",
+        "self-hosted"
+      ]
+    },
+    {
       "name": "page-cro",
       "slug": "page-cro",
       "description": "When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says \"CRO,\" \"conversion rate optimization,\" \"this page isn't converting,\" \"improve conversions,\" or \"why isn't this page working.\" For signup/registration flows, see signup-flow-cro. For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.",
@@ -1191,5 +1204,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-13T10:26:27.893Z"
+  "updatedAt": "2026-02-14T20:39:04.361Z"
 }
