@@ -868,6 +868,19 @@
       ]
     },
     {
+      "name": "picoclaw",
+      "slug": "picoclaw",
+      "description": "Set up, configure, and manage PicoClaw — an ultra-lightweight personal AI assistant built in Go. Use when the user mentions \"picoclaw,\" \"pico claw,\" \"lightweight AI assistant,\" or wants to deploy a personal AI agent on low-resource hardware (Raspberry Pi, RISC-V boards). Covers installation, LLM provider configuration, messaging gateway setup (Telegram, Discord, Slack, LINE, DingTalk), scheduled tasks, heartbeat, workspace layout, security sandbox, and Docker deployment.",
+      "category": "automation",
+      "tags": [
+        "picoclaw",
+        "ai-assistant",
+        "chatbot",
+        "telegram-bot",
+        "iot"
+      ]
+    },
+    {
       "name": "popup-cro",
       "slug": "popup-cro",
       "description": "When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. Also use when the user mentions \"exit intent,\" \"popup conversions,\" \"modal optimization,\" \"lead capture popup,\" \"email popup,\" \"announcement banner,\" or \"overlay.\" For forms outside of popups, see form-cro. For general page conversion optimization, see page-cro.",
@@ -1204,5 +1217,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-15T14:51:50.828Z"
+  "updatedAt": "2026-02-15T15:07:42.037Z"
 }
