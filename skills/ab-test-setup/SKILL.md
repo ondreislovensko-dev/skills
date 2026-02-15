@@ -1,9 +1,9 @@
 ---
 name: ab-test-setup
-version: 1.0.0
 description: When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions "A/B test," "split test," "experiment," "test this change," "variant copy," "multivariate test," or "hypothesis." For tracking implementation, see analytics-tracking.
 metadata:
   author: coreyhaines31
+  version: "1.0.0"
   category: marketing
   tags:
     - testing
