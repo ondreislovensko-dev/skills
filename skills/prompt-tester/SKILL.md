@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with any LLM-based workflow or AI agent system"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: data-ai
   tags: ["prompt-engineering", "llm", "evaluation", "ai-agents"]
