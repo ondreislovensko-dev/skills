@@ -59,6 +59,7 @@ Replace `pdf-analyzer` with the skill name you want to install.
 | [code-migration](skills/code-migration/) | Development | Migrate codebases between frameworks, languages, and API versions |
 | [cicd-pipeline](skills/cicd-pipeline/) | DevOps | Generate and optimize CI/CD pipelines for testing, building, and deployment |
 | [mcp-server-builder](skills/mcp-server-builder/) | Data & AI | Build MCP servers to connect AI agents to external services |
+| [log-analyzer](skills/log-analyzer/) | DevOps | Analyze application logs to identify root causes and incident timelines |
 
 ## Use Cases
 
@@ -75,6 +76,7 @@ Step-by-step guides for common workflows:
 - [Generate Documentation](use-cases/generate-documentation.md)
 - [Optimize SQL Queries](use-cases/optimize-sql-queries.md)
 - [Automate Release Notes](use-cases/automate-release-notes.md)
+- [Debug Production Incidents](use-cases/debug-production-incident.md)
 
 ## Contributing
 
