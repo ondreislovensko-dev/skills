@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Node.js 18+, works with Express, Fastify, or Koa"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["graphql", "rest-api", "migration", "api-design"]
