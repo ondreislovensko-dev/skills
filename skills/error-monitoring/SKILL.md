@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with exported data from Sentry, Datadog, Rollbar, or any JSON/CSV error log"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["error-monitoring", "sentry", "observability", "debugging", "triage"]

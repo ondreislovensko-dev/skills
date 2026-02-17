@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Generates configurations for Sentry, PagerDuty, Datadog, OpsGenie, or generic webhook-based systems"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["alerting", "on-call", "pagerduty", "incident-response", "observability"]
