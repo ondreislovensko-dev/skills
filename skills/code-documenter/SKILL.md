@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Supports TypeScript, JavaScript, Python, Go, Java, Rust, Ruby, C#, and PHP."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["documentation", "jsdoc", "docstrings", "architecture", "onboarding"]
