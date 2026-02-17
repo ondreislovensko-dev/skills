@@ -98,7 +98,7 @@ The agent configures a commit message template using Conventional Commits format
 
 ## Real-World Example
 
-Dani, the engineering lead at a SaaS startup called TaskPilot, releases every two weeks. Before using AI, changelog day meant 2 hours of archaeology through 80+ commits written by 5 developers with wildly different commit styles.
+Dani, the engineering lead at a 12-person SaaS startup, releases every two weeks. Before using AI, changelog day meant 2 hours of archaeology through 80+ commits written by 5 developers with wildly different commit styles.
 
 1. Dani asks the agent: "Generate release notes from v3.11.0 to HEAD"
 2. The agent parses 83 commits, identifies 12 features, 9 bug fixes, and 1 breaking change
