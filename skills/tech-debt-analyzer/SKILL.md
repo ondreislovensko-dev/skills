@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Requires git repository with history; supports any language"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["technical-debt", "code-quality", "refactoring", "engineering"]

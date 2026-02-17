@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with any language; best results with JS/TS, Python, Go, Java"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["code-quality", "complexity", "metrics", "static-analysis"]
