@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with CSV, JSON, Parquet (via Python), and SQL query results"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: data-ai
   tags: ["data-quality", "validation", "etl", "data-pipeline"]
