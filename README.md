@@ -75,6 +75,7 @@ Step-by-step guides for common workflows:
 - [Create Data Visualizations](use-cases/create-data-visualizations.md)
 - [Generate Documentation](use-cases/generate-documentation.md)
 - [Optimize SQL Queries](use-cases/optimize-sql-queries.md)
+- [Automate Release Notes](use-cases/automate-release-notes.md)
 - [Debug Production Incidents](use-cases/debug-production-incident.md)
 
 ## Contributing
