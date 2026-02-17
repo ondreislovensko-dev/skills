@@ -11,7 +11,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Node.js 18+. React 18+ for Next.js, Vue 3+ for Nuxt 3."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["ssr", "ssg", "nextjs", "performance", "seo"]
