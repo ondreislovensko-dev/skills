@@ -29,13 +29,11 @@ npx terminal-skills install test-generator
 
 Tell your AI agent:
 
-```
-Download the OpenAPI spec from https://api.internal.dev/docs/openapi.json. Validate it for completeness — flag any endpoints missing response schemas, any fields without types, and any mismatches between the spec and actual API responses by hitting each GET endpoint once.
-```
+> Download the OpenAPI spec from https://api.internal.dev/docs/openapi.json. Validate it for completeness — flag any endpoints missing response schemas, any fields without types, and any mismatches between the spec and actual API responses by hitting each GET endpoint once.
 
 The agent uses **api-tester** to probe the live API:
 
-```
+```text
 OpenAPI Spec Validation — 34 endpoints
 
 ✅ 28 endpoints match their spec
@@ -52,13 +50,11 @@ OpenAPI Spec Validation — 34 endpoints
 
 ### 2. Generate a mock server with realistic data
 
-```
-Generate a mock API server using MSW (Mock Service Worker) that serves all 34 endpoints from the OpenAPI spec. For each endpoint, generate 20 realistic seed records. Use proper names, dates, UUIDs, and domain-appropriate values (project names, task descriptions). Handle pagination, filtering, and error responses.
-```
+> Generate a mock API server using MSW (Mock Service Worker) that serves all 34 endpoints from the OpenAPI spec. For each endpoint, generate 20 realistic seed records. Use proper names, dates, UUIDs, and domain-appropriate values (project names, task descriptions). Handle pagination, filtering, and error responses.
 
 The **coding-agent** produces a complete mock setup:
 
-```
+```text
 Created mock server:
   mocks/
     handlers/
@@ -79,19 +75,15 @@ Start: npx msw init public/
 
 ### 3. Wire the mock server into the dev environment
 
-```
-Configure our Next.js app to use the MSW mock server in development and Storybook. The mock server should activate automatically when NEXT_PUBLIC_API_MOCKING=true. Add a toggle in the browser dev tools to switch between mock and real API.
-```
+> Configure our Next.js app to use the MSW mock server in development and Storybook. The mock server should activate automatically when NEXT_PUBLIC_API_MOCKING=true. Add a toggle in the browser dev tools to switch between mock and real API.
 
 ### 4. Generate contract tests
 
-```
-Create contract tests that compare the mock server responses against the OpenAPI spec. If the backend team updates the spec, these tests should fail immediately and show exactly which fields changed. Run them in CI on every PR.
-```
+> Create contract tests that compare the mock server responses against the OpenAPI spec. If the backend team updates the spec, these tests should fail immediately and show exactly which fields changed. Run them in CI on every PR.
 
 The **test-generator** skill produces:
 
-```
+```text
 Generated 34 contract tests in tests/contracts/
 
   ✓ GET /api/projects — response matches schema (12 fields)
@@ -107,9 +99,7 @@ CI integration: added to .github/workflows/test.yml
 
 ### 5. Auto-update mocks when the spec changes
 
-```
-Write a script that diffs the current OpenAPI spec against the last known version. When fields are added, auto-generate new seed data and update handlers. When fields are removed, flag them for manual review. Run this as a daily CI job.
-```
+> Write a script that diffs the current OpenAPI spec against the last known version. When fields are added, auto-generate new seed data and update handlers. When fields are removed, flag them for manual review. Run this as a daily CI job.
 
 ## Real-World Example
 

@@ -27,10 +27,7 @@ npx terminal-skills install api-tester
 
 ### 1. Tell the agent what to test
 
-```
-Test the CRUD operations on our /api/products endpoint. The base URL is
-http://localhost:3000 and auth uses a Bearer token from the LOGIN_TOKEN env var.
-```
+> Test the CRUD operations on our /api/products endpoint. The base URL is http://localhost:3000 and auth uses a Bearer token from the LOGIN_TOKEN env var.
 
 ### 2. The agent builds and sends requests
 
@@ -46,7 +43,7 @@ Each response is checked for:
 
 ### 4. Results are reported clearly
 
-```
+```text
 API Test Suite: Products CRUD
 ==============================
 

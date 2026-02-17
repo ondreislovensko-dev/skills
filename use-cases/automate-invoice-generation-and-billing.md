@@ -27,13 +27,11 @@ npx terminal-skills install billing-automation invoice-generator template-engine
 
 Start by structuring how billing data flows through your system:
 
-```
-Design a billing system database schema for our API platform. We have usage-based pricing with three tiers (free up to 10,000 API calls, standard at $0.001/call up to 100,000, volume at $0.0005/call above that). Customers can also have flat add-ons (premium support at $99/month, dedicated IP at $49/month). We bill monthly and need to support proration for mid-cycle changes. Use PostgreSQL.
-```
+> Design a billing system database schema for our API platform. We have usage-based pricing with three tiers (free up to 10,000 API calls, standard at $0.001/call up to 100,000, volume at $0.0005/call above that). Customers can also have flat add-ons (premium support at $99/month, dedicated IP at $49/month). We bill monthly and need to support proration for mid-cycle changes. Use PostgreSQL.
 
 The agent designs a normalized schema:
 
-```
+```text
 Schema created:
   customers — account details, billing email, tax info, currency
   pricing_plans — tier definitions with usage breakpoints
@@ -52,13 +50,11 @@ Indexes optimized for:
 
 ### 2. Build the invoice generation pipeline
 
-```
-Implement a monthly invoice generation service in Node.js. It should: query all active customers, aggregate their API usage for the billing period, apply tiered pricing, add any flat subscription charges with proration for mid-cycle signups, calculate tax based on customer country (EU VAT, US sales tax — use a tax rates lookup table for now), generate an invoice record with line items, and render a PDF. Process all 200 customers in parallel with concurrency limit of 10.
-```
+> Implement a monthly invoice generation service in Node.js. It should: query all active customers, aggregate their API usage for the billing period, apply tiered pricing, add any flat subscription charges with proration for mid-cycle signups, calculate tax based on customer country (EU VAT, US sales tax — use a tax rates lookup table for now), generate an invoice record with line items, and render a PDF. Process all 200 customers in parallel with concurrency limit of 10.
 
 The agent generates a complete pipeline with usage aggregation, tiered pricing calculation, proration logic, tax handling, and PDF rendering:
 
-```
+```text
 Invoice generation complete for February 2026:
   Processed: 200 customers
   Invoices generated: 187 (13 skipped — zero usage, no active subscriptions)
@@ -85,21 +81,17 @@ Invoice generation complete for February 2026:
 
 ### 3. Create professional invoice PDFs
 
-```
-Design a PDF invoice template with our branding. Include: company logo area, invoice number, date, and due date in the header. Customer billing details on the left, our company details on the right. A line items table with description, quantity, unit price, and amount. Subtotal, tax breakdown, and total in bold. Payment instructions at the bottom with bank transfer details and a link to pay online. Footer with payment terms (Net 30) and our tax registration number.
-```
+> Design a PDF invoice template with our branding. Include: company logo area, invoice number, date, and due date in the header. Customer billing details on the left, our company details on the right. A line items table with description, quantity, unit price, and amount. Subtotal, tax breakdown, and total in bold. Payment instructions at the bottom with bank transfer details and a link to pay online. Footer with payment terms (Net 30) and our tax registration number.
 
 The agent generates a PDF template using a headless rendering approach that produces clean, professional invoices matching the layout specification.
 
 ### 4. Automate payment collection and dunning
 
-```
-Implement a payment collection workflow. For customers with a card on file, automatically charge via Stripe when the invoice is created. For bank transfer customers, send the invoice with payment instructions and track incoming payments. Build a dunning workflow for failed payments: retry on day 0, send a reminder email on day 3, send an urgent notice on day 7 with a direct payment link, and flag for manual review on day 14. Track all state transitions in an audit log.
-```
+> Implement a payment collection workflow. For customers with a card on file, automatically charge via Stripe when the invoice is created. For bank transfer customers, send the invoice with payment instructions and track incoming payments. Build a dunning workflow for failed payments: retry on day 0, send a reminder email on day 3, send an urgent notice on day 7 with a direct payment link, and flag for manual review on day 14. Track all state transitions in an audit log.
 
 The agent creates webhook handlers, email templates for each dunning stage, and a state machine for invoice lifecycle:
 
-```
+```text
 Payment collection flow:
   Auto-charge customers (card on file): 142 customers
     ✓ Successful: 136
@@ -115,9 +107,7 @@ Payment collection flow:
 
 ### 5. Build financial reporting
 
-```
-Create a billing dashboard API with these endpoints: GET /api/billing/mrr (monthly recurring revenue with trend), GET /api/billing/outstanding (total unpaid invoices by aging bucket: current, 1-30 days, 31-60 days, 60+ days), GET /api/billing/revenue-by-customer (top 20 customers by revenue with month-over-month change), and GET /api/billing/churn-risk (customers with declining usage or payment failures). Include CSV export for the finance team.
-```
+> Create a billing dashboard API with these endpoints: GET /api/billing/mrr (monthly recurring revenue with trend), GET /api/billing/outstanding (total unpaid invoices by aging bucket: current, 1-30 days, 31-60 days, 60+ days), GET /api/billing/revenue-by-customer (top 20 customers by revenue with month-over-month change), and GET /api/billing/churn-risk (customers with declining usage or payment failures). Include CSV export for the finance team.
 
 ## Real-World Example
 

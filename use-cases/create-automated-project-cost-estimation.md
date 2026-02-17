@@ -29,13 +29,11 @@ npx terminal-skills install excel-processor
 
 Tell your AI agent:
 
-```
-Read our project history from /estimates/completed-projects.xlsx. Each row has: project name, feature category, estimated hours, actual hours, team size, and complexity rating. Calculate the average estimation accuracy by feature category. Show which categories we consistently overestimate and underestimate.
-```
+> Read our project history from /estimates/completed-projects.xlsx. Each row has: project name, feature category, estimated hours, actual hours, team size, and complexity rating. Calculate the average estimation accuracy by feature category. Show which categories we consistently overestimate and underestimate.
 
 The agent uses **data-analysis** to compute:
 
-```
+```text
 Estimation Accuracy by Feature Category (24 past projects)
 
 | Category | Avg Estimated | Avg Actual | Accuracy | Bias |
@@ -50,13 +48,11 @@ Estimation Accuracy by Feature Category (24 past projects)
 
 ### 2. Analyze new project requirements
 
-```
-Read the requirements document at /estimates/new/acme-portal-requirements.pdf. Break it into individual features, classify each by our category system, and estimate hours using our historical benchmarks (adjusted for the accuracy bias we just calculated).
-```
+> Read the requirements document at /estimates/new/acme-portal-requirements.pdf. Break it into individual features, classify each by our category system, and estimate hours using our historical benchmarks (adjusted for the accuracy bias we just calculated).
 
 The **proposal-writer** decomposes the project:
 
-```
+```text
 Project: Client Portal — 14 features identified
 
 | Feature | Category | Base Estimate | Bias Adjustment | Adjusted Hours |
@@ -76,13 +72,11 @@ Confidence range: 340-420 hours (based on historical variance)
 
 ### 3. Generate cost scenarios
 
-```
-Create three cost scenarios: optimistic (340h), expected (378h), and pessimistic (420h). Apply our blended rate of $150/hour. Add line items for project management (15% overhead), QA (20% of dev hours), and a 10% contingency buffer. Output as a formatted Excel spreadsheet.
-```
+> Create three cost scenarios: optimistic (340h), expected (378h), and pessimistic (420h). Apply our blended rate of $150/hour. Add line items for project management (15% overhead), QA (20% of dev hours), and a 10% contingency buffer. Output as a formatted Excel spreadsheet.
 
 The **excel-processor** produces:
 
-```
+```text
 Cost Estimate — Client Portal
 
 | Line Item | Optimistic | Expected | Pessimistic |
@@ -98,11 +92,9 @@ Timeline: 8-10 weeks with a team of 3
 
 ### 4. Compare against similar past projects
 
-```
-Find the 3 most similar completed projects from our history based on feature mix and scope. Show how their estimates compared to actuals and use that to validate our current estimate.
-```
+> Find the 3 most similar completed projects from our history based on feature mix and scope. Show how their estimates compared to actuals and use that to validate our current estimate.
 
-```
+```text
 Similar Projects:
 
 1. "Partner Portal" (2024-Q2) — 12 features, estimated 320h, actual 365h (+14%)
@@ -115,9 +107,7 @@ Recommendation: present the "expected" scenario as the primary quote.
 
 ### 5. Generate the client-ready proposal
 
-```
-Create a client-facing cost proposal PDF. Include the feature breakdown, timeline, cost scenarios, team composition, and assumptions. Use our proposal template at /templates/proposal-template.html.
-```
+> Create a client-facing cost proposal PDF. Include the feature breakdown, timeline, cost scenarios, team composition, and assumptions. Use our proposal template at /templates/proposal-template.html.
 
 ## Real-World Example
 

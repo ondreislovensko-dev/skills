@@ -27,15 +27,13 @@ npx terminal-skills install web-scraper competitor-alternatives report-generator
 
 Tell your AI agent what to track:
 
-```
-I need a competitive analysis report. Our competitors are: Acme Analytics, DataPulse, MetricFlow, and ChartBase. For each, I need: pricing tiers, key features shipped in the last 90 days, positioning statement from their homepage, and any notable G2 review trends. Output as a structured markdown report.
-```
+> I need a competitive analysis report. Our competitors are: Acme Analytics, DataPulse, MetricFlow, and ChartBase. For each, I need: pricing tiers, key features shipped in the last 90 days, positioning statement from their homepage, and any notable G2 review trends. Output as a structured markdown report.
 
 ### 2. The agent scrapes competitor sources
 
 The agent visits each competitor's website, pricing page, changelog, and public review profiles. It extracts structured data points:
 
-```
+```text
 Scraping competitor data...
 - Acme Analytics: pricing page (3 tiers found), changelog (7 entries last 90 days), G2 profile (4.3 stars, 187 reviews)
 - DataPulse: pricing page (4 tiers found), changelog (12 entries last 90 days), G2 profile (4.1 stars, 94 reviews)
@@ -47,7 +45,7 @@ Scraping competitor data...
 
 Using the scraped data, the agent generates a structured feature-by-feature comparison and identifies gaps and opportunities:
 
-```
+```text
 Generating competitive comparison matrix...
 - Feature parity analysis: 23 features compared across 4 competitors
 - Pricing comparison: normalized to per-seat monthly pricing
@@ -59,7 +57,7 @@ Generating competitive comparison matrix...
 
 The agent produces a markdown report with executive summary, detailed comparisons, and strategic recommendations:
 
-```
+```text
 Report generated: competitive-analysis-q1-2026.md
 
 Sections:
@@ -73,17 +71,13 @@ Sections:
 
 ### 5. Schedule recurring updates
 
-```
-Set this up as a monthly report. Same competitors, same format. Flag anything that changed significantly from the previous month.
-```
+> Set this up as a monthly report. Same competitors, same format. Flag anything that changed significantly from the previous month.
 
 The agent diffs against the previous report and highlights material changes like new pricing tiers, major feature launches, or review score swings.
 
 ### 6. Generate presentation-ready slides
 
-```
-Convert the executive summary and key findings into a 10-slide deck I can present at the next leadership meeting.
-```
+> Convert the executive summary and key findings into a 10-slide deck I can present at the next leadership meeting.
 
 The agent formats the highlights into a clean presentation structure with comparison charts and strategic takeaways that leadership can act on immediately.
 

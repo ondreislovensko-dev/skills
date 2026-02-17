@@ -27,20 +27,18 @@ npx terminal-skills install meeting-notes markdown-writer coding-agent
 
 Gather the raw materials and point the agent at them:
 
-```
-Here's our incident from last night. I have:
-- incident-slack-thread.txt (exported Slack conversation)
-- error-logs-2026-02-16.json (application logs from 02:00-04:30 UTC)
-- datadog-timeline.md (exported alert timeline)
-
-Generate a postmortem following our template: title, summary, impact, timeline, root cause, action items, lessons learned.
-```
+> Here's our incident from last night. I have:
+> - incident-slack-thread.txt (exported Slack conversation)
+> - error-logs-2026-02-16.json (application logs from 02:00-04:30 UTC)
+> - datadog-timeline.md (exported alert timeline)
+> 
+> Generate a postmortem following our template: title, summary, impact, timeline, root cause, action items, lessons learned.
 
 ### 2. The agent extracts the timeline
 
 The agent parses the Slack thread and correlates timestamps with log entries to build a unified chronological timeline:
 
-```
+```text
 Incident Timeline (all times UTC):
 02:12 - Datadog alert: API error rate exceeded 5% threshold
 02:14 - On-call engineer Dani acknowledged the page
@@ -55,7 +53,7 @@ Incident Timeline (all times UTC):
 
 By analyzing the log patterns, the agent traces the failure chain:
 
-```
+```text
 Root Cause:
 A scheduled batch job (invoice-reconciliation) was migrated to run during
 off-peak hours (02:00 UTC) without adjusting connection pool limits. The job
@@ -84,7 +82,7 @@ Action Items:
 
 The complete postmortem is written in markdown with consistent formatting, ready to be committed to your team's incident repository or pasted into Notion.
 
-```
+```text
 Postmortem saved to: postmortem-2026-02-16-payment-service-outage.md
 Document includes: summary, impact assessment (23 minutes of degraded service,
 ~140 failed API calls), full timeline, root cause analysis, 4 action items,

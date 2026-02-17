@@ -27,43 +27,41 @@ Keep REST for external-facing APIs (mobile, web, third-party integrations) and s
 
 ### Prompt for Your AI Agent
 
-```
-I need to build an API layer for our microservices with REST externally and gRPC internally. Here's the setup:
-
-**Current architecture (6 services):**
-- api-gateway (Express.js) — public REST API for web/mobile
-- user-service (Node.js) — accounts, profiles, authentication
-- payment-service (Node.js) — transactions, billing, invoices
-- compliance-service (Python) — KYC, AML checks, risk scoring
-- document-service (Go) — file storage, ID verification, OCR
-- notification-service (Python) — email, SMS, push notifications
-
-**Requirements:**
-1. External API stays REST (JSON over HTTPS) — web and mobile clients depend on it
-2. Internal communication switches to gRPC (protobuf over HTTP/2)
-3. Shared .proto files define the contract between all services
-4. API gateway translates: REST request → gRPC call(s) → REST response
-5. Single auth at the gateway — internal calls use trusted metadata, no JWT re-validation
-6. Streaming for real-time: payment status updates (server streaming), document upload (client streaming)
-7. Standard error handling across all services using gRPC status codes
-8. Health checks and service discovery for Kubernetes readiness/liveness probes
-
-**Proto structure:**
-- proto/user/v1/user.proto — User messages and UserService
-- proto/payment/v1/payment.proto — Payment messages and PaymentService  
-- proto/compliance/v1/compliance.proto — KYC messages and ComplianceService
-- proto/document/v1/document.proto — Document messages and DocumentService
-- proto/notification/v1/notification.proto — Notification messages and NotificationService
-- proto/common/v1/common.proto — shared types (Money, Address, PaginationRequest, etc.)
-
-**API Gateway pattern:**
-- POST /api/v1/payments → calls PaymentService.CreatePayment via gRPC
-  - PaymentService internally calls UserService.GetUser + ComplianceService.CheckKYC via gRPC
-- GET /api/v1/payments/:id/status → opens SSE stream, backed by PaymentService.WatchPayment (server streaming)
-- POST /api/v1/documents/upload → receives multipart, converts to DocumentService.UploadDocument (client streaming)
-
-Build the proto definitions for the payment flow (user → payment → compliance → document), the API gateway REST-to-gRPC translation layer, and the gRPC server for the payment service with interceptors for logging and auth propagation.
-```
+> I need to build an API layer for our microservices with REST externally and gRPC internally. Here's the setup:
+>
+> **Current architecture (6 services):**
+> - api-gateway (Express.js) — public REST API for web/mobile
+> - user-service (Node.js) — accounts, profiles, authentication
+> - payment-service (Node.js) — transactions, billing, invoices
+> - compliance-service (Python) — KYC, AML checks, risk scoring
+> - document-service (Go) — file storage, ID verification, OCR
+> - notification-service (Python) — email, SMS, push notifications
+>
+> **Requirements:**
+> 1. External API stays REST (JSON over HTTPS) — web and mobile clients depend on it
+> 2. Internal communication switches to gRPC (protobuf over HTTP/2)
+> 3. Shared .proto files define the contract between all services
+> 4. API gateway translates: REST request → gRPC call(s) → REST response
+> 5. Single auth at the gateway — internal calls use trusted metadata, no JWT re-validation
+> 6. Streaming for real-time: payment status updates (server streaming), document upload (client streaming)
+> 7. Standard error handling across all services using gRPC status codes
+> 8. Health checks and service discovery for Kubernetes readiness/liveness probes
+>
+> **Proto structure:**
+> - proto/user/v1/user.proto — User messages and UserService
+> - proto/payment/v1/payment.proto — Payment messages and PaymentService  
+> - proto/compliance/v1/compliance.proto — KYC messages and ComplianceService
+> - proto/document/v1/document.proto — Document messages and DocumentService
+> - proto/notification/v1/notification.proto — Notification messages and NotificationService
+> - proto/common/v1/common.proto — shared types (Money, Address, PaginationRequest, etc.)
+>
+> **API Gateway pattern:**
+> - POST /api/v1/payments → calls PaymentService.CreatePayment via gRPC
+>   - PaymentService internally calls UserService.GetUser + ComplianceService.CheckKYC via gRPC
+> - GET /api/v1/payments/:id/status → opens SSE stream, backed by PaymentService.WatchPayment (server streaming)
+> - POST /api/v1/documents/upload → receives multipart, converts to DocumentService.UploadDocument (client streaming)
+>
+> Build the proto definitions for the payment flow (user → payment → compliance → document), the API gateway REST-to-gRPC translation layer, and the gRPC server for the payment service with interceptors for logging and auth propagation.
 
 ### What Your Agent Will Do
 

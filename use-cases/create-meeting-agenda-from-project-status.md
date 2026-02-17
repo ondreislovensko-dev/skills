@@ -27,13 +27,11 @@ npx terminal-skills install github meeting-notes report-generator
 
 Tell the agent what to check:
 
-```
-Prepare an agenda for Monday's team sync. Check our GitHub org for: open PRs older than 2 days, any failing CI checks, PRs with unresolved review comments, and commits merged since last Monday. Also summarize any issues labeled "blocker" or "urgent".
-```
+> Prepare an agenda for Monday's team sync. Check our GitHub org for: open PRs older than 2 days, any failing CI checks, PRs with unresolved review comments, and commits merged since last Monday. Also summarize any issues labeled "blocker" or "urgent".
 
 ### 2. The agent gathers live data
 
-```
+```text
 Project Status (Feb 10–17):
 
 PRs merged: 14
@@ -53,13 +51,11 @@ Blockers: 2 issues
 
 ### 3. Generate a structured agenda
 
-```
-Create a 30-minute meeting agenda from this status. Put blockers first, then stale PRs, then a quick wins section. Add time boxes for each topic. Skip anything already resolved.
-```
+> Create a 30-minute meeting agenda from this status. Put blockers first, then stale PRs, then a quick wins section. Add time boxes for each topic. Skip anything already resolved.
 
 ### 4. The agent produces a ready-to-share agenda
 
-```
+```text
 ## Team Sync — Monday Feb 17 (30 min)
 
 ### Blockers (10 min)
@@ -80,11 +76,9 @@ Create a 30-minute meeting agenda from this status. Put blockers first, then sta
 
 ### 5. Add context from previous meetings
 
-```
-Check last week's meeting notes in ./meetings/2025-02-10.md. Pull out any action items that were assigned but not yet completed. Add them to the agenda as follow-ups.
-```
+> Check last week's meeting notes in ./meetings/2025-02-10.md. Pull out any action items that were assigned but not yet completed. Add them to the agenda as follow-ups.
 
-```
+```text
 Outstanding action items from Feb 10:
 - [ ] Dani: Investigate Stripe webhook 500 (now ISSUE-891 — already on agenda)
 - [ ] Lena: Review payment flow PR (PR #342 — already on agenda)

@@ -27,13 +27,11 @@ npx terminal-skills install coding-agent applicant-screening markdown-writer
 
 Tell the agent what role you're hiring for:
 
-```
-Analyze our codebase and generate technical interview questions for a mid-level backend engineer. Focus on patterns they'd actually encounter: our event-driven architecture, database query patterns, API design conventions, and error handling approach. Generate questions at easy, medium, and hard difficulty levels.
-```
+> Analyze our codebase and generate technical interview questions for a mid-level backend engineer. Focus on patterns they'd actually encounter: our event-driven architecture, database query patterns, API design conventions, and error handling approach. Generate questions at easy, medium, and hard difficulty levels.
 
 ### 2. The agent identifies key patterns
 
-```
+```text
 Codebase analysis complete — patterns identified:
 
 Architecture patterns:
@@ -57,7 +55,7 @@ Error handling conventions:
 
 The agent produces tiered questions based on real code patterns:
 
-```
+```text
 Generated 9 interview questions:
 
 Easy (warm-up, 15 min each):
@@ -78,11 +76,9 @@ Hard (senior signal, 45 min each):
 
 ### 4. Generate rubrics and evaluation guides
 
-```
-Create scoring rubrics for each question. Include what a strong answer looks like, common mistakes, and follow-up questions to probe deeper.
-```
+> Create scoring rubrics for each question. Include what a strong answer looks like, common mistakes, and follow-up questions to probe deeper.
 
-```
+```text
 Rubrics generated: interview-questions/rubrics.md
 
 For each question:
@@ -95,9 +91,7 @@ For each question:
 
 ### 5. Create a take-home option
 
-```
-Create a simplified take-home assignment based on question #4. Strip proprietary code, add a README with setup instructions, and include an automated test suite that validates the submission.
-```
+> Create a simplified take-home assignment based on question #4. Strip proprietary code, add a README with setup instructions, and include an automated test suite that validates the submission.
 
 The agent packages a self-contained take-home repo with the problem, boilerplate, and test harness.
 

@@ -29,17 +29,13 @@ npx terminal-skills install data-analysis
 
 Tell your AI agent:
 
-```
-We compete in the project management space. Our top 5 competitors are listed in /research/competitors.md with their URLs. Research each competitor's current feature set across these categories: task management, time tracking, reporting, integrations, SSO/security, mobile app, and pricing tiers. Check their marketing site, docs, and changelog.
-```
+> We compete in the project management space. Our top 5 competitors are listed in /research/competitors.md with their URLs. Research each competitor's current feature set across these categories: task management, time tracking, reporting, integrations, SSO/security, mobile app, and pricing tiers. Check their marketing site, docs, and changelog.
 
 The agent uses **web-research** to visit each competitor's site and extract structured data.
 
 ### 2. Build the feature comparison matrix
 
-```
-Create a feature matrix comparing our product against all 5 competitors. For each feature, use: ✅ (fully supported), ⚠️ (partial/limited), ❌ (not available), and 🆕 (added in last 90 days). Include the source URL for each data point.
-```
+> Create a feature matrix comparing our product against all 5 competitors. For each feature, use: ✅ (fully supported), ⚠️ (partial/limited), ❌ (not available), and 🆕 (added in last 90 days). Include the source URL for each data point.
 
 The **competitor-alternatives** skill organizes the research into:
 
@@ -57,41 +53,33 @@ The **competitor-alternatives** skill organizes the research into:
 
 ### 3. Identify gaps and opportunities
 
-```
-Based on the feature matrix, list features where we are behind (competitors have it, we don't), features where we lead (we have it, most competitors don't), and features recently launched by competitors (last 90 days).
-```
+> Based on the feature matrix, list features where we are behind (competitors have it, we don't), features where we lead (we have it, most competitors don't), and features recently launched by competitors (last 90 days).
 
-```
-Gaps (competitors have, we lack):
-  - Gantt charts: 3 of 5 competitors offer this, including one that just launched it
-  - SAML SSO: we have partial support, 3 competitors have full implementation
+**Gaps (competitors have, we lack):**
+- Gantt charts: 3 of 5 competitors offer this, including one that just launched it
+- SAML SSO: we have partial support, 3 competitors have full implementation
 
-Our advantages:
-  - Built-in time tracking: only 2 of 5 competitors offer this
-  - Custom reports: only 1 competitor matches our depth
+**Our advantages:**
+- Built-in time tracking: only 2 of 5 competitors offer this
+- Custom reports: only 1 competitor matches our depth
 
-Recent competitor launches (last 90 days):
-  - Competitor B added Gantt charts (announced Dec 2024)
-  - Competitor A launched an AI assistant for task creation (Jan 2025)
-```
+**Recent competitor launches (last 90 days):**
+- Competitor B added Gantt charts (announced Dec 2024)
+- Competitor A launched an AI assistant for task creation (Jan 2025)
 
 ### 4. Generate visual comparison charts
 
-```
-Create a comparison chart showing feature coverage percentage for each competitor. Also make a radar chart comparing our product vs the top 2 competitors across all categories. Export as PNG for the next product review.
-```
+> Create a comparison chart showing feature coverage percentage for each competitor. Also make a radar chart comparing our product vs the top 2 competitors across all categories. Export as PNG for the next product review.
 
 The **data-analysis** skill produces publication-ready charts showing feature parity at a glance.
 
 ### 5. Set up ongoing monitoring
 
-```
-Create a monitoring checklist that I can re-run monthly. It should check each competitor's changelog page, blog, and pricing page for changes. Highlight anything new since the last run on Jan 15, 2025.
-```
+> Create a monitoring checklist that I can re-run monthly. It should check each competitor's changelog page, blog, and pricing page for changes. Highlight anything new since the last run on Jan 15, 2025.
 
 The agent generates a reusable prompt and comparison baseline so future runs only surface changes.
 
-```
+```text
 Monitoring config saved to /research/competitor-monitor.json
 
 Next run will diff against today's baseline:
@@ -103,9 +91,7 @@ Next run will diff against today's baseline:
 
 ### 6. Generate a stakeholder-ready presentation
 
-```
-Create a slide deck with the feature comparison table, a radar chart of our product vs top 2 competitors, and the gap/opportunity summary. Use our brand colors and export as PDF.
-```
+> Create a slide deck with the feature comparison table, a radar chart of our product vs top 2 competitors, and the gap/opportunity summary. Use our brand colors and export as PDF.
 
 The **data-analysis** produces a clean five-slide deck: market overview, feature matrix, radar comparison, gap analysis, and recommended roadmap priorities — ready for the next product review meeting.
 
