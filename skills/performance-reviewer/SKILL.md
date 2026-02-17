@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with any codebase. Optional: lighthouse CLI, webpack-bundle-analyzer"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["performance", "optimization", "code-review", "profiling"]
