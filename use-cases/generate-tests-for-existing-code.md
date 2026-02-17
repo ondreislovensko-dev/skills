@@ -117,11 +117,11 @@ Created: .github/workflows/test.yml
 
 ## Real-World Example
 
-Marcus, a senior backend engineer at fintech startup LedgerFlow, joined three months before their SOC 2 Type II audit. The 60,000-line Node.js API had zero automated tests — built by contractors over 18 months. Auditors needed evidence of systematic testing practices.
+A senior backend engineer at a 30-person fintech startup joined three months before their SOC 2 Type II audit. The 60,000-line Node.js API had zero automated tests — built by contractors over 18 months. Auditors needed evidence of systematic testing practices.
 
 He started with the test-generator skill on Monday, targeting the transaction processing pipeline. By lunch, the agent had generated 156 tests across 8 modules. Three tests failed due to timezone-dependent comparisons — fixed in under a minute. By Wednesday, he had 340 tests covering 22 core modules at 74% statement coverage. Thursday, he reviewed generated tests and added 15 business-logic-specific assertions. Friday, the CI pipeline with coverage gates was live.
 
-The SOC 2 auditors reviewed the testing infrastructure two weeks later. The automated suite, CI pipeline, and coverage reports satisfied change management and QA controls. LedgerFlow passed without findings in the testing category — saving an estimated $45,000 in remediation costs and avoiding a 3-month delay on their enterprise sales pipeline.
+The SOC 2 auditors reviewed the testing infrastructure two weeks later. The automated suite, CI pipeline, and coverage reports satisfied change management and QA controls. The startup passed without findings in the testing category — saving an estimated $45,000 in remediation costs and avoiding a 3-month delay on their enterprise sales pipeline.
 
 ## Related Skills
 
