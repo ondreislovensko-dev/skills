@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Node.js 18+, Python 3.9+, Go 1.21+. Grafana LGTM stack via Docker."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["observability", "opentelemetry", "grafana", "tracing", "monitoring"]
