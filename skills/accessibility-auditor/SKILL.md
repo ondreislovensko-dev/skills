@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with any HTML/JSX/Vue/Svelte component code. Framework-agnostic."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["accessibility", "wcag", "a11y", "compliance", "screen-reader"]
