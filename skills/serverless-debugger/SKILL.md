@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 compatibility: "AWS Lambda, Vercel Functions, Cloudflare Workers, Google Cloud Functions"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["serverless", "lambda", "debugging", "cold-start", "cloudwatch"]
