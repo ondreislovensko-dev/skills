@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with .env files, Docker, CI/CD platforms. Optional: Doppler CLI, AWS SSM, Vault"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["environment-variables", "secrets", "configuration", "devops", "security"]
