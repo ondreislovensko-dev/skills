@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Node.js 18+, ClickHouse 23.8+, Docker recommended"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: data-ai
   tags: ["analytics", "real-time", "clickhouse", "event-tracking"]
