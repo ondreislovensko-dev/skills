@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Any web stack. Examples use Node.js/Prisma but patterns apply to any framework."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["gdpr", "privacy", "compliance", "data-protection"]
