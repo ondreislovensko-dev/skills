@@ -8,7 +8,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Supports npm (package.json), yarn (yarn.lock), pnpm (pnpm-lock.yaml), pip (requirements.txt), and Go (go.mod)"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["dependencies", "npm", "security", "upgrades", "semver"]
