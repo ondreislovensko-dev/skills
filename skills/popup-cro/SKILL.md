@@ -3,7 +3,7 @@ name: popup-cro
 version: 1.0.0
 description: When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. Also use when the user mentions "exit intent," "popup conversions," "modal optimization," "lead capture popup," "email popup," "announcement banner," or "overlay." For forms outside of popups, see form-cro. For general page conversion optimization, see page-cro.
 metadata:
-  author: coreyhaines31
+  author: terminal-skills
   category: marketing
   tags:
     - popups
