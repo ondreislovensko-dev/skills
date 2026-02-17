@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Works with any test framework (Jest, Vitest, pytest, Go test). Requires git for diff analysis."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["regression-testing", "refactoring", "testing", "code-quality"]
