@@ -29,13 +29,13 @@ npx terminal-skills install coding-agent
 
 Point the agent at your images:
 
-```
+```text
 Scan our Docker images for vulnerabilities: api-server:latest, worker:latest, and web-frontend:latest. Use Trivy and give me a summary grouped by severity and fixability.
 ```
 
 ### 2. The agent runs scans and summarizes
 
-```
+```text
 Container Vulnerability Scan Results:
 
 api-server:latest (node:18-bullseye base)
@@ -55,13 +55,13 @@ Total fixable critical/high vulnerabilities: 4 critical, 14 high
 
 ### 3. Get actionable remediation plans
 
-```
+```text
 For each critical and high-severity fixable vulnerability, tell me exactly what to change in the Dockerfile or package files to fix it. Prioritize by exploitability.
 ```
 
 ### 4. The agent creates a remediation plan
 
-```
+```text
 Remediation Plan — Priority Order:
 
 1. CRITICAL: CVE-2024-38816 in api-server (Spring Web path traversal)
@@ -82,7 +82,7 @@ Remediation Plan — Priority Order:
 
 ### 5. Generate fixed Dockerfiles
 
-```
+```text
 Generate updated Dockerfiles for all three images with the security fixes applied. Add a comment explaining each change.
 ```
 

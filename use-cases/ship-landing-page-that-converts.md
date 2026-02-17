@@ -29,11 +29,11 @@ npx terminal-skills install page-cro frontend-design
 
 ### 1. Run a CRO audit
 
-```
+```text
 Audit our landing page at app.ourproduct.com/signup for conversion issues.
 ```
 
-```
+```text
 CRO Audit Results:
 
 PAGE SPEED: 🔴 FCP 3.8s, LCP 6.2s (2.4MB hero, 847KB JS bundle)
@@ -59,11 +59,11 @@ PRIORITY FIXES (by conversion impact):
 
 ### 2. Redesign the hero section
 
-```
+```text
 Redesign with a specific headline, 2-field form, trust badges, and product screenshot.
 ```
 
-```
+```text
   Headline: "Cut Your Reporting Time from 4 Hours to 15 Minutes"
   Subheadline: "Automated dashboards from Salesforce, HubSpot, and 50+ tools."
 
@@ -79,11 +79,11 @@ Generated: Hero.tsx (67 lines) + Hero.module.css (89 lines)
 
 ### 3. Fix page speed
 
-```
+```text
 Get LCP under 2.5 seconds without losing visual quality.
 ```
 
-```
+```text
   Hero image: 2.4MB → 148KB (WebP + responsive srcset)
   JS bundle: 847KB → 124KB critical + 323KB deferred
   CSS: critical inlined (4.2KB), rest async
@@ -94,11 +94,11 @@ Get LCP under 2.5 seconds without losing visual quality.
 
 ### 4. Set up A/B testing
 
-```
+```text
 A/B test current page vs redesign with proper statistics.
 ```
 
-```
+```text
   Variant A: Current page | Variant B: Redesigned hero + 2-field form
   Split: 50/50 | Sample needed: 3,847/variant (95% confidence, 80% power)
   Duration: ~14 days at 450 visits/day
@@ -110,11 +110,11 @@ A/B test current page vs redesign with proper statistics.
 
 ### 5. Analyze results
 
-```
+```text
 The test ran 16 days. Show me the results.
 ```
 
-```
+```text
   Control:   3,641 visitors → 34 conversions (0.93%)
   Treatment: 3,671 visitors → 112 conversions (3.05%)
 

@@ -25,14 +25,14 @@ npx terminal-skills install ab-test-setup analytics-tracking feature-flag-manage
 
 ### 1. Build the feature flag system with user bucketing
 
-```
+```text
 I need a feature flag system for A/B testing in my Next.js app with a Node.js API.
 Requirements: deterministic user assignment (same user always sees same variant),
 percentage-based rollout, and the ability to target by user attributes (plan type,
 country, signup date). No third-party service — I want to own the data.
 ```
 
-```
+```text
 Created experimentation/flags.ts — Flag evaluation engine
 Created experimentation/bucketing.ts — Deterministic hash-based assignment
 Created experimentation/targeting.ts — Attribute-based targeting rules
@@ -54,13 +54,13 @@ Targeting example:
 
 ### 2. Integrate flag evaluation into the application
 
-```
+```text
 Show me how to integrate this into my Next.js pages and API routes.
 I need server-side evaluation (no flicker) and the flag values available
 in both server components and client components.
 ```
 
-```
+```text
 Created experimentation/middleware.ts — Evaluates flags per request
 Created experimentation/context.ts — React context for flag values
 Created experimentation/hooks.ts — useFlag() and useExperiment() hooks
@@ -86,13 +86,13 @@ Client-side (React components):
 
 ### 3. Set up event tracking for experiment metrics
 
-```
+```text
 I need to track these events for experiments: page_view, button_click,
 checkout_started, checkout_completed, and revenue. Each event should be
 tagged with the active experiments and variants for that user.
 ```
 
-```
+```text
 Created experimentation/tracking.ts — Event collection with experiment context
 Created experimentation/events.ts — Event schema and validation
 Created api/events/route.ts — Event ingestion endpoint
@@ -115,13 +115,13 @@ Batch insert: client buffers events, flushes every 5 seconds or 10 events.
 
 ### 4. Build the analysis dashboard
 
-```
+```text
 Build a results page that shows for each experiment: variant distribution,
 conversion rate per variant, statistical significance (p-value and confidence
 interval), and estimated sample size to reach significance.
 ```
 
-```
+```text
 Created experimentation/analysis.ts — Statistical analysis engine
 Created app/admin/experiments/page.tsx — Experiment results dashboard
 
@@ -149,12 +149,12 @@ Analysis for each experiment:
 
 ### 5. Implement safe rollout and cleanup
 
-```
+```text
 The checkout experiment is significant. Roll it out to 100% of users,
 then clean up the experiment code. Show me the safe rollout process.
 ```
 
-```
+```text
 Rollout plan for "checkout-redesign":
 
 Step 1 — Gradual rollout (monitoring):

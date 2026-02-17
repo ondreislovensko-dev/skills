@@ -27,7 +27,7 @@ npx terminal-skills install markdown-writer github template-engine
 
 Tell the agent your design idea:
 
-```
+```text
 I need to write an RFC for migrating our session storage from Redis to DynamoDB. Here are my rough notes: current Redis setup hits memory limits at 50k concurrent sessions, DynamoDB would give us auto-scaling, estimated cost increase is $200/month, migration can be done with dual-write strategy over 2 weeks. Risks: DynamoDB latency is higher for single-key lookups. Generate a full RFC document.
 ```
 
@@ -35,7 +35,7 @@ I need to write an RFC for migrating our session storage from Redis to DynamoDB.
 
 The agent expands your notes into a complete RFC following your team's template:
 
-```
+```text
 Generated: rfcs/2026-02-RFC-session-storage-migration.md
 
 Sections:
@@ -55,13 +55,13 @@ Sections:
 
 ### 3. Create a PR-based review workflow
 
-```
+```text
 Open a pull request for this RFC. Assign reviewers from the backend and infrastructure teams. Set a review deadline of 5 business days.
 ```
 
 The agent creates a PR with the RFC, tags relevant reviewers, and adds labels for tracking:
 
-```
+```text
 PR created: #247 "RFC: Migrate Session Storage from Redis to DynamoDB"
 - Reviewers: backend-team, infra-team
 - Labels: rfc, status/draft, area/infrastructure
@@ -70,13 +70,13 @@ PR created: #247 "RFC: Migrate Session Storage from Redis to DynamoDB"
 
 ### 4. Track RFC status across the org
 
-```
+```text
 Show me all open RFCs, their status, who's blocking review, and how long they've been waiting.
 ```
 
 The agent queries GitHub for all RFC-labeled PRs and generates a status dashboard:
 
-```
+```text
 Open RFCs:
 1. #247 Session Storage Migration — Draft, 0 days, awaiting review (0/2 approved)
 2. #231 API Rate Limiting Strategy — In Review, 4 days, 1/2 approved (waiting: @chen)
@@ -92,13 +92,13 @@ Action needed:
 
 When an RFC is approved and merged, the agent indexes it for searchability:
 
-```
+```text
 Index all merged RFCs so the team can search past decisions. Create a decision log with title, date, outcome, and key trade-offs for each.
 ```
 
 ### 6. Generate RFC summaries for all-hands
 
-```
+```text
 Summarize all RFCs approved this month into a 2-paragraph update I can include in the engineering all-hands notes. Focus on what changed and why.
 ```
 

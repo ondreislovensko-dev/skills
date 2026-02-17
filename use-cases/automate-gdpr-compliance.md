@@ -27,13 +27,13 @@ npx terminal-skills install code-reviewer
 
 ### 1. Audit personal data flows
 
-```
+```text
 Scan the codebase in src/ and the database schema in prisma/schema.prisma for personal data. Identify every field that stores PII: email, name, IP address, phone, location, device identifiers. Map where each piece of data flows — which services read it, which third-party APIs receive it, where it is logged. Output a data flow inventory as a markdown table.
 ```
 
 The agent produces:
 
-```
+```text
 Personal Data Inventory — 23 PII fields found across 7 models:
 
 | Data Type      | DB Table    | Field          | Shared With          | Retention  |
@@ -51,13 +51,13 @@ Personal Data Inventory — 23 PII fields found across 7 models:
 
 ### 2. Generate a consent management system
 
-```
+```text
 Build a cookie consent banner and preference center for the app. Categories: strictly_necessary (no consent needed), analytics, marketing, functional. Create a React component that blocks third-party scripts until consent is given. Store consent records in the database with timestamp, version, and granular choices. Generate the Prisma migration for the consent_records table.
 ```
 
 ### 3. Build data subject request handlers
 
-```
+```text
 Create API endpoints for GDPR data subject requests:
 - GET /api/privacy/export — generates a JSON export of all personal data for the authenticated user
 - DELETE /api/privacy/delete — anonymizes or deletes all personal data, cascading across related tables
@@ -67,13 +67,13 @@ Add a 30-day verification flow for deletion requests. Log every DSR in an audit_
 
 ### 4. Add retention policies and auto-cleanup
 
-```
+```text
 Based on the data flow inventory, add retention policies: anonymize IP addresses after 30 days, delete inactive sessions after 90 days, purge soft-deleted user data after 30 days. Create a scheduled job in src/jobs/data-retention.ts that runs daily and enforces these policies. Add dry-run mode that reports what would be deleted without actually deleting.
 ```
 
 ### 5. Generate the privacy policy
 
-```
+```text
 Based on the data flow inventory and consent categories, generate a privacy policy page in markdown. Include: what data is collected, legal basis for each type, retention periods, third-party processors, user rights (access, deletion, portability, rectification), and contact information placeholder. Keep language clear and non-legalistic.
 ```
 

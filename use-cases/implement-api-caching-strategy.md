@@ -29,11 +29,11 @@ npx terminal-skills install cache-strategy docker-helper
 
 ### 1. Analyze API performance and identify caching opportunities
 
-```
+```text
 Analyze our Node.js API logs from the past 7 days to identify the slowest and most frequently called endpoints. I want to understand which queries are expensive, which data changes infrequently, and what our current cache hit/miss patterns look like. Focus on the analytics dashboard APIs that are causing database load.
 ```
 
-```
+```text
 📊 API PERFORMANCE ANALYSIS (7 days of production logs)
 
 TOP EXPENSIVE ENDPOINTS:
@@ -73,11 +73,11 @@ PERFORMANCE PROBLEMS:
 
 ### 2. Implement Redis-based application caching with intelligent TTLs
 
-```
+```text
 Set up Redis caching for our top 3 API endpoints. Use different cache strategies: dashboard analytics with 15-minute TTL and user-specific keys, engagement reports with 1-hour TTL, and social metrics with 5-minute TTL. Include cache warming, compression for large payloads, and graceful degradation when Redis is unavailable.
 ```
 
-```
+```text
 🚀 IMPLEMENTING MULTI-LAYER REDIS CACHING...
 
 Redis infrastructure setup (docker-compose.yml):
@@ -130,11 +130,11 @@ MEMORY OPTIMIZATION:
 
 ### 3. Add HTTP-level caching and CDN integration
 
-```
+```text
 Implement HTTP caching headers, set up Cloudflare caching for static and semi-static API responses, and add client-side caching strategies. Include conditional requests (ETag/If-None-Match) and vary headers for personalized content.
 ```
 
-```
+```text
 🌐 HTTP CACHING & CDN INTEGRATION...
 
 HTTP caching headers implementation:
@@ -181,11 +181,11 @@ PERFORMANCE IMPROVEMENTS:
 
 ### 4. Monitor cache performance and optimize based on metrics
 
-```
+```text
 Set up comprehensive cache monitoring with key metrics like hit rates, response time improvements, memory usage, and cost savings. Create alerting for cache failures and automated optimization recommendations.
 ```
 
-```
+```text
 📈 CACHE PERFORMANCE MONITORING & OPTIMIZATION...
 
 Real-time monitoring dashboard (src/monitoring/cache-metrics.ts):

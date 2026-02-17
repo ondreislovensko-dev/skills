@@ -25,7 +25,7 @@ npx terminal-skills install api-load-tester capacity-planner
 
 ### 1. Generate load test scenarios from API routes
 
-```
+```text
 Look at our Express.js API in ./src/routes/ and generate k6 load test scripts.
 Focus on the checkout flow: POST /api/cart/add, POST /api/orders/create, and
 GET /api/orders/:id. Use realistic payloads based on our TypeScript interfaces
@@ -80,13 +80,13 @@ export default function () {
 
 ### 2. Run the load test and collect results
 
-```
+```text
 Run the checkout flow load test against our staging environment at
 https://staging-api.example.com. Ramp up to 500 virtual users over 14 minutes.
 Show me the results with focus on p95/p99 latency and error rates at each stage.
 ```
 
-```
+```text
 Load Test Results — checkout-flow
 ─────────────────────────────────
 
@@ -110,13 +110,13 @@ Top slow endpoints:
 
 ### 3. Generate capacity plan from results
 
-```
+```text
 Based on these results, create a capacity plan. We expect 3x current traffic
 for our product launch in 6 weeks. Current production runs 3 API pods and
 a single RDS db.r5.large with max_connections=100. What do we need?
 ```
 
-```
+```text
 Capacity Plan — Product Launch (3x Traffic Target)
 ──────────────────────────────────────────────────
 
@@ -148,7 +148,7 @@ Cost per 1000 RPS: $1,498/month (current: $1,890/month — better efficiency)
 
 ### 4. Create pre-launch verification test
 
-```
+```text
 Generate a final verification test script I can run after applying these
 changes to confirm we can handle 3x traffic with acceptable latency.
 ```

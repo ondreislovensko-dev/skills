@@ -29,7 +29,7 @@ npx terminal-skills install report-generator
 
 Tell the agent what to monitor:
 
-```
+```text
 Set up DNS monitoring for our domains. Here's the list:
 - example.com — production app, should have A record to 203.0.113.10
 - api.example.com — CNAME to our load balancer at lb.example.com
@@ -42,7 +42,7 @@ Also monitor: domain expiration dates, SSL certificate expiry, and SPF/DKIM/DMAR
 
 ### 2. The agent builds the monitoring system
 
-```
+```text
 DNS Monitoring Setup Complete:
 
 Created monitoring scripts:
@@ -67,7 +67,7 @@ Current Status Scan:
 
 ### 3. Set up automated alerts
 
-```
+```text
 Create an n8n workflow that runs these checks every 6 hours and sends alerts to our Slack #ops channel when:
 - Any DNS record doesn't match expected value
 - SSL certificate expires within 30 days
@@ -81,7 +81,7 @@ The agent creates an n8n workflow definition with scheduled triggers, DNS resolu
 
 ### 5. Generate a weekly domain health report
 
-```
+```text
 Every Monday, generate a domain health report summarizing the status of all domains, any changes detected in the past week, and upcoming expirations.
 ```
 

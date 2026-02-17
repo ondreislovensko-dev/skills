@@ -25,13 +25,13 @@ npx terminal-skills install db-explain-analyzer sql-optimizer data-analysis
 
 ### 1. Identify the worst offenders
 
-```
+```text
 Here's our PostgreSQL slow query log from the last 24 hours (attached: slow-queries.log). Rank the top 5 queries by total time spent and show me how many times each was called.
 ```
 
 The agent parses the log and produces:
 
-```
+```text
 Top 5 Queries by Total Time (last 24h)
 ========================================
 1. SELECT * FROM events WHERE org_id = $1 AND created_at > $2 ORDER BY created_at DESC
@@ -52,13 +52,13 @@ Top 5 Queries by Total Time (last 24h)
 
 ### 2. Analyze execution plans for top queries
 
-```
+```text
 Run EXPLAIN ANALYZE on the top 3 queries using org_id = 'org_4f8a2c' and created_at > '2026-01-01'. Show me what's wrong with each.
 ```
 
 The agent runs the plans and reports:
 
-```
+```text
 Query #1: events by org_id + created_at
   Issue: Index scan on idx_events_org_id, then in-memory sort on created_at
   The index doesn't include created_at, so PostgreSQL fetches 84,000 rows
@@ -86,11 +86,11 @@ Query #3: batch subscription expiration
 
 ### 3. Validate index impact before production
 
-```
+```text
 Estimate the total disk space and write overhead for these 3 new indexes. Are there any existing indexes that become redundant?
 ```
 
-```
+```text
 Index Impact Analysis
 ======================
 New indexes:
@@ -110,7 +110,7 @@ Net disk change: +680MB +4MB -340MB = +344MB additional disk
 
 ### 4. Generate migration script
 
-```
+```text
 Create a database migration file that adds the recommended indexes concurrently, drops the redundant one, and runs ANALYZE on affected tables.
 ```
 

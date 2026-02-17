@@ -27,13 +27,13 @@ npx terminal-skills install regression-tester test-generator code-reviewer
 
 After completing your refactoring, ask for verification:
 
-```
+```text
 I refactored the order processing module — split OrderService into OrderService, PricingService, and InventoryService. Check for regressions against main.
 ```
 
 ### 2. The agent analyzes the refactoring scope
 
-```
+```text
 Analyzing diff: main...HEAD (12 files changed, +624 -389)
 
 Refactoring map:
@@ -58,7 +58,7 @@ Generating regression tests...
 
 ### 3. Review the regression test results
 
-```
+```text
 Generated 31 regression tests across 3 test files.
 
 Running against OLD code (main):  31/31 passed ✓
@@ -83,11 +83,11 @@ Running against NEW code (HEAD):  29/31 passed ✗
 
 ### 4. Fix and re-verify
 
-```
+```text
 I fixed both issues. Run the regression tests again.
 ```
 
-```
+```text
 Running 31 regression tests against fixed code...
 
 31/31 passed ✓

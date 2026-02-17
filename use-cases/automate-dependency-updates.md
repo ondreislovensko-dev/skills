@@ -25,13 +25,13 @@ npx terminal-skills install dependency-updater code-migration
 
 ### 1. Audit your dependency health
 
-```
+```text
 Analyze our package.json and package-lock.json. Show me every outdated dependency grouped by risk level: critical (known CVEs), major (breaking version jump), minor (safe to update), and pinned (intentionally locked). Include how far behind each one is.
 ```
 
 The agent scans your lockfile and cross-references npm registry data:
 
-```
+```text
 Dependency Audit — 187 packages analyzed
 
 CRITICAL (Known Vulnerabilities) — Update Immediately:
@@ -52,13 +52,13 @@ PINNED — 3 packages locked with exact versions:
 
 ### 2. Get a detailed breaking change report
 
-```
+```text
 For the three MAJOR packages (next, prisma, stripe), show me exactly what APIs changed between our version and the latest. Check our codebase for files that use the affected APIs.
 ```
 
 The agent reads changelogs and scans your source code:
 
-```
+```text
 Breaking Change Impact Report:
 
 next 13.4.12 → 14.2.3:
@@ -81,19 +81,19 @@ stripe 12.18.0 → 15.8.0:
 
 ### 3. Generate the upgrade plan and migration code
 
-```
+```text
 Create a safe upgrade plan with the exact order to update packages. For each major upgrade, generate the migration code diffs. Start with the CVE fixes since those are low-risk, then handle the major bumps one at a time.
 ```
 
 ### 4. Apply and verify
 
-```
+```text
 Apply the CVE fixes first — update jsonwebtoken, axios, and semver. Show me the exact npm commands and any code changes needed. Then run the existing test suite to confirm nothing broke.
 ```
 
 ### 5. Set up continuous dependency monitoring
 
-```
+```text
 Create a weekly automated check that scans for new CVEs in our current dependencies and alerts us in Slack if anything critical appears. Also flag any dependency that becomes deprecated or unmaintained. Generate the GitHub Action workflow for this.
 ```
 

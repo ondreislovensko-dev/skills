@@ -25,7 +25,7 @@ npx terminal-skills install coding-agent docker-helper hetzner-cloud
 
 ### 1. Describe your requirements and constraints
 
-```
+```text
 We run a Next.js frontend and Express API with Postgres. Currently single-region
 in US East. We need to expand to Europe (Frankfurt) and Asia (Singapore) for:
 - Lower latency for global users
@@ -36,7 +36,7 @@ Our budget for infrastructure is $2,000/month. Help me plan this.
 
 ### 2. The agent designs the multi-region architecture
 
-```
+```text
 Multi-Region Architecture Plan:
 
 Topology: Active-Active (US + EU), Read Replica (Asia)
@@ -63,7 +63,7 @@ Estimated cost: $1,740/month
 
 ### 3. The agent generates infrastructure-as-code
 
-```
+```text
 Generated Terraform configuration:
 
 terraform/
@@ -86,7 +86,7 @@ Key decisions:
 
 ### 4. The agent creates deployment orchestration
 
-```
+```text
 Deployment Strategy: Rolling region-by-region
 
 deploy.sh workflow:
@@ -103,7 +103,7 @@ Health check endpoints added:
 
 ### 5. The agent configures data residency routing
 
-```
+```text
 GDPR Data Residency Configuration:
 
 - Users with EU billing addresses are assigned region=eu at signup

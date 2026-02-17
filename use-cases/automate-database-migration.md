@@ -25,7 +25,7 @@ npx terminal-skills install data-migration sql-optimizer
 
 ### 1. Analyze the source and target schemas
 
-```
+```text
 I'm migrating from a legacy MySQL 5.7 database to PostgreSQL 16.
 Source has 45 tables, ~12M rows total. The big tables are orders (4M rows),
 order_items (8M rows), and customers (500K rows). Some columns need renaming,
@@ -33,7 +33,7 @@ some ENUM types need converting, and DATETIME columns need timezone handling.
 Generate the schema mapping.
 ```
 
-```
+```text
 Analyzed source schema (MySQL 5.7) → target schema (PostgreSQL 16):
 
 Schema Mapping Report:
@@ -58,13 +58,13 @@ Schema Mapping Report:
 
 ### 2. Build the migration pipeline with dependency ordering
 
-```
+```text
 Build the migration script. Tables have foreign keys so order matters.
 I need: dependency resolution, batch processing for large tables,
 and the ability to resume if it fails midway.
 ```
 
-```
+```text
 Created migration/migrate.ts — Main migration orchestrator
 Created migration/dependency-graph.ts — FK-based table ordering
 Created migration/batch-reader.ts — Cursor-based batch reading
@@ -90,14 +90,14 @@ On resume: skip completed tables, continue from last checkpoint.
 
 ### 3. Handle data transformations
 
-```
+```text
 The customers table has address data split across 5 columns in MySQL.
 In PostgreSQL, I want it in a JSONB column. Also, phone numbers are stored
 inconsistently — some have dashes, some have country codes, some don't.
 Normalize during migration.
 ```
 
-```
+```text
 Updated migration/transform.ts — Added customer transformation:
 
 Address consolidation:
@@ -117,13 +117,13 @@ Phone normalization:
 
 ### 4. Validate the migration
 
-```
+```text
 After migration, validate that all data transferred correctly.
 Check row counts, spot-check random records, verify foreign key integrity,
 and compare aggregates (sum of order totals, count of active customers).
 ```
 
-```
+```text
 Created migration/validate.ts — Post-migration validation suite
 
 Validation checks:
@@ -143,12 +143,12 @@ Estimated runtime: 3 minutes for full validation suite
 
 ### 5. Plan zero-downtime cutover
 
-```
+```text
 Plan the cutover strategy. I need minimal downtime — the app serves
 real customers. Can we do it with less than 5 minutes of downtime?
 ```
 
-```
+```text
 Cutover Plan — Estimated downtime: 2-3 minutes
 
 Phase 1 — Pre-migration (zero downtime):

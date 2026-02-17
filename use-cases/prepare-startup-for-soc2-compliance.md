@@ -29,11 +29,11 @@ npx terminal-skills install security-audit cicd-pipeline code-reviewer
 
 ### 1. Run a SOC 2 gap analysis
 
-```
+```text
 Analyze this codebase against SOC 2 Type II criteria. Focus on security, availability, and confidentiality.
 ```
 
-```
+```text
 SOC 2 Gap Analysis
 
 SECURITY (CC6.x):
@@ -55,11 +55,11 @@ Summary: 4/18 controls passing | Remediation: 14-18 engineering days
 
 ### 2. Implement audit logging
 
-```
+```text
 Add audit logging that satisfies CC6.3 — who accessed what, when, from where.
 ```
 
-```
+```text
 Created: src/middleware/audit-logger.ts
   Captures: userId, action, resource, ipAddress, userAgent, timestamp
   Storage: audit_logs table (append-only, partitioned by month, 90-day retention)
@@ -72,11 +72,11 @@ CC6.3: ✅ Now compliant
 
 ### 3. Add role-based access control
 
-```
+```text
 Implement RBAC: admin (full access), manager (team data), member (own data only).
 ```
 
-```
+```text
 Created: src/middleware/rbac.ts (94 lines)
   Permission matrix enforced on all 34 API routes
   Added: 18 tests for permission boundaries
@@ -90,11 +90,11 @@ CC6.1: ✅ Now compliant
 
 ### 4. Harden CI/CD for change management
 
-```
+```text
 Update CI/CD to meet SOC 2 change management: required reviews, security scan, approval gate, deploy audit trail.
 ```
 
-```
+```text
 Branch protection: 1 approving review, status checks, signed commits, no direct push
 Deploy pipeline: SAST scan + CVE check + production approval gate
 Weekly compliance check: verifies rules active, flags bypass attempts
@@ -107,11 +107,11 @@ CC8.1 (change management): ✅ Now compliant
 
 ### 5. Generate the compliance evidence report
 
-```
+```text
 Generate a SOC 2 readiness report with compliance status and auditor-ready evidence.
 ```
 
-```
+```text
 Generated: SOC2-READINESS-REPORT.md
 
   Security:        7/8 passing (was 2/8)

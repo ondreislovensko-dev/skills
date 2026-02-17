@@ -25,7 +25,7 @@ npx terminal-skills install k8s-cost-optimizer cloud-resource-analyzer
 
 ### 1. Audit current resource allocation vs actual usage
 
-```
+```text
 Connect to our production k8s cluster and analyze resource allocation efficiency.
 Compare CPU and memory requests/limits against actual usage from metrics-server
 for all namespaces. Show me the biggest gaps.
@@ -33,7 +33,7 @@ for all namespaces. Show me the biggest gaps.
 
 The agent runs kubectl top pods alongside resource requests and produces a waste report:
 
-```
+```text
 Resource Efficiency Report — production cluster (us-east-1)
 ──────────────────────────────────────────────────────────
 
@@ -57,7 +57,7 @@ Total estimated monthly savings: $965/month ($11,580/year)
 
 ### 2. Generate right-sizing manifests
 
-```
+```text
 Generate patched Kubernetes manifests for the top 5 recommendations.
 Use the p99 usage from the last 14 days plus a 30% headroom buffer.
 Output as kustomize patches I can review and apply.
@@ -88,13 +88,13 @@ spec:
 
 ### 3. Identify unused cloud resources outside the cluster
 
-```
+```text
 Now check our AWS account for cloud resources attached to this cluster that
 might be orphaned — unused EBS volumes, old snapshots, unattached elastic IPs,
 and idle load balancers with zero healthy targets.
 ```
 
-```
+```text
 Orphaned Cloud Resources — AWS us-east-1
 ────────────────────────────────────────
 EBS Volumes (available, unattached):
@@ -113,7 +113,7 @@ Total orphaned resource cost: $106.80/month
 
 ### 4. Create a cleanup plan with safety checks
 
-```
+```text
 Create a cleanup script for the orphaned resources. Include dry-run mode,
 tag verification, and a 7-day grace period where resources get tagged
 for-deletion before actual removal.

@@ -27,13 +27,13 @@ npx terminal-skills install code-reviewer security-audit performance-reviewer te
 
 Point the agent at a PR branch:
 
-```
+```text
 Review the PR on branch feature/user-permissions against main. Check everything: style, security, performance, and test coverage. Give me one consolidated report.
 ```
 
 ### 2. The agent analyzes the diff across all dimensions
 
-```
+```text
 Reviewing feature/user-permissions (14 files changed, +487 -92)
 
 ═══ CODE QUALITY (code-reviewer) ═══
@@ -70,11 +70,11 @@ Summary: 1 critical security issue, 1 critical test gap, 3 warnings, 2 info.
 
 ### 3. Fix the critical issues and re-review
 
-```
+```text
 I fixed the privilege escalation and added the permission middleware tests. Can you re-review just the changed files?
 ```
 
-```
+```text
 Re-reviewing 3 changed files...
 
 ✅ Security: Privilege escalation fixed — req.auth.userId now used correctly.
@@ -87,11 +87,11 @@ at current scale (< 1000 users). Created issue suggestion for tracking it.
 
 ### 4. Get a merge-ready summary
 
-```
+```text
 Write a review summary I can post on the PR.
 ```
 
-```
+```text
 ## Review Summary
 
 **Status: Approved** ✅

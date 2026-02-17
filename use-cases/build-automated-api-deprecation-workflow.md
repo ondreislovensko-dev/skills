@@ -27,13 +27,13 @@ npx terminal-skills install api-tester coding-agent github
 
 Tell the agent to analyze your API:
 
-```
+```text
 Analyze our API endpoints and identify candidates for deprecation. Check for: endpoints with duplicate functionality (v1 vs v2), endpoints with fewer than 10 calls per day, and endpoints not referenced in our current client SDKs. Cross-reference with access logs from the past 90 days.
 ```
 
 ### 2. The agent produces a deprecation report
 
-```
+```text
 API Deprecation Analysis — 140 endpoints scanned:
 
 Immediate candidates (superseded + low traffic):
@@ -52,13 +52,13 @@ Consumer breakdown for top candidates:
 
 ### 3. Create deprecation timeline and notices
 
-```
+```text
 Create a deprecation plan for the v1/users endpoint. Set a 90-day sunset period. Generate the deprecation headers, API response warnings, and consumer notification emails.
 ```
 
 The agent sets up the full deprecation lifecycle:
 
-```
+```text
 Deprecation plan created for GET /v1/users/{id}:
 
 Timeline:
@@ -78,7 +78,7 @@ Files generated:
 
 The agent creates a GitHub issue to track each deprecation:
 
-```
+```text
 GitHub issue created: #892 "Deprecate GET /v1/users/{id} — Sunset: 2026-05-18"
 
 Checklist:
@@ -96,11 +96,11 @@ Assigned: @platform-team
 
 ### 5. Monitor consumer migration
 
-```
+```text
 Show me migration progress for all active deprecations. Which consumers haven't migrated yet?
 ```
 
-```
+```text
 Active Deprecations Dashboard:
 
 GET /v1/users/{id} — Sunset: May 18, 2026

@@ -25,7 +25,7 @@ npx terminal-skills install coding-agent docker-helper api-tester
 
 ### 1. Describe your current service landscape
 
-```
+```text
 We have 8 microservices running in Docker:
 - auth-service (:4001) - login, signup, token refresh
 - user-service (:4002) - profiles, preferences
@@ -43,7 +43,7 @@ auth, and rate limiting.
 
 ### 2. The agent designs the routing table
 
-```
+```text
 API Gateway Routing Plan (using Kong):
 
 Public routes (require JWT):
@@ -103,7 +103,7 @@ services:
 
 ### 4. The agent creates a comprehensive test suite
 
-```
+```text
 Generated API gateway test suite: tests/gateway/
 
 Test cases (47 total):
@@ -124,7 +124,7 @@ Running tests against local gateway...
 
 ### 5. The agent generates deployment and migration plan
 
-```
+```text
 Migration Plan (zero-downtime):
 
 Phase 1: Deploy gateway alongside existing direct connections

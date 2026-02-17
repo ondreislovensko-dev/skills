@@ -25,11 +25,11 @@ npx terminal-skills install security-audit docker-helper cicd-pipeline
 
 ### 1. Scan application code for vulnerabilities
 
-```
+```text
 Run a security audit on this Express.js API. Focus on injection vulnerabilities, authentication flaws, and secret management.
 ```
 
-```
+```text
 Security Audit — 31 findings
 
 CRITICAL (4):
@@ -48,11 +48,11 @@ Manual action needed: Rotate database credentials and JWT secret
 
 ### 2. Audit Docker configurations
 
-```
+```text
 Audit all Dockerfiles and docker-compose.yml for security issues. Check privilege escalation, exposed secrets, and image bloat.
 ```
 
-```
+```text
 Docker Security Audit — 9 findings
 
 CRITICAL (2):
@@ -72,11 +72,11 @@ Image size: 1.1GB → 180MB. Attack surface significantly reduced.
 
 ### 3. Fix dependency vulnerabilities
 
-```
+```text
 Update the vulnerable dependencies. Check for breaking changes and run tests after each update.
 ```
 
-```
+```text
   ✓ lodash 4.17.15 → 4.17.21 (prototype pollution fix)
   ✓ jsonwebtoken 8.5.1 → 9.0.2 (algorithm confusion fix)
   ✓ express-fileupload 1.2.0 → 1.5.1 (arbitrary file write fix)
@@ -87,11 +87,11 @@ npm audit: 0 vulnerabilities (was 11). All 47 tests passing ✓
 
 ### 4. Set up security gates in CI/CD
 
-```
+```text
 Add security scanning to our GitHub Actions pipeline. SAST on code, Docker image scanning, dependency audit, and secret detection. Block deployment on critical findings.
 ```
 
-```
+```text
 Created: .github/workflows/security.yml
 
   1. SAST scan — Semgrep with Express.js rules
@@ -107,11 +107,11 @@ Updated deploy workflow: production requires green security check
 
 ### 5. Validate the full security posture
 
-```
+```text
 Run the complete security pipeline to establish a clean baseline.
 ```
 
-```
+```text
 Full Pipeline — PASSED ✓
 
   ✓ SAST: 0 critical, 0 high (31 resolved)

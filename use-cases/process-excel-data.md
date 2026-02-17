@@ -29,11 +29,11 @@ npx terminal-skills install excel-processor data-analysis report-generator
 
 ### 1. Multi-file data ingestion and standardization
 
-```
+```text
 Process all 23 department Excel files. Detect data types, normalize formats, and combine into a unified dataset.
 ```
 
-```
+```text
 EXCEL FILES PROCESSING COMPLETE:
 
 Data Sources Analyzed:
@@ -55,11 +55,11 @@ COMBINED DATASET: 47,832 rows × 31 columns, 99.7% data integrity
 
 ### 2. Advanced duplicate detection and cleaning
 
-```
+```text
 Identify duplicate records across files using fuzzy matching and business logic rules. Clean inconsistent data entries.
 ```
 
-```
+```text
 DUPLICATE DETECTION RESULTS:
 
 Customer Matching (Fuzzy Logic):
@@ -84,11 +84,11 @@ Final dataset: 44,985 unique records (6% duplicate removal rate)
 
 ### 3. Automated data quality analysis
 
-```
+```text
 Analyze data quality issues, detect outliers, and generate data health reports with recommendations.
 ```
 
-```
+```text
 DATA QUALITY ASSESSMENT:
 
 Completeness Analysis:
@@ -114,11 +114,11 @@ RECOMMENDATIONS: 12 data quality improvements prioritized by business impact
 
 ### 4. Advanced analytics and insight generation
 
-```
+```text
 Generate business insights through statistical analysis, trend detection, and predictive modeling.
 ```
 
-```
+```text
 BUSINESS INSIGHTS GENERATED:
 
 Revenue Analysis:
@@ -147,11 +147,11 @@ Predictive Forecasts:
 
 ### 5. Automated dashboard and reporting system
 
-```
+```text
 Create executive dashboards with automated data refresh, alert systems, and drill-down capabilities.
 ```
 
-```
+```text
 AUTOMATED REPORTING SYSTEM DEPLOYED:
 
 Executive Dashboard Created:

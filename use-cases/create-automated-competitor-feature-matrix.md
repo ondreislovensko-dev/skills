@@ -39,7 +39,7 @@ The agent uses **web-research** to visit each competitor's site and extract stru
 
 The **competitor-alternatives** skill organizes the research into:
 
-```
+```text
 | Feature | Us | Competitor A | Competitor B | Competitor C |
 |---------|-----|-------------|-------------|-------------|
 | Kanban boards | ✅ | ✅ | ✅ | ⚠️ |

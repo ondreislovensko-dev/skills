@@ -27,7 +27,7 @@ npx terminal-skills install cicd-pipeline coding-agent analytics-tracking
 
 Tell the agent your deployment requirements:
 
-```
+```text
 Set up canary deployments for our Node.js API running on Kubernetes. I want traffic to shift gradually: 5% for 5 minutes, 25% for 10 minutes, then 100%. Auto-rollback if error rate exceeds 1% or p99 latency goes above 500ms during any canary phase. We use Prometheus for metrics.
 ```
 
@@ -35,7 +35,7 @@ Set up canary deployments for our Node.js API running on Kubernetes. I want traf
 
 The agent creates the deployment manifests and traffic splitting rules:
 
-```
+```text
 Generated canary deployment configuration:
 
 Files created:
@@ -54,7 +54,7 @@ Traffic schedule:
 
 The agent sets up Prometheus queries that evaluate canary health at each stage:
 
-```
+```text
 Health check metrics configured:
 
 - Error rate: rate(http_requests_total{status=~"5.."}[2m]) / rate(http_requests_total[2m])
@@ -70,7 +70,7 @@ Rollback: automatic if any threshold breached for 2 consecutive checks
 
 ### 4. Test with a dry run
 
-```
+```text
 Run a dry-run canary deployment using our current stable version to validate the pipeline works end-to-end without risk.
 ```
 
@@ -80,7 +80,7 @@ The agent deploys the current version as a canary to verify traffic splitting, m
 
 The agent configures Slack notifications for each canary stage:
 
-```
+```text
 Notifications configured:
 - Canary started: "Deploying v2.4.1 — canary at 5%"
 - Stage promoted: "Canary v2.4.1 promoted to 25% — metrics healthy"
@@ -100,7 +100,7 @@ Tomás is the DevOps engineer at a 20-person fintech startup. Their last bad dep
 
 ### 6. Review rollback history
 
-```
+```text
 Show me all canary rollbacks from the last 30 days with the metric that triggered each one and how long the canary ran before rollback.
 ```
 

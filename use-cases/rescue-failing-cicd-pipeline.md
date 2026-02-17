@@ -29,11 +29,11 @@ npx terminal-skills install cicd-pipeline test-generator docker-helper
 
 ### 1. Profile the pipeline
 
-```
+```text
 Analyze our GitHub Actions pipeline. Where are the 43 minutes going and which tests are flaky?
 ```
 
-```
+```text
 TIME BREAKDOWN (43m 12s avg):
   npm install:  8m 47s (20%) ← no cache
   Tests:       18m 33s (43%) ← serial execution
@@ -55,11 +55,11 @@ PROJECTED AFTER FIXES: 43m → 11m, failures 28% → ~3%
 
 ### 2. Fix flaky tests
 
-```
+```text
 Fix all 14 flaky tests with deterministic replacements.
 ```
 
-```
+```text
   1. checkout.spec.ts — setTimeout(1000) for Stripe webhook → waitForCondition() polling
   2. search.spec.ts — Elasticsearch stale read → explicit index refresh before assert
   3. websocket.spec.ts — hardcoded port 3001 → port 0 (OS-assigned random)
@@ -72,11 +72,11 @@ Validation: Full suite 20 consecutive runs — 20/20 green ✓ (was ~5/20)
 
 ### 3. Optimize build performance
 
-```
+```text
 Add dependency caching, parallelize tests, and optimize Docker builds.
 ```
 
-```
+```text
   1. DEPENDENCY CACHE: npm install 8m 47s → 12s (actions/cache on lockfile hash)
   2. PARALLEL TESTS: 3 shards running simultaneously
      18m 33s → 4m 11s (slowest shard)
@@ -89,11 +89,11 @@ CI cost: $840/mo → $310/mo (fewer minutes + fewer re-runs)
 
 ### 4. Add monitoring and alerts
 
-```
+```text
 Alert us if build times regress or flake rate increases.
 ```
 
-```
+```text
 Weekly Slack report (#engineering, Monday 9am):
   📊 Avg build: 10m 47s (target <15m) ✅
   📊 Pass rate: 97.2% (target >95%) ✅
@@ -107,11 +107,11 @@ Instant alerts (#ci-alerts):
 
 ### 5. Document pipeline standards
 
-```
+```text
 Create a playbook so new tests don't introduce flakiness.
 ```
 
-```
+```text
 Created: docs/CI-PLAYBOOK.md
 
   Performance budgets: Pipeline <15m, tests <5m/shard, Docker <2m cached

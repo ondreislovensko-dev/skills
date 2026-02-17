@@ -25,7 +25,7 @@ npx terminal-skills install jenkins-pipelines docker-helper kubernetes-helm
 
 ### 1. Migrate from UI jobs to Jenkinsfiles
 
-```
+```text
 We have 15 Jenkins jobs configured in the UI for 5 services (API, frontend,
 auth, worker, shared-lib). Each service has build, test, and deploy steps
 but they're all slightly different. Audit all 15 jobs and create a
@@ -41,7 +41,7 @@ The agent audits all 15 jobs, identifies the common patterns and per-service dif
 
 ### 2. Build a shared library for common pipeline logic
 
-```
+```text
 Extract the common pipeline logic into a Jenkins Shared Library:
 - buildDockerImage(name, dockerfile, registry): builds, tags with git SHA, pushes
 - runTests(type: 'node'|'python'|'go'): installs deps and runs tests per language
@@ -57,7 +57,7 @@ The agent creates a shared library repo with `vars/` global functions and `src/`
 
 ### 3. Set up dynamic Kubernetes agents
 
-```
+```text
 Our Jenkins controller is overloaded running builds directly. Set up
 Kubernetes-based agents that spin up per-build and die after:
 - Node.js pod template: node:20 + docker-in-docker for building images
@@ -73,7 +73,7 @@ The agent configures the Kubernetes cloud in Jenkins via JCasC, creates three po
 
 ### 4. Add quality gates and automated rollbacks
 
-```
+```text
 Add quality gates to the pipeline:
 1. Code coverage must be >80% or the build fails
 2. Trivy image scan: no critical/high CVEs
@@ -90,7 +90,7 @@ The agent adds quality gate stages with thresholds, a dynamic namespace creation
 
 ### 5. Set up Jenkins Configuration as Code and disaster recovery
 
-```
+```text
 Our Jenkins config exists only in the UI — if the server dies, we lose
 everything. Set up:
 1. Jenkins Configuration as Code (JCasC) covering: security, agents,

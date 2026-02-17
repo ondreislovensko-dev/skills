@@ -25,7 +25,7 @@ npx terminal-skills install git-commit-pro changelog-generator cicd-pipeline
 
 ### 1. Audit existing commit history and establish conventions
 
-```
+```text
 Analyze the last 200 commits in our monorepo. Categorize them by what they
 actually did: bug fixes, new features, breaking changes, refactors, docs,
 chores. Show me what the version history should have looked like if we had
@@ -36,7 +36,7 @@ The agent scans 200 commits and classifies them: 67 bug fixes, 41 features, 12 b
 
 ### 2. Set up conventional commit enforcement
 
-```
+```text
 Configure commitlint and husky for our monorepo so every commit must follow
 the conventional commits spec. Our scopes should match our package names:
 api, web, shared, cli, docs, auth, billing, notifications. Add a commit
@@ -48,7 +48,7 @@ The agent generates `.commitlintrc.js` with the 8 scopes, husky pre-commit and c
 
 ### 3. Generate changelogs from commit history
 
-```
+```text
 Generate a CHANGELOG.md for each package based on the last 6 months of
 commits. Group entries by version, with sections for Features, Bug Fixes,
 Breaking Changes, and Performance Improvements. Link each entry to its
@@ -60,7 +60,7 @@ The agent produces 8 CHANGELOG.md files, one per package. Each has properly grou
 
 ### 4. Automate version bumping and release
 
-```
+```text
 Create a GitHub Actions release workflow that triggers on merge to main.
 It should:
 1. Determine which packages changed (using file paths)
@@ -80,7 +80,7 @@ The agent generates a multi-job workflow: detect-changes identifies affected pac
 
 ### 5. Handle the monorepo dependency chain
 
-```
+```text
 When the shared package gets a breaking change, all packages that depend on
 it need a version bump too. Set up automatic dependency updates: if shared
 bumps to 3.0.0, all packages that depend on it should update their

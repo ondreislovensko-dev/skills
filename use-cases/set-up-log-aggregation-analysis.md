@@ -25,7 +25,7 @@ npx terminal-skills install docker-helper coding-agent data-analysis
 
 ### 1. Describe your current logging landscape
 
-```
+```text
 We have 4 services: an Express API on EC2, a Python worker on EC2, a Next.js
 frontend on Vercel, and a Postgres database on RDS. Logs are all over the place.
 Help me set up centralized logging with search and alerting. We want to self-host
@@ -34,7 +34,7 @@ on our existing EC2 infrastructure.
 
 ### 2. The agent designs a logging architecture
 
-```
+```text
 Recommended Stack: Loki + Grafana (lightweight, cost-effective for your scale)
 
 Architecture:
@@ -78,7 +78,7 @@ services:
 
 ### 4. The agent standardizes your log format
 
-```
+```text
 Created structured logging configurations:
 
 Express API (api/src/logger.js):
@@ -95,7 +95,7 @@ making cross-service correlation possible via requestId.
 
 ### 5. The agent builds Grafana dashboards and alerts
 
-```
+```text
 Created 3 Grafana dashboards:
 1. Service Overview: error rate, log volume, and top error messages per service
 2. Request Tracing: filter by requestId to see a request's journey across services

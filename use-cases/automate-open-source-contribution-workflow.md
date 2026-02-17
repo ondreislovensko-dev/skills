@@ -29,7 +29,7 @@ npx terminal-skills install coding-agent
 
 Tell the agent which projects matter to your team:
 
-```
+```text
 Search for good-first-issue and help-wanted labels in these repos: facebook/react, vercel/next.js, and prisma/prisma. Filter for issues opened in the last 30 days that haven't been assigned yet.
 ```
 
@@ -37,7 +37,7 @@ Search for good-first-issue and help-wanted labels in these repos: facebook/reac
 
 The agent queries GitHub's API, filters by labels and assignment status, and ranks issues by activity and complexity:
 
-```
+```text
 Found 14 unassigned issues across 3 repos:
 
 1. vercel/next.js #58234 - Fix middleware redirect loop with trailing slashes
@@ -57,13 +57,13 @@ Found 14 unassigned issues across 3 repos:
 
 Pick an issue and ask the agent to prepare:
 
-```
+```text
 I want to work on vercel/next.js #58234. Read their CONTRIBUTING.md, check for CLA requirements, and tell me what I need to do before submitting a PR.
 ```
 
 ### 4. The agent builds a contribution checklist
 
-```
+```text
 Contribution checklist for vercel/next.js:
 
 - [x] CLA: Contributor License Agreement required — sign at https://cla.vercel.com
@@ -80,7 +80,7 @@ the redirect target, causing an infinite loop.
 
 ### 5. Implement and submit the PR
 
-```
+```text
 Create the fix for issue #58234. Write the code change and the integration test, then prepare the PR description following their template.
 ```
 

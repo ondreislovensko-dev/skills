@@ -29,11 +29,11 @@ npx terminal-skills install data-extractor web-scraper markdown-writer
 
 ### 1. Export and analyze chat history
 
-```
+```text
 Parse our Slack export (slack-export.zip). Identify the highest-value messages: solutions to problems, architectural decisions, config explanations, and how-to threads.
 ```
 
-```
+```text
 ANALYZED: 143,291 messages across 47 channels (Jan 2023 - Feb 2026)
 
 HIGH-VALUE CONTENT:
@@ -47,11 +47,11 @@ TOP CHANNELS: #engineering (127), #incidents (84), #devops (63), #help (68)
 
 ### 2. Extract and deduplicate knowledge
 
-```
+```text
 Extract the top knowledge threads. Deduplicate — if the same question was answered multiple times, keep the most complete answer. Group by topic.
 ```
 
-```
+```text
 EXTRACTED 412 unique knowledge items, grouped:
 
 Infrastructure & DevOps (94 items)
@@ -74,11 +74,11 @@ DEDUPLICATED: Merged 47 duplicate Q&A threads into single authoritative answers
 
 ### 3. Generate knowledge base articles
 
-```
+```text
 Convert the extracted threads into structured knowledge base articles. Each should have a clear title, context, solution, and last-verified date.
 ```
 
-```
+```text
 Generated 412 articles in docs/knowledge-base/:
 
   infrastructure/connect-to-staging-database.md
@@ -102,11 +102,11 @@ Generated 412 articles in docs/knowledge-base/:
 
 ### 4. Build the search index and navigation
 
-```
+```text
 Create a table of contents, tag index, and search-friendly structure. Add cross-references between related articles.
 ```
 
-```
+```text
 docs/knowledge-base/
   README.md — Table of contents with 5 categories, 412 articles
   _tags.md — Tag index: 34 tags, most used: "database" (41), "auth" (28)
@@ -121,11 +121,11 @@ Search: articles use consistent frontmatter (title, tags, date, source)
 
 ### 5. Set up continuous knowledge capture
 
-```
+```text
 Create a Slack workflow that lets engineers flag messages as "knowledge" and automatically adds them to the base.
 ```
 
-```
+```text
 Workflow created:
   1. React with :brain: emoji on any valuable Slack message
   2. Bot collects the thread, asks for a one-line summary

@@ -29,11 +29,11 @@ npx terminal-skills install sql-optimizer db-explain-analyzer data-analysis
 
 ### 1. Identify and profile the slowest queries
 
-```
+```text
 Analyze our PostgreSQL slow query log from the past 7 days. Find the top 10 slowest queries by total time consumed (query duration × frequency). Include the query text, average duration, frequency per hour, and percentage of total database load.
 ```
 
-```
+```text
 🔍 SLOW QUERY ANALYSIS - PostgreSQL 14.2 (7 days of logs)
 
 TOP 10 QUERIES BY TOTAL IMPACT:
@@ -63,11 +63,11 @@ SUMMARY STATS:
 
 ### 2. Analyze execution plans to find bottlenecks
 
-```
+```text
 For the top 3 slowest queries, run EXPLAIN ANALYZE and identify specific performance problems. Show which operations are expensive, which indexes are missing, and what percentage of time each step consumes.
 ```
 
-```
+```text
 📊 EXECUTION PLAN ANALYSIS
 
 QUERY 1: Customer Analytics Dashboard (47.3s avg)
@@ -103,11 +103,11 @@ Projected improvement: 47.3s → 1.8s (96% faster)
 
 ### 3. Generate optimized query versions with indexes
 
-```
+```text
 Rewrite the top 3 slow queries with better SQL structure and provide the exact CREATE INDEX statements needed. Show before/after execution plans and projected performance improvements.
 ```
 
-```
+```text
 🚀 OPTIMIZED QUERY SOLUTIONS
 
 QUERY 1: Customer Analytics Dashboard
@@ -160,11 +160,11 @@ TOTAL DATABASE LOAD REDUCTION:
 
 ### 4. Analyze performance trends and set up monitoring
 
-```
+```text
 Create a performance monitoring dashboard that tracks query execution times, identifies performance regressions, and alerts when queries exceed baseline thresholds. Track the impact of our optimizations over time.
 ```
 
-```
+```text
 📈 PERFORMANCE MONITORING SETUP
 
 Created monitoring dashboard with 4 key metrics:

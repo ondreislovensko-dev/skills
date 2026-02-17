@@ -25,7 +25,7 @@ npx terminal-skills install slack-bot-builder coding-agent n8n-workflow
 
 ### 1. Build the standup automation
 
-```
+```text
 Build a Slack bot using the Bolt framework that automates daily standups.
 Every weekday at 9:00 AM, it posts a standup prompt to #engineering with
 three thread reply buttons: "Yesterday", "Today", "Blockers". Team members
@@ -38,7 +38,7 @@ The agent scaffolds a Bolt.js app with node-cron for scheduling, Block Kit messa
 
 ### 2. Create the incident response workflow
 
-```
+```text
 Add an incident command: /incident-create [severity] [title]. When triggered,
 the bot should:
 1. Create a new channel #inc-{date}-{short-title}
@@ -55,7 +55,7 @@ The agent implements the full incident lifecycle: channel creation with proper n
 
 ### 3. Set up deployment approvals
 
-```
+```text
 Build a deployment approval flow: when someone runs /deploy [service] [env],
 the bot posts an approval request to #deployments with the service name,
 environment, git diff summary (from GitHub API), and Approve/Reject buttons.
@@ -68,7 +68,7 @@ The agent creates a role-based approval system with GitHub integration that fetc
 
 ### 4. Automate PTO tracking
 
-```
+```text
 Add /pto-request [dates] [reason] that creates an approval flow: posts to
 the requester's manager (looked up from a team config), shows a calendar
 view of team availability for those dates, and provides Approve/Deny buttons.
@@ -81,7 +81,7 @@ The agent builds a complete PTO system: manager lookup from a JSON config, team 
 
 ### 5. Connect everything with n8n
 
-```
+```text
 Set up n8n workflows to connect the Slack bot with external services:
 1. PagerDuty → Slack: route alerts to the right channel based on service
 2. GitHub → Slack: post PR review requests to #code-review with approve/reject buttons

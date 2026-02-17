@@ -25,7 +25,7 @@ npx terminal-skills install security-audit cicd-pipeline coding-agent
 
 ### 1. Ask the agent to assess your current security posture
 
-```
+```text
 Audit our Node.js monorepo for security scanning gaps. We have a GitHub Actions
 CI pipeline but no security scanning. The repo has 3 services: api/ (Express),
 worker/ (Bull queue), and web/ (Next.js). Show me what we're missing.
@@ -33,7 +33,7 @@ worker/ (Bull queue), and web/ (Next.js). Show me what we're missing.
 
 ### 2. The agent identifies scanning gaps
 
-```
+```text
 Security Scanning Gap Analysis:
 
 Currently missing:
@@ -85,7 +85,7 @@ jobs:
 
 ### 4. The agent creates a triage configuration to reduce noise
 
-```
+```text
 Created .semgrep-ignore with 12 rules for test files and generated code.
 Created security-triage.json with severity mappings:
 - CRITICAL/HIGH in src/: block PR, require fix
@@ -98,7 +98,7 @@ Expected noise reduction: ~80% fewer false positive comments on PRs.
 
 ### 5. The agent generates fix suggestions for real findings
 
-```
+```text
 Found 3 actionable vulnerabilities in current codebase:
 
 1. [HIGH] SQL injection in api/src/routes/search.js:42

@@ -25,7 +25,7 @@ npx terminal-skills install whatsapp-bot-builder coding-agent template-engine
 
 ### 1. Set up the WhatsApp Cloud API and welcome flow
 
-```
+```text
 Set up a WhatsApp Business API bot using the Meta Cloud API. When a customer
 sends any message, respond with a welcome message and an interactive button
 menu:
@@ -42,7 +42,7 @@ The agent scaffolds a Node.js Express server with webhook verification, message 
 
 ### 2. Build the order tracking flow
 
-```
+```text
 When the customer taps "Track Order", start a conversation flow:
 1. Ask for order number or email address
 2. Look up the order in the database (query by order number or last order by email)
@@ -59,7 +59,7 @@ The agent implements fuzzy order lookup with Levenshtein distance for typo corre
 
 ### 3. Automate returns and FAQ
 
-```
+```text
 Build the returns flow:
 1. Ask for order number
 2. Show order items as a numbered list — customer selects which item to return
@@ -78,7 +78,7 @@ The agent creates a multi-step return conversation with item selection via inter
 
 ### 4. Implement human agent handoff
 
-```
+```text
 When a customer needs a human agent:
 1. Add them to a queue with their conversation history
 2. Notify the support team group: "New customer waiting — [name], topic: [returns],
@@ -96,7 +96,7 @@ The agent builds a queue system with real-time position updates, agent claiming 
 
 ### 5. Set up proactive notifications with templates
 
-```
+```text
 Create approved WhatsApp template messages for:
 1. Order confirmation: "Your order {{1}} for {{2}} has been confirmed. Track: {{3}}"
 2. Shipping notification: "Great news! Order {{1}} has shipped. Track here: {{2}}"

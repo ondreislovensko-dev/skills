@@ -27,7 +27,7 @@ npx terminal-skills install content-writer batch-processor data-extractor
 
 Tell the agent where your locale files live:
 
-```
+```text
 Scan ./src and ./emails for all translatable strings. Extract every key from en.json and find any hardcoded English strings in React components that should be externalized.
 ```
 
@@ -35,7 +35,7 @@ Scan ./src and ./emails for all translatable strings. Extract every key from en.
 
 The agent parses your JSON locale files and scans JSX files for hardcoded text. It produces a report:
 
-```
+```text
 Locale file: src/locales/en.json — 847 keys
 Hardcoded strings found: 23 across 14 components
 Email templates: 6 files with translatable blocks
@@ -46,7 +46,7 @@ Total strings to translate: 912
 
 Provide target locales and context:
 
-```
+```text
 Translate all 912 strings to de-DE, pt-BR, and ja-JP. This is a project management SaaS app. Use informal tone for pt-BR, formal Sie-form for de-DE. Keep UI strings under 40 characters where the English is under 30. For date and number formats, use each locale's native convention.
 ```
 
@@ -54,7 +54,7 @@ Translate all 912 strings to de-DE, pt-BR, and ja-JP. This is a project manageme
 
 The batch-processor handles all 912 strings across three locales, respecting character limits and cultural conventions:
 
-```
+```text
 Processing de-DE: 912/912 complete
 Processing pt-BR: 912/912 complete
 Processing ja-JP: 912/912 complete
@@ -76,11 +76,11 @@ Output: src/locales/de-DE.json, src/locales/pt-BR.json, src/locales/ja-JP.json
 
 Different languages have different pluralization rules. Ask the agent to handle this:
 
-```
+```text
 Check all translated strings for pluralization issues. German has different plural forms than English, Japanese doesn't pluralize nouns, and Portuguese has gendered nouns. Update the locale files to use ICU MessageFormat where needed.
 ```
 
-```
+```text
 Pluralization fixes applied:
 - de-DE: 34 strings updated to handle German plural forms
 - pt-BR: 18 strings updated for gendered variants (o projeto/a tarefa)
@@ -92,11 +92,11 @@ Pluralization fixes applied:
 
 Ask the agent to check consistency:
 
-```
+```text
 Verify that all three locale files have the same keys as en.json. Flag any translations that are identical to the English original, suspiciously short, or containing untranslated English words embedded in otherwise translated strings.
 ```
 
-```
+```text
 Validation Results:
 - de-DE: 912/912 keys present ✓, 0 identical to English, 2 embedded English words flagged
 - pt-BR: 912/912 keys present ✓, 1 identical to English ("OK" button — acceptable), 0 issues

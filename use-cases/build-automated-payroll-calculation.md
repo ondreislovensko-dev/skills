@@ -30,13 +30,13 @@ npx terminal-skills install template-engine
 
 Tell your AI agent:
 
-```
+```text
 Read all .xlsx files in the /payroll/timesheets-jan-15/ folder. Each file has columns for employee name, date, hours worked, and project code. Merge them into a single table and flag any rows with missing data or hours over 16 in a day.
 ```
 
 The agent uses **excel-processor** to parse each file and produce:
 
-```
+```text
 Merged timesheet: 30 employees, 420 rows
 Flagged issues:
   - Row 87: Marta Oliveira, Jan 9 — 18 hours (exceeds 16h threshold)
@@ -45,13 +45,13 @@ Flagged issues:
 
 ### 2. Calculate gross pay and overtime
 
-```
+```text
 Using the merged timesheet and the salary table in /payroll/salary-rates.xlsx, calculate gross pay for each employee. Apply 1.5x for hours over 40 per week. Output a summary table.
 ```
 
 The **report-generator** skill computes:
 
-```
+```text
 Payroll Period: Jan 1-15, 2025
 
 | Employee | Regular Hours | OT Hours | Regular Pay | OT Pay | Gross Pay |
@@ -64,11 +64,11 @@ Payroll Period: Jan 1-15, 2025
 
 ### 3. Apply deductions and compute net pay
 
-```
+```text
 Apply federal tax withholding based on each employee's W-4 data in /payroll/w4-elections.xlsx. Deduct health insurance premiums from /payroll/benefits.xlsx. Calculate net pay for each employee.
 ```
 
-```
+```text
 Deductions Applied:
 
 | Employee | Gross Pay | Federal Tax | State Tax | Health Ins | Net Pay |
@@ -79,7 +79,7 @@ Deductions Applied:
 
 ### 4. Generate individual pay stubs
 
-```
+```text
 Using the pay stub template in /payroll/templates/pay-stub.html, generate a PDF pay stub for each employee. Save them to /payroll/output/stubs/jan-15/.
 ```
 
@@ -87,13 +87,13 @@ The **template-engine** skill fills in each employee's data and renders 30 PDF p
 
 ### 5. Produce the payroll summary report
 
-```
+```text
 Generate a payroll summary report showing total gross, total deductions by category, total net pay, and a department-level breakdown. Save as PDF and Excel.
 ```
 
 The agent combines all calculations into a single summary document:
 
-```
+```text
 Payroll Summary — Jan 1-15, 2025
 Total Gross Pay: $142,650.00
 Total Federal Tax: $22,824.00

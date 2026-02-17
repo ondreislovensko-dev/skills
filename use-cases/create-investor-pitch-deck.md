@@ -27,11 +27,11 @@ npx terminal-skills install data-analysis content-writer ai-slides
 
 ### 1. Organize your raw data
 
-```
+```text
 Here's our key data: MRR from Stripe export (mrr.csv), user metrics from our analytics (users.csv), and market research notes (market-research.md). Analyze and identify the strongest data points for a seed-stage pitch.
 ```
 
-```
+```text
 STRONGEST DATA POINTS:
 
 Growth metrics:
@@ -52,11 +52,11 @@ Market opportunity:
 
 ### 2. Create the narrative arc
 
-```
+```text
 Write the pitch narrative. Follow the classic structure: problem, insight, solution, traction, market, business model, team, ask. Make it compelling for seed investors.
 ```
 
-```
+```text
 NARRATIVE ARC:
 
 Slide 1 — Title: [Company] — Developer tools that mid-market teams actually use
@@ -79,11 +79,11 @@ Slide 13 — Ask: $2.5M seed, 18 months runway, 3 key milestones
 
 ### 3. Generate data visualizations
 
-```
+```text
 Create charts for the traction slide: MRR growth (bar chart), retention curve, and DAU/MAU trend. Use clean, minimal styling with our brand colors.
 ```
 
-```
+```text
 Generated 4 charts:
   mrr-growth.svg — Bar chart, 8 months, clear upward trend, $47K highlighted
   retention-curve.svg — Cohort retention, 89% week-1 flattening at 61% month-3
@@ -96,11 +96,11 @@ Exported as SVG (scalable) and PNG (for compatibility)
 
 ### 4. Assemble the deck
 
-```
+```text
 Build the full pitch deck using our narrative and charts. 13 slides, clean design, consistent typography.
 ```
 
-```
+```text
 Generated: pitch-deck-seed-2026.pptx (13 slides)
 
 Design specs:
@@ -115,11 +115,11 @@ Also exported: pitch-deck-seed-2026.pdf (for email sharing)
 
 ### 5. Create variant versions
 
-```
+```text
 Make a 5-slide teaser version for cold emails and a detailed appendix with unit economics, cohort data, and competitive analysis.
 ```
 
-```
+```text
 Teaser (5 slides): problem, solution, traction, market, ask
   pitch-teaser-2026.pdf — optimized for email attachment (<3MB)
 

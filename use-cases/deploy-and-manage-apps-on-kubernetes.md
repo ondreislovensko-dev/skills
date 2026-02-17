@@ -25,7 +25,7 @@ npx terminal-skills install kubernetes-helm docker-helper cicd-pipeline security
 
 ### 1. Containerize and optimize all services
 
-```
+```text
 We have 6 services: API (Node.js), frontend (React/nginx), auth service
 (Go), worker (Python), PostgreSQL, and Redis. The Docker images are large
 (API is 1.2 GB, worker is 900 MB). Optimize all Dockerfiles with
@@ -37,7 +37,7 @@ The agent rewrites all Dockerfiles with multi-stage builds: the API drops from 1
 
 ### 2. Write Kubernetes manifests and Helm chart
 
-```
+```text
 Create a Helm chart for our entire platform. Each service should be a
 subchart or a configurable component in the main chart. Requirements:
 - API: 3 replicas, HPA scaling 3-20 on CPU (70%), readiness/liveness probes
@@ -57,7 +57,7 @@ The agent generates a complete Helm chart with parameterized templates, helper f
 
 ### 3. Set up the cluster and deploy
 
-```
+```text
 We're using EKS (AWS). Set up the cluster with:
 - 3 node groups: system (t3.medium), app (t3.large), worker (c5.xlarge spot)
 - Taints on worker nodes so only worker pods schedule there
@@ -72,7 +72,7 @@ The agent provides the exact `eksctl` cluster config, Helm install commands for 
 
 ### 4. Implement GitOps with ArgoCD
 
-```
+```text
 Set up ArgoCD for continuous deployment:
 - Install ArgoCD on the cluster
 - Create ArgoCD Applications for each environment (dev, staging, production)
@@ -89,7 +89,7 @@ The agent installs ArgoCD via Helm, configures three Application resources with 
 
 ### 5. Add monitoring, autoscaling, and zero-downtime deploys
 
-```
+```text
 Complete the production setup:
 - Prometheus + Grafana for monitoring (install via kube-prometheus-stack)
 - Dashboards for: pod CPU/memory, request latency, error rates, HPA status

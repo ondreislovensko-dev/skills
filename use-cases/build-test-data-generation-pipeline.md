@@ -27,13 +27,13 @@ npx terminal-skills install coding-agent test-generator data-analysis
 
 Point the agent at your database:
 
-```
+```text
 Analyze the database schema in ./prisma/schema.prisma. Map all tables, relationships, constraints, and enums. Identify which fields need realistic data (emails, addresses, phone numbers) versus which are system-generated (UUIDs, timestamps).
 ```
 
 ### 2. The agent maps the data model
 
-```
+```text
 Schema Analysis — 24 tables, 156 columns:
 
 Core entities: User, Organization, Project, Task, Subscription
@@ -49,13 +49,13 @@ Fields requiring realistic data:
 
 ### 3. Generate data factories
 
-```
+```text
 Create data factory functions for each entity that generate realistic data. Include: international names and addresses (at least US, EU, Japan, Brazil), edge cases (very long names, special characters, emoji in text fields), and valid relational integrity across all foreign keys. Generate 10,000 users across 500 organizations.
 ```
 
 ### 4. The agent builds the pipeline
 
-```
+```text
 Generated data factories for 24 tables:
 - UserFactory: international names, valid emails, 12 timezone variants
 - OrganizationFactory: realistic company names, multi-country addresses
@@ -76,13 +76,13 @@ All unique constraints respected ✓
 
 ### 5. Create scenario-specific datasets
 
-```
+```text
 Generate a focused dataset for testing the billing system: 20 organizations with subscriptions in every state — active, trial expiring tomorrow, trial expired, payment failed, cancelled, downgraded mid-cycle, upgraded mid-cycle, and annual renewal due today.
 ```
 
 The agent generates a targeted dataset that exercises every billing edge case:
 
-```
+```text
 Billing Test Dataset — 20 organizations:
 
 Active subscriptions:

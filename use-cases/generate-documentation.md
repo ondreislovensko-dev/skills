@@ -126,7 +126,7 @@ npm run test:load     # Load testing (100 req/s)
 
 ## Deployment
 Deployed via GitHub Actions on merge to main. See [deployment guide](./DEPLOY.md).
-```
+```text
 
 ```text
 TEMPLATE APPLIED TO ALL 43 SERVICES: Consistent structure, auto-updated dependencies, working examples

@@ -26,7 +26,7 @@ npx terminal-skills install git-commit-pro
 
 ### 1. Ask the agent to analyze recent changes
 
-```
+```text
 Generate release notes for version 2.4.0. Compare the changes between tags v2.3.0 and HEAD on main.
 ```
 
@@ -34,7 +34,7 @@ Generate release notes for version 2.4.0. Compare the changes between tags v2.3.
 
 It runs `git log v2.3.0..HEAD --oneline` and groups commits:
 
-```
+```text
 ## v2.4.0 (2026-02-17)
 
 ### ✨ New Features
@@ -57,11 +57,11 @@ It runs `git log v2.3.0..HEAD --oneline` and groups commits:
 
 ### 3. Request a user-facing version
 
-```
+```text
 Now rewrite these as user-facing release notes for our blog. Our audience is non-technical small business owners who use our invoicing platform.
 ```
 
-```
+```text
 ## What's New in BillFlow 2.4.0
 
 **Import your data faster** — You can now upload CSV files up to 50MB
@@ -82,7 +82,7 @@ to improved caching.
 
 ### 4. Generate a structured CHANGELOG entry
 
-```
+```text
 Append this release to CHANGELOG.md in Keep a Changelog format.
 ```
 
@@ -90,7 +90,7 @@ The agent formats and prepends the new version entry to your existing CHANGELOG.
 
 ### 5. Improve future commits
 
-```
+```text
 Our commit messages are messy. Set up a commit convention so future changelogs are easier to generate.
 ```
 

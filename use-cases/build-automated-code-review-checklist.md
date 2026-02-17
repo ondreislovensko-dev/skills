@@ -29,13 +29,13 @@ npx terminal-skills install github
 
 Tell your AI agent:
 
-```
+```text
 Read these files containing our team coding standards: /docs/CONTRIBUTING.md, /docs/notion-export-coding-guidelines.md, /docs/wiki-backend-standards.html. Extract every specific rule — naming conventions, error handling patterns, logging requirements, security practices, API response formats. Deduplicate and flag any contradictions.
 ```
 
 The agent uses **doc-parser** to extract rules from each source:
 
-```
+```text
 Extracted Standards — 3 sources, 67 rules found
 
 Deduplicated to 48 unique rules:
@@ -67,7 +67,7 @@ Contradictions found (2):
 
 ### 2. Resolve contradictions and finalize the checklist
 
-```
+```text
 For the two contradictions, use the most recent document's version (Notion was last updated in December 2024, CONTRIBUTING.md in August 2024). Produce a final checklist document in markdown with rules grouped by category, each with a clear pass/fail description.
 ```
 
@@ -96,7 +96,7 @@ The **code-reviewer** skill produces a clean `REVIEW_CHECKLIST.md`:
 
 ### 3. Create a PR review bot configuration
 
-```
+```text
 Convert the checklist into a GitHub Actions workflow that runs on every PR. For each changed file, check the applicable rules and post inline comments on violations. Use the code-reviewer skill's analysis — don't just pattern match, understand the code context.
 ```
 
@@ -104,11 +104,11 @@ The **github** skill creates `.github/workflows/review-checklist.yml` and a revi
 
 ### 4. Test against recent PRs
 
-```
+```text
 Run the automated checklist against our last 10 merged PRs. Show which rules each PR would have violated. This helps us calibrate — if the tool flags too many false positives, we'll adjust.
 ```
 
-```
+```text
 Retroactive Analysis — Last 10 PRs
 
 PR #287 (Add user preferences endpoint):
@@ -128,7 +128,7 @@ Most common violation: missing input validation (5 cases)
 
 ### 5. Roll out to the team
 
-```
+```text
 Write a brief team announcement explaining the new automated review checklist. Include a link to the REVIEW_CHECKLIST.md, explain how the bot works, and note that it's advisory for the first two weeks (comments only, no blocking).
 ```
 

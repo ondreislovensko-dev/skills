@@ -25,13 +25,13 @@ npx terminal-skills install serverless-debugger data-analysis
 
 ### 1. Trace a failing request across functions
 
-```
+```text
 Here are CloudWatch logs from three Lambda functions (auth-handler, order-processor, payment-webhook) for the last 2 hours. A customer reported their checkout failed at 14:32 UTC. Find the request trace, show me where it failed, and why.
 ```
 
 The agent correlates logs by request ID:
 
-```
+```text
 Request Trace — correlation ID: req-8f4a2c91
 
 14:32:01.203 [auth-handler] START RequestId: a1b2c3
@@ -60,11 +60,11 @@ payment processor's 5s webhook delivery window.
 
 ### 2. Analyze cold start patterns
 
-```
+```text
 Pull the last 7 days of invocation data for all 35 functions. Show me which ones have cold starts, how often, the P50/P95/P99 init durations, and what time of day they're worst. Identify the top 5 functions to optimize.
 ```
 
-```
+```text
 Cold Start Analysis — 7 Days, 35 Functions, 284,391 Invocations
 
 Functions with Cold Starts (sorted by impact):
@@ -91,13 +91,13 @@ Top 5 to Optimize: payment-webhook, report-generator, image-resizer,
 
 ### 3. Apply cold start fixes
 
-```
+```text
 For the payment-webhook function, give me specific fixes to reduce cold start from 4.8s to under 500ms. Consider: tree-shaking, SDK v3 migration, lazy imports, provisioned concurrency, and memory tuning.
 ```
 
 ### 4. Generate optimized configuration
 
-```
+```text
 Generate the serverless.yml (or SAM template) changes for: provisioned concurrency on payment-webhook (minimum 2), memory increase to 1024MB for faster init, and the tree-shaken bundle configuration using esbuild.
 ```
 

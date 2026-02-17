@@ -26,13 +26,13 @@ npx terminal-skills install data-analysis
 
 ### 1. Define your evaluation rubric
 
-```
+```text
 I'm building an AI feature that extracts invoice data from emails. Help me define evaluation criteria for the extraction prompt.
 ```
 
 The agent creates a scoring rubric:
 
-```
+```text
 ## Evaluation Rubric: Invoice Email Extractor
 
 | Criterion        | Weight | Pass Condition                          |
@@ -47,11 +47,11 @@ The agent creates a scoring rubric:
 
 ### 2. Build a test suite
 
-```
+```text
 Create 10 test cases for the invoice extractor. Include normal invoices, edge cases like partial data, and adversarial inputs.
 ```
 
-```
+```text
 ## Test Suite: 10 cases
 
 Normal (5):
@@ -73,13 +73,13 @@ Adversarial (2):
 
 ### 3. Test prompt variants
 
-```
+```text
 Here are two versions of my extraction prompt. Run both against all 10 test cases and compare.
 ```
 
 The agent runs each variant and produces a comparison:
 
-```
+```text
 ## Results: Variant A vs Variant B
 
 | Metric           | Variant A | Variant B |
@@ -100,7 +100,7 @@ Winner: Variant B (80% accuracy, zero hallucinations)
 
 ### 4. Iterate on failures
 
-```
+```text
 Variant B failed on TC-05 (international format) and TC-10 (empty body). Help me fix the prompt for these cases.
 ```
 
@@ -108,11 +108,11 @@ The agent analyzes the failures, suggests adding explicit instructions for date 
 
 ### 5. Document the final prompt
 
-```
+```text
 Create a prompt spec document with the final version, its test results, and when to re-evaluate.
 ```
 
-```
+```text
 ## Prompt Spec: Invoice Email Extractor v2.1
 
 Last tested: 2026-02-17

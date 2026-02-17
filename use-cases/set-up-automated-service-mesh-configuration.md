@@ -29,13 +29,13 @@ npx terminal-skills install security-audit
 
 Tell your AI agent:
 
-```
+```text
 Read all Kubernetes manifests in /k8s/deployments/. For each service, extract: service name, port, protocol (HTTP/gRPC), dependencies (which other services it calls), and current timeout/retry settings if any. Output a service dependency graph.
 ```
 
 The agent uses **coding-agent** to parse manifests:
 
-```
+```text
 Service Topology — 22 services
 
 api-gateway → [user-service, order-service, product-service, notification-service]
@@ -56,13 +56,13 @@ Current timeout settings:
 
 ### 2. Generate Istio configurations for all services
 
-```
+```text
 For each of the 22 services, generate: (1) a VirtualService with appropriate timeouts and retries based on the service type, (2) a DestinationRule with circuit breaker settings, (3) enable mTLS via PeerAuthentication in STRICT mode. Use 3s timeout for synchronous calls, 10s for batch operations, and 2 retries with exponential backoff.
 ```
 
 The **coding-agent** generates config files:
 
-```
+```text
 Generated Istio configs in /k8s/istio/:
 
   user-service/
@@ -85,11 +85,11 @@ Total: 22 services × 3 files = 66 YAML files generated
 
 ### 3. Add authorization policies
 
-```
+```text
 Based on the service dependency graph, generate AuthorizationPolicies that restrict each service to only accept traffic from its known callers. For example, payment-service should only accept requests from order-service and stripe-webhook. Deny all other traffic.
 ```
 
-```
+```text
 Authorization Policies:
 
 payment-service:
@@ -109,13 +109,13 @@ user-service:
 
 ### 4. Validate the configuration
 
-```
+```text
 Dry-run all generated Istio configs against our cluster. Check for: YAML syntax errors, port mismatches, missing sidecar injection labels, and circular dependency issues. Also verify that mTLS is STRICT on all services with no PERMISSIVE exceptions.
 ```
 
 The **security-audit** skill validates:
 
-```
+```text
 Validation Results:
 
 ✅ 66 YAML files pass syntax validation
@@ -132,7 +132,7 @@ Recommended fixes:
 
 ### 5. Create a rollout plan
 
-```
+```text
 Generate a phased rollout plan. Start with non-critical services, then internal services, then the api-gateway last. Include kubectl commands and rollback steps for each phase.
 ```
 

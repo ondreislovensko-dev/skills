@@ -25,7 +25,7 @@ npx terminal-skills install coding-agent test-generator git-commit-pro
 
 ### 1. Define commands from existing tribal knowledge
 
-```
+```text
 I want to build an internal CLI called "dx" (developer experience) for our team.
 Here are the things developers do manually today:
 
@@ -42,7 +42,7 @@ The agent scaffolds a full CLI project with `dx setup`, `dx deploy staging`, `dx
 
 ### 2. Add interactive prompts and safety checks
 
-```
+```text
 For destructive commands (db:reset, deploy), add confirmation prompts with
 a summary of what will happen. For db:reset, show the current row counts
 before proceeding. For deploy, show the git diff summary and current
@@ -53,7 +53,7 @@ The agent adds Inquirer.js prompts with color-coded warnings for destructive ope
 
 ### 3. Implement the environment setup command
 
-```
+```text
 The "dx setup" command should:
 1. Check prerequisites (Node 18+, Docker, AWS CLI)
 2. Clone frontend, backend, and shared-lib repos if not present
@@ -72,7 +72,7 @@ The agent implements the full setup flow with `ora` spinners, health check polli
 
 ### 4. Add tests and documentation
 
-```
+```text
 Generate integration tests for the setup and deploy commands. Mock external
 calls (Docker, AWS CLI) but test the actual command logic: argument parsing,
 confirmation flows, error handling, and output formatting. Also generate
@@ -83,7 +83,7 @@ The agent produces 24 test cases covering happy paths, error scenarios, and edge
 
 ### 5. Package and distribute internally
 
-```
+```text
 Set up the CLI for internal distribution:
 - Publish to our private npm registry (Artifactory at registry.internal.company.com)
 - Add a postinstall script that checks for updates

@@ -29,7 +29,7 @@ npx terminal-skills install coding-agent
 
 Tell your AI agent:
 
-```
+```text
 Create a GitHub Actions workflow for our React Native app. It should trigger on tags matching v*. Build the iOS .ipa using Fastlane and the Android .aab using Gradle. Store both artifacts. Use separate jobs for iOS (macos-latest) and Android (ubuntu-latest).
 ```
 
@@ -67,7 +67,7 @@ jobs:
 
 ### 2. Configure code signing and Fastlane
 
-```
+```text
 Write Fastlane configurations for both platforms. iOS should use match for certificate management with our git-based signing repo. Android should read the keystore from a GitHub secret. Add lanes for build, beta (TestFlight / internal track), and production.
 ```
 
@@ -75,13 +75,13 @@ The **coding-agent** generates `ios/fastlane/Fastfile` and `android/fastlane/Fas
 
 ### 3. Auto-generate release notes
 
-```
+```text
 Add a step to the release workflow that generates release notes from all merged PRs since the last tag. Group changes into Features, Fixes, and Maintenance. Write the output to CHANGELOG.md and use it as the release body on GitHub.
 ```
 
 The **changelog-generator** skill produces:
 
-```
+```text
 ## v2.4.0 (2025-01-20)
 
 ### Features
@@ -98,13 +98,13 @@ The **changelog-generator** skill produces:
 
 ### 4. Automate store submissions
 
-```
+```text
 Add Fastlane lanes that upload the iOS build to TestFlight and the Android bundle to Google Play internal testing track automatically after a successful build. Include store metadata (description, screenshots path, release notes) from a metadata/ directory.
 ```
 
 ### 5. Add version bumping automation
 
-```
+```text
 Write a script that reads the current version from package.json, bumps it (major/minor/patch based on a parameter), updates package.json, ios/Info.plist, and android/app/build.gradle versionCode and versionName, commits the changes, and creates a git tag. Run it with: ./scripts/bump-version.sh minor
 ```
 

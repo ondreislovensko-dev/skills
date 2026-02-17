@@ -179,7 +179,7 @@ terminal-skills install data-analysis
    ```
 
 4. **Use with your AI agent:**
-   ```
+```text
    > Review this NDA for red flags
    > Extract all tables from report.pdf
    > Draft a follow-up email to the client

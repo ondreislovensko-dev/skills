@@ -27,11 +27,11 @@ npx terminal-skills install security-audit coding-agent report-generator
 
 ### 1. Scan the full dependency tree
 
-```
+```text
 Scan all dependencies in our project (package.json + lockfile). For each package, identify the license. Flag any that are AGPL, GPL, SSPL, or unknown.
 ```
 
-```
+```text
 LICENSE SCAN — 847 packages analyzed
 
 BY LICENSE:
@@ -61,11 +61,11 @@ UNKNOWN (manual review needed):
 
 ### 2. Analyze risk and find alternatives
 
-```
+```text
 For each flagged package, assess the actual risk for our commercial SaaS product. Suggest MIT/Apache alternatives where we need to replace.
 ```
 
-```
+```text
 RISK ASSESSMENT:
 
 🚨 REPLACE: @some-org/data-processor@2.1.0 (AGPL-3.0)
@@ -86,11 +86,11 @@ RISK ASSESSMENT:
 
 ### 3. Build the CI compliance gate
 
-```
+```text
 Create a CI pipeline step that blocks PRs adding dependencies with prohibited licenses. Allow-list our approved licenses.
 ```
 
-```
+```text
 Created .github/workflows/license-check.yml:
 
   Triggers: on PR when package.json or lockfile changes
@@ -108,11 +108,11 @@ Created .github/workflows/license-check.yml:
 
 ### 4. Generate the compliance report for legal
 
-```
+```text
 Generate a full license compliance report suitable for enterprise customer due diligence. Include license texts and attribution notices.
 ```
 
-```
+```text
 Generated: compliance-report-2026-02.pdf (34 pages)
 
 Contents:

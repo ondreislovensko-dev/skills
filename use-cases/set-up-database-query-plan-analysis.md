@@ -29,13 +29,13 @@ npx terminal-skills install report-generator
 
 Tell the agent where to find the data:
 
-```
+```text
 Parse the PostgreSQL slow query log at /var/log/postgresql/slow.log. Extract all queries that took longer than 500ms in the past 7 days. Group by query pattern and show frequency and average duration.
 ```
 
 ### 2. The agent identifies the worst offenders
 
-```
+```text
 Slow Query Analysis — Last 7 days:
 
 | Pattern                                    | Count | Avg Duration | Max Duration | Total Time |
@@ -49,13 +49,13 @@ Top 3 patterns account for 73% of total slow query time.
 
 ### 3. Analyze execution plans for the worst queries
 
-```
+```text
 Run EXPLAIN ANALYZE on the top 3 slow query patterns and tell me exactly what's wrong with each one.
 ```
 
 ### 4. The agent reads the execution plans
 
-```
+```text
 Query 1: SELECT * FROM orders JOIN line_items ON orders.id = line_items.order_id
          WHERE orders.created_at > '2025-01-01' AND orders.status = 'pending'
 
@@ -76,7 +76,7 @@ Fix:
 
 ### 5. Generate a report with all fixes
 
-```
+```text
 Create a query optimization report with all findings, recommended indexes, and estimated impact. Format it as a markdown document I can share with the team.
 ```
 

@@ -29,11 +29,11 @@ npx terminal-skills install seo-audit content-strategy web-research
 
 ### 1. Audit your SEO position vs competitors
 
-```
+```text
 Compare our SEO against our top 3 competitors. Show the keyword gap.
 ```
 
-```
+```text
 YOUR SITE: DR 18, 34 keywords, ~210 visitors/mo, 3 blog posts
   competitor1.com — DR 52, 847 keywords, ~15,200 visitors/mo, 142 posts
   competitor2.com — DR 41, 523 keywords, ~8,400 visitors/mo, 89 posts
@@ -51,11 +51,11 @@ KEYWORD GAP (they rank, you don't):
 
 ### 2. Build a 90-day content calendar
 
-```
+```text
 Create a content calendar targeting keyword gaps. Organize as topic clusters.
 ```
 
-```
+```text
 90-Day Calendar — 24 articles, 2/week
 
 PILLAR 1: Product Analytics Fundamentals (7 articles)
@@ -74,11 +74,11 @@ Projected traffic at 90 days: 2,400-3,200 organic visitors/month
 
 ### 3. Research and outline the pillar article
 
-```
+```text
 Research "product analytics for startups." Analyze top 5 ranking articles, find gaps, create a better outline.
 ```
 
-```
+```text
 TOP 5 RANKING: 1,890-3,201 words, mostly high-level overviews
 
 GAPS (none of the top 5 cover):
@@ -101,11 +101,11 @@ SEO: primary keyword in H1, intro, 2 H2s, conclusion. LSI keywords mapped.
 
 ### 4. Generate article drafts
 
-```
+```text
 Write the first 3 articles: analytics pillar, feature adoption guide, cohort tutorial.
 ```
 
-```
+```text
 Article 1: "Product Analytics for Startups: Complete 2026 Guide"
   3,742 words | 16 min read | 7 H2s, 14 H3s | 4 internal links ✓
 
@@ -121,11 +121,11 @@ Ready for review — add brand voice and product screenshots before publishing.
 
 ### 5. Set up monthly SEO monitoring
 
-```
+```text
 Create a tracking system to measure what's working and adjust strategy.
 ```
 
-```
+```text
 Monthly metrics: organic traffic, keywords in top 10/3, CTR by article
 Keyword tracking: 24 target keywords with position goals by month
   Month 1: 210 → 450 visitors (content indexed)

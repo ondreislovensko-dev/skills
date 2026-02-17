@@ -29,11 +29,11 @@ npx terminal-skills install ssr-migration frontend-design docker-helper
 
 ### 1. Analyze current performance and identify migration strategy
 
-```
+```text
 Audit our React SPA's performance and SEO issues. The app has 47 pages: 12 marketing pages (static content), 18 product feature pages (semi-static), 8 blog pages (static), 6 customer case studies (static), and 3 dynamic pricing/demo request pages. Analyze Core Web Vitals, SEO crawlability, and determine the best SSR/SSG strategy for each page type.
 ```
 
-```
+```text
 🔍 PERFORMANCE & SEO AUDIT RESULTS...
 
 CURRENT PERFORMANCE METRICS (PageSpeed Insights):
@@ -86,11 +86,11 @@ PROJECTED IMPROVEMENTS:
 
 ### 2. Migrate to Next.js with SSG for static content
 
-```
+```text
 Convert our React SPA to Next.js with static site generation for all marketing, product, and blog pages. Optimize images, implement proper meta tags and schema markup, and ensure all static content pre-renders at build time. Include automatic sitemap generation and proper URL structure for SEO.
 ```
 
-```
+```text
 🚀 NEXT.JS SSG MIGRATION IN PROGRESS...
 
 Project structure transformation:
@@ -148,11 +148,11 @@ PERFORMANCE OPTIMIZATIONS:
 
 ### 3. Implement SSR for dynamic pages and optimize Core Web Vitals
 
-```
+```text
 Set up server-side rendering for dynamic pages like pricing calculator and demo forms. Implement advanced performance optimizations to pass all Core Web Vitals metrics: optimize LCP, reduce CLS, minimize FID. Include edge caching and progressive enhancement.
 ```
 
-```
+```text
 ⚡ SSR IMPLEMENTATION & CORE WEB VITALS OPTIMIZATION...
 
 Server-Side Rendering setup:
@@ -208,11 +208,11 @@ PERFORMANCE MONITORING:
 
 ### 4. Deploy with Docker and measure SEO improvements
 
-```
+```text
 Set up production deployment with Docker containers, implement proper caching headers, and measure SEO performance improvements. Include A/B testing setup to measure conversion rate improvements and track search ranking changes over time.
 ```
 
-```
+```text
 🐳 PRODUCTION DEPLOYMENT & SEO MEASUREMENT...
 
 Docker deployment setup (docker-compose.production.yml):

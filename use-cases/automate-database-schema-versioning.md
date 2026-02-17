@@ -27,7 +27,7 @@ npx terminal-skills install docker-helper
 
 ### 1. Initialize the migration infrastructure
 
-```
+```text
 Set up database migration infrastructure for my Node.js app using Knex.js and
 PostgreSQL. I need: a migrations directory with timestamp-based naming, a shadow
 database via Docker for testing, and a seed file for development data. We currently
@@ -39,7 +39,7 @@ The agent runs `pg_dump --schema-only` against the existing database, converts t
 
 ### 2. Generate a migration for a new feature
 
-```
+```text
 I need to add an orders table with: uuid primary key, foreign key to users,
 decimal total, status enum (pending/paid/shipped/cancelled), and timestamps.
 Also add a composite index on (user_id, status). Generate the migration with
@@ -50,7 +50,7 @@ The agent creates `migrations/20250217143000_create_orders_table.ts` with a `cre
 
 ### 3. Add CI validation for migrations
 
-```
+```text
 Add a GitHub Actions workflow that validates every migration on pull requests.
 It should: spin up a PostgreSQL container, apply all migrations from scratch,
 verify rollback works for the entire chain, and re-apply to confirm clean state.
@@ -61,7 +61,7 @@ The agent creates `.github/workflows/migration-check.yml` with a PostgreSQL serv
 
 ### 4. Create a rollback runbook
 
-```
+```text
 Create a rollback script and runbook for production. I need: a one-command rollback
 that reverts the last N migrations, captures the before/after state for audit,
 and sends a notification to our team channel. Also document the manual rollback

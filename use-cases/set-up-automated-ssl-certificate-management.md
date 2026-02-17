@@ -27,13 +27,13 @@ npx terminal-skills install coding-agent cicd-pipeline n8n-workflow
 
 Tell the agent to discover and catalog your certificates:
 
-```
+```text
 Scan all our domains and subdomains, check the SSL certificates on each, and create an inventory. Include: domain, issuer, expiration date, days until expiry, certificate type (single, wildcard, SAN), and which services use it.
 ```
 
 ### 2. The agent builds a certificate inventory
 
-```
+```text
 SSL Certificate Inventory — 24 certificates found:
 
 Critical (expires within 30 days):
@@ -52,13 +52,13 @@ Inventory saved: ssl-inventory.json
 
 ### 3. Set up automated monitoring
 
-```
+```text
 Create a monitoring system that checks certificate expiration daily, alerts at 60/30/14/7 days, and sends notifications to Slack with renewal instructions.
 ```
 
 The agent creates the monitoring pipeline:
 
-```
+```text
 Certificate monitoring configured:
 
 Daily check: Scans all 24 endpoints at 6:00 AM UTC
@@ -77,11 +77,11 @@ n8n workflow: ssl-monitoring-workflow.json
 
 For certificates using Let's Encrypt, the agent sets up fully automated renewal:
 
-```
+```text
 Set up auto-renewal for all Let's Encrypt certificates. Use certbot with DNS challenge for wildcard certs and HTTP challenge for single-domain certs. Deploy renewed certs automatically and reload the affected services.
 ```
 
-```
+```text
 Auto-renewal configured for 18 Let's Encrypt certificates:
 
 Renewal pipeline:
@@ -100,7 +100,7 @@ Remaining manual certificates: 6 (purchased from vendor, renewal reminders only)
 
 The agent adds certificate validation to your deployment pipeline:
 
-```
+```text
 CI integration added to deployment workflow:
 
 Pre-deploy check:

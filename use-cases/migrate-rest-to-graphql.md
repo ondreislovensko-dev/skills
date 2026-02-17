@@ -27,13 +27,13 @@ npx terminal-skills install code-migration
 
 ### 1. Audit existing REST endpoints
 
-```
+```text
 Scan the routes directory in src/routes/ and list every REST endpoint with its HTTP method, path, request params, and response shape. Group them by domain (users, orders, products). Flag endpoints that return nested resources — those benefit most from GraphQL.
 ```
 
 The agent produces a structured inventory:
 
-```
+```text
 Found 34 REST endpoints across 4 domains:
 - Users (8 endpoints): GET /users, GET /users/:id, POST /users, ...
 - Orders (12 endpoints): GET /orders?status=pending, GET /orders/:id/items, ...
@@ -47,31 +47,31 @@ High-value migration candidates (nested responses causing over-fetch):
 
 ### 2. Generate the GraphQL schema from REST contracts
 
-```
+```text
 Based on the endpoint audit, generate a GraphQL schema (schema.graphql) that covers Users, Orders, and Products. Map each REST response shape to a GraphQL type. Add relay-style pagination for list endpoints. Keep field names consistent with the existing JSON keys so serialization stays stable.
 ```
 
 ### 3. Create resolver layer that delegates to REST handlers
 
-```
+```text
 For each GraphQL type, generate resolvers in src/graphql/resolvers/ that call the existing REST service functions directly (not over HTTP). Use DataLoader for batching — especially for orders→products and products→reviews relationships. Add error mapping from REST status codes to GraphQL errors.
 ```
 
 ### 4. Set up the compatibility proxy
 
-```
+```text
 Configure the API gateway so that existing REST routes still work unchanged. Add a /graphql endpoint alongside them. Write an Express middleware that checks the Accept header — requests with application/json hit REST, requests with application/graphql hit the new layer. Add request logging to track which clients still use REST.
 ```
 
 ### 5. Validate with parallel testing
 
-```
+```text
 Write integration tests that call both the old REST endpoint and the equivalent GraphQL query, then diff the responses. Run them against GET /products/:id, GET /orders?status=pending, and GET /users/:id. Report any field mismatches or missing data.
 ```
 
 The agent runs both paths and reports:
 
-```
+```text
 Parallel test results (3 endpoint pairs):
 ✅ GET /products/:id vs query { product(id: "p-42") { ... } } — fields match
 ⚠️  GET /orders?status=pending — REST returns `created_at`, GraphQL returns `createdAt`

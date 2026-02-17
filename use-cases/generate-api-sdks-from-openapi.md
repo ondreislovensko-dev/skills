@@ -27,11 +27,11 @@ npx terminal-skills install coding-agent test-generator markdown-writer
 
 ### 1. Analyze the OpenAPI spec
 
-```
+```text
 Parse our openapi.yaml. Summarize the API surface: endpoints, models, auth patterns, and pagination style. Identify anything that needs special SDK handling.
 ```
 
-```
+```text
 API SURFACE ANALYSIS:
 
 Endpoints: 31 across 6 groups (Orders, Products, Users, Webhooks, Reports, Events)
@@ -43,11 +43,11 @@ SPECIAL HANDLING: bulk arrays, async report generation, SSE, streaming exports
 
 ### 2. Generate the TypeScript SDK
 
-```
+```text
 Generate a TypeScript SDK for our API. Use fetch, full type safety, automatic pagination, retry on 429, and idiomatic error handling. Structure it as a publishable npm package.
 ```
 
-```
+```text
 Generated: sdks/typescript/
   src/client.ts — Main class with auth, retry on 429, auto-pagination
   src/resources/ — Typed methods for all 6 resource groups
@@ -61,11 +61,11 @@ Usage:
 
 ### 3. Generate the Python SDK
 
-```
+```text
 Generate a Python SDK using httpx for async support, Pydantic models, and Pythonic conventions. Package with pyproject.toml for PyPI publishing.
 ```
 
-```
+```text
 Generated: sdks/python/
   src/api_client/client.py — Sync and async clients with httpx
   src/api_client/resources/ — Type-hinted methods for all resources
@@ -80,11 +80,11 @@ Usage:
 
 ### 4. Generate test suites for both SDKs
 
-```
+```text
 Create test suites for both SDKs. Use recorded HTTP fixtures so tests run without a live API. Cover auth, CRUD, pagination, error handling, and retries.
 ```
 
-```
+```text
 TypeScript: 42 tests (vitest) — auth, CRUD, pagination, errors, retry | 94% coverage
 Python: 38 tests (pytest + pytest-httpx) — sync/async, Pydantic, errors | 91% coverage
 HTTP fixtures: recorded responses in tests/fixtures/ (shared format)
@@ -92,11 +92,11 @@ HTTP fixtures: recorded responses in tests/fixtures/ (shared format)
 
 ### 5. Generate documentation and publish pipeline
 
-```
+```text
 Create README docs for both SDKs with installation, quickstart, and per-resource examples. Add CI pipelines to publish on tag.
 ```
 
-```
+```text
 Documentation:
   sdks/typescript/README.md — Install, quickstart, all resources with examples
   sdks/python/README.md — pip install, quickstart, sync/async examples

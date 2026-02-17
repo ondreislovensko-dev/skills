@@ -27,11 +27,11 @@ npx terminal-skills install test-generator code-reviewer cicd-pipeline
 
 ### 1. Generate tests for high-risk modules
 
-```
+```text
 Analyze this project for coverage gaps. Generate tests for the top 5 highest-risk modules — prioritize payment, auth, and data processing.
 ```
 
-```
+```text
 Generating tests for highest-risk modules...
 
 Created: tests/services/payment.test.js    — 23 tests (charge, webhook, refund flows)
@@ -46,11 +46,11 @@ Coverage: 0% → 43% statements
 
 ### 2. Review generated tests for quality
 
-```
+```text
 Review the generated test files for quality. Check for weak assertions, implementation coupling, and missing business logic tests.
 ```
 
-```
+```text
 Test Quality Review — 14 issues found
 
 CRITICAL (3):
@@ -69,11 +69,11 @@ Re-running suite... 85 tests passing ✓
 
 ### 3. Add tests from review suggestions
 
-```
+```text
 Generate the additional test cases from review suggestions — race condition, idempotency, and session invalidation scenarios.
 ```
 
-```
+```text
 Added 19 tests:
   + inventory — concurrent reservation lock (3 parallel requests)
   + payment — idempotency key collision returns original result
@@ -86,11 +86,11 @@ Total: 104 tests, all passing. Coverage: 43% → 58% ✓
 
 ### 4. Set up CI with coverage gates
 
-```
+```text
 Create a GitHub Actions workflow that runs tests on every PR, posts coverage diff as a comment, and blocks merges below 65%.
 ```
 
-```
+```text
 Created: .github/workflows/test.yml
 
   Trigger: push to main, all PRs
@@ -103,11 +103,11 @@ Created: .github/workflows/test.yml
 
 ### 5. Expand coverage to hit the threshold
 
-```
+```text
 Generate tests for remaining untested modules to push coverage above 65%. Focus on business logic, skip trivial utilities.
 ```
 
-```
+```text
 Generated tests for 8 modules:
   billing (11), reporting (9), rateLimit (7), checkout (14),
   subscription (12), encryption (8), audit-log (6), permissions (10)

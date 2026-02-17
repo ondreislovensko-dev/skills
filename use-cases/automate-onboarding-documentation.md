@@ -27,11 +27,11 @@ npx terminal-skills install doc-parser content-writer markdown-writer
 
 ### 1. Inventory existing documentation
 
-```
+```text
 Scan our repo for all documentation: READMEs, markdown files, docker-compose files, Makefiles, and CI configs. List what exists and what's outdated.
 ```
 
-```
+```text
 DOCUMENTATION INVENTORY:
   README.md — Last updated 14 months ago, references Node 16 (current: 20)
   docs/api.md — Accurate but incomplete, covers 12 of 31 endpoints
@@ -45,11 +45,11 @@ DOCUMENTATION INVENTORY:
 
 ### 2. Generate the local development setup guide
 
-```
+```text
 Create a step-by-step local dev setup guide from docker-compose.yml, .env.example, and the Makefile.
 ```
 
-```
+```text
 # Local Development Setup
 
 ## Prerequisites
@@ -69,11 +69,11 @@ Create a step-by-step local dev setup guide from docker-compose.yml, .env.exampl
 
 ### 3. Build the architecture overview
 
-```
+```text
 Analyze our codebase structure and CI configs. Generate an architecture overview with services, data flow, and key decisions.
 ```
 
-```
+```text
 # Architecture Overview
 
 ## Services
@@ -92,11 +92,11 @@ Analyze our codebase structure and CI configs. Generate an architecture overview
 
 ### 4. Create the first-week checklist
 
-```
+```text
 Generate a day-by-day first-week checklist for new engineers covering setup, codebase orientation, and first PR.
 ```
 
-```
+```text
 # Your First Week
 
 Day 1: Get access (GitHub, Slack, Railway, Sentry). Follow setup guide. Run tests.
@@ -107,11 +107,11 @@ Day 5: Update onboarding docs with anything wrong. Meet 2 teammates.
 
 ### 5. Add documentation freshness checks
 
-```
+```text
 Create a CI check that flags PRs changing code without updating related docs.
 ```
 
-```
+```text
 Added .github/workflows/docs-check.yml:
   Triggers on PRs modifying src/, docker-compose.yml, or .env.example
   Posts reminder comment if corresponding docs/ files weren't updated

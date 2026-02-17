@@ -29,11 +29,11 @@ npx terminal-skills install api-tester cicd-pipeline report-generator
 
 ### 1. Identify critical performance paths
 
-```
+```text
 Analyze our API routes and identify the top 10 endpoints by traffic volume and latency sensitivity. These will be our benchmark targets.
 ```
 
-```
+```text
 CRITICAL PATHS (by traffic × impact):
 
   1. GET  /api/orders          — 12K req/hr, p95: 340ms, revenue-critical
@@ -52,11 +52,11 @@ Baseline recorded from production metrics (last 7 days, p50/p95/p99)
 
 ### 2. Create the benchmark suite
 
-```
+```text
 Build a benchmark configuration that tests these 10 endpoints with realistic payloads. Each test should run 100 requests and measure p50, p95, and p99 latency.
 ```
 
-```
+```text
 Created: benchmarks/performance.config.json
 
 10 scenarios with realistic payloads (orders CRUD, search, dashboard, auth, etc.)
@@ -67,11 +67,11 @@ Created: benchmarks/performance.config.json
 
 ### 3. Set up the CI pipeline
 
-```
+```text
 Add a GitHub Actions workflow that runs benchmarks on every PR. Compare results against the main branch baseline. Fail the check if any endpoint regresses more than 20%.
 ```
 
-```
+```text
 Created: .github/workflows/performance.yml
 
 Workflow:
@@ -94,11 +94,11 @@ Runs in ~3 minutes (docker startup + 45s benchmarks × 2 branches)
 
 ### 4. Generate the comparison report
 
-```
+```text
 Format the benchmark comparison as a clear PR comment showing before/after for each endpoint.
 ```
 
-```
+```text
 ## ⚡ Performance Benchmark Results
 
 | Endpoint | Baseline p95 | PR p95 | Change | Status |
@@ -117,11 +117,11 @@ Format the benchmark comparison as a clear PR comment showing before/after for e
 
 ### 5. Track performance trends over time
 
-```
+```text
 Store benchmark results from each merged PR. Generate a weekly trend report showing performance trajectory per endpoint.
 ```
 
-```
+```text
 Stored: benchmarks/history/ — JSON per merged PR with timestamp
 
 Weekly Performance Trend (last 4 weeks):

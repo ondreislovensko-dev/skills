@@ -25,11 +25,11 @@ npx terminal-skills install code-migration test-generator security-audit
 
 ### 1. Generate baseline tests before migration
 
-```
+```text
 Generate snapshot tests for the payment, auth, and order modules. Capture current input/output behavior for regression detection during migration.
 ```
 
-```
+```text
 Baseline Tests Created:
 
   tests/baseline/payment.test.js — 28 tests
@@ -45,11 +45,11 @@ Tests verify behavior, not implementation — they'll validate the migration.
 
 ### 2. Migrate the first module
 
-```
+```text
 Migrate src/services/payment.js from callbacks to async/await. Convert require() to ESM. Replace Waterline queries with Prisma. Keep the same API contracts.
 ```
 
-```
+```text
 Migration: src/services/payment.js
 
   ✓ 34 callback chains → async/await (8 nesting levels → 3)
@@ -63,11 +63,11 @@ Running baseline tests... 28/28 passing ✓
 
 ### 3. Migrate remaining modules
 
-```
+```text
 Migrate auth.js and orders.js using the same patterns. Run baseline tests after each module.
 ```
 
-```
+```text
   src/services/auth.js
     ✓ 21 callbacks → async/await, JWT modernized (jose library)
     ✓ Waterline → Prisma (User, Session, Token models)
@@ -82,11 +82,11 @@ All 69 baseline tests passing. Zero regressions.
 
 ### 4. Audit migrated code for security issues
 
-```
+```text
 Run a security audit on the migrated modules. Focus on issues introduced during migration — new ORM queries, async error handling, updated JWT library.
 ```
 
-```
+```text
 Security Audit — Migrated Code — 7 findings
 
 CRITICAL (1):
@@ -108,11 +108,11 @@ All fixes applied. Baseline tests: 69/69 passing ✓
 
 ### 5. Generate tests for new patterns
 
-```
+```text
 Generate tests covering the new async patterns, Prisma transactions, and jose JWT handling.
 ```
 
-```
+```text
 Migration-Specific Tests:
 
   async-errors.test.js — 11 tests (rejection propagation, pool exhaustion, timeouts)

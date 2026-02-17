@@ -27,7 +27,7 @@ npx terminal-skills install test-generator coding-agent data-analysis
 
 Tell the agent to map your coverage landscape:
 
-```
+```text
 Analyze our codebase test coverage. Run the coverage tool, parse the output, and give me a breakdown by module showing: line coverage percentage, number of uncovered lines, and which files have zero tests. Sort by risk — lowest coverage in most-changed files first.
 ```
 
@@ -35,7 +35,7 @@ Analyze our codebase test coverage. Run the coverage tool, parse the output, and
 
 The agent executes your test suite with coverage enabled and parses the output into a structured report:
 
-```
+```text
 Coverage analysis complete:
 
 High Risk (low coverage + high change frequency):
@@ -53,13 +53,13 @@ Module Summary:
 
 ### 3. Generate the tracking dashboard
 
-```
+```text
 Create a coverage tracking dashboard that reads from our CI coverage reports. Show trends over time per module, highlight regressions, and flag any PR that drops coverage below threshold.
 ```
 
 The agent builds a lightweight HTML dashboard that reads coverage JSON artifacts:
 
-```
+```text
 Dashboard created: coverage-dashboard/index.html
 
 Features:
@@ -73,7 +73,7 @@ Features:
 
 The agent configures your CI pipeline to block PRs that reduce coverage:
 
-```
+```text
 Coverage gate configured in .github/workflows/coverage.yml:
 - Fails if overall coverage drops below 70%
 - Warns if any module drops more than 5% from baseline
@@ -83,7 +83,7 @@ Coverage gate configured in .github/workflows/coverage.yml:
 
 ### 5. Generate tests for the worst gaps
 
-```
+```text
 Generate tests for the 5 files with the lowest coverage in the billing module. Focus on the uncovered branches and error paths.
 ```
 
@@ -101,7 +101,7 @@ Ravi is the tech lead at a 15-person SaaS startup. After a billing bug caused du
 
 ### 6. Set up weekly coverage digests
 
-```
+```text
 Send a weekly coverage summary to the engineering Slack channel showing trend per module, biggest improvements, and any new regressions introduced this week.
 ```
 

@@ -68,7 +68,7 @@ Contributing Factors:
 
 ### 4. The agent generates action items with owners
 
-```
+```text
 Action Items:
 | # | Action | Owner | Priority | Due |
 |---|--------|-------|----------|-----|

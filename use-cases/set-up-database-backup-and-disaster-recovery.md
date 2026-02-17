@@ -27,13 +27,13 @@ npx terminal-skills install db-backup docker-helper cicd-pipeline
 
 Start by understanding what you have and what you need:
 
-```
+```text
 Audit my current database backup setup. I have a PostgreSQL 15 database (180GB) running on an AWS RDS instance. There's a cron job in /etc/cron.d/db-backup that runs pg_dump nightly. Check the backup script, verify recent backups exist and are valid, and identify gaps in our disaster recovery readiness. Also tell me our current RPO and RTO.
 ```
 
 The agent examines the setup and reports:
 
-```
+```text
 Backup Audit Results:
 
 Current setup:
@@ -60,7 +60,7 @@ Recommended target: RPO < 5 minutes (WAL archiving), RTO < 30 minutes (tested ru
 
 Now build the real backup infrastructure:
 
-```
+```text
 Set up a comprehensive backup strategy for our PostgreSQL 15 database on RDS. I need: continuous WAL archiving to S3 for point-in-time recovery (RPO < 5 minutes), daily full backups with compression and encryption uploaded to S3 in a different region (us-west-2, database is in us-east-1), backup rotation keeping 7 daily, 4 weekly, and 12 monthly backups, and automated cleanup of expired backups. Use a containerized backup runner so it's portable. Store the encryption key in AWS Secrets Manager.
 ```
 
@@ -70,13 +70,13 @@ The agent generates a complete backup system: a Docker container with pg_basebac
 
 Backups you have not restored are just hopes:
 
-```
+```text
 Create an automated backup verification job that runs daily after the backup completes. It should: download the latest backup from S3, restore it to a temporary RDS instance (db.t3.medium), run integrity checks comparing row counts of the 10 largest tables against production, verify that the most recent transaction timestamp is within 24 hours, then tear down the temporary instance. Send a Slack notification with results. If verification fails, page the on-call engineer.
 ```
 
 The agent produces a verification script:
 
-```
+```text
 Backup Verification Report — Feb 17, 2026
 
   ✓ Backup downloaded: 18.2 GB compressed (180 GB uncompressed)
@@ -98,7 +98,7 @@ Verified RTO: 22 minutes (restore time)
 
 Document exact recovery steps so anyone on the team can execute under pressure:
 
-```
+```text
 Create a disaster recovery runbook for our PostgreSQL database. Cover these scenarios: 1) accidental data deletion (restore specific tables from backup), 2) database corruption (full restore from latest backup), 3) point-in-time recovery (restore to a specific timestamp before an incident), 4) complete region failure (failover to cross-region replica). Include exact commands, estimated time per step, verification queries, and a stakeholder communication template.
 ```
 
@@ -106,7 +106,7 @@ The agent produces a detailed runbook with four scenario playbooks, each with nu
 
 ### 5. Integrate backup monitoring into your infrastructure
 
-```
+```text
 Set up monitoring and alerting for the backup system. Track: backup job completion/failure, backup size trend (alert if size drops more than 20% — indicates partial backup), time since last successful verified backup (alert if over 26 hours), S3 storage usage and costs, and restore drill results. Create a CloudWatch dashboard with these metrics and PagerDuty alerts for failures.
 ```
 

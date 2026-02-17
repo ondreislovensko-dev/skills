@@ -29,11 +29,11 @@ npx terminal-skills install job-queue docker-helper batch-processor
 
 ### 1. Set up queue infrastructure with Redis and job types
 
-```
+```text
 Create a BullMQ job queue system for my Node.js Express API. I need to handle 4 types of background jobs: PDF OCR processing (CPU-intensive, can take 5-8 minutes), bulk email sending (I/O bound, rate-limited to 100/minute by our provider), CSV data export (memory-intensive, up to 100K rows), and document thumbnail generation (CPU-bound, batched). Set up Redis with Docker and create typed job definitions.
 ```
 
-```
+```text
 🚀 CREATING JOB QUEUE INFRASTRUCTURE...
 
 Created docker-compose.yml:
@@ -66,11 +66,11 @@ Created 4 optimized queues:
 
 ### 2. Implement workers with proper concurrency and error handling
 
-```
+```text
 Create background workers for each queue type. PDF worker should process 2 jobs simultaneously (CPU-bound), email worker should respect our provider's 100/minute rate limit, CSV worker should run 1 at a time to avoid memory spikes, thumbnail worker can handle 4 concurrent jobs. All workers need graceful shutdown, progress tracking, and detailed error logging.
 ```
 
-```
+```text
 📋 IMPLEMENTING BACKGROUND WORKERS...
 
 Created src/workers/pdf-worker.ts:
@@ -108,11 +108,11 @@ Worker management (src/workers/index.ts):
 
 ### 3. Add job scheduling and progress tracking APIs
 
-```
+```text
 Add recurring job scheduling for maintenance tasks: daily email digest at 8 AM UTC, weekly analytics report generation every Monday at 6 AM, monthly data cleanup at midnight on the 1st. Also create REST endpoints so the frontend can poll job status and show progress bars to users.
 ```
 
-```
+```text
 ⏰ SCHEDULING & PROGRESS TRACKING SETUP...
 
 Added recurring jobs to src/jobs/scheduled.ts:
@@ -149,11 +149,11 @@ Frontend integration examples:
 
 ### 4. Add monitoring dashboard and failure alerting
 
-```
+```text
 Set up Bull Board dashboard for queue monitoring and create automated alerting. I want to know when queues back up beyond normal levels, when workers are failing repeatedly, or when job processing times exceed expected thresholds.
 ```
 
-```
+```text
 📊 MONITORING & ALERTING DASHBOARD...
 
 Installed Bull Board at /admin/queues (basic auth protected):

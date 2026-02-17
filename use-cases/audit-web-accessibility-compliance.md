@@ -25,13 +25,13 @@ npx terminal-skills install accessibility-auditor code-reviewer frontend-design
 
 ### 1. Audit the most critical user flows first
 
-```
+```text
 Audit the accessibility of our signup flow: src/pages/signup.tsx, src/components/SignupForm.tsx, and src/components/PasswordStrength.tsx. Check against WCAG 2.2 Level AA. This needs to be compliant before June.
 ```
 
 The agent analyzes all three files and produces:
 
-```
+```text
 Accessibility Audit: Signup Flow
 ==================================
 14 violations found (5 Critical, 6 Major, 3 Minor)
@@ -82,13 +82,13 @@ MAJOR [WCAG 2.4.7] Focus not moved to first error on submit
 
 ### 2. Fix critical issues and verify
 
-```
+```text
 I've implemented the 5 critical fixes. Review my changes in the git diff and check if the ARIA patterns are correct.
 ```
 
 The agent reviews the diff:
 
-```
+```text
 Code Review: Accessibility Fixes
 ==================================
 4/5 fixes correctly implemented. 1 issue:
@@ -110,7 +110,7 @@ Error association via aria-describedby is properly wired.
 
 ### 3. Audit remaining pages systematically
 
-```
+```text
 Now audit these 6 component files that appear on every page: Header.tsx, Footer.tsx, Navigation.tsx, SearchBar.tsx, MobileMenu.tsx, CookieBanner.tsx. These are shared components so fixing them fixes accessibility site-wide.
 ```
 
@@ -118,11 +118,11 @@ The agent audits all shared components and finds 23 issues, including a keyboard
 
 ### 4. Generate a compliance report
 
-```
+```text
 Generate a WCAG 2.2 Level AA compliance summary showing: total violations found, violations fixed, remaining issues, and our compliance percentage by WCAG principle (Perceivable, Operable, Understandable, Robust).
 ```
 
-```
+```text
 WCAG 2.2 Level AA Compliance Report
 ======================================
 Date: February 2026

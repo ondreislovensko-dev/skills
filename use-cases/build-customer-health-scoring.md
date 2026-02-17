@@ -27,11 +27,11 @@ npx terminal-skills install data-analysis excel-processor data-analysis
 
 ### 1. Merge and clean multi-source data
 
-```
+```text
 Here are three exports: product-usage.csv (daily logins, feature usage per account), support-tickets.csv (ticket history with resolution times), and billing.csv (MRR, plan changes, payment failures). Merge them into a single customer dataset.
 ```
 
-```
+```text
 MERGED DATASET: 340 accounts, 24 features per account
 
 Product: login_frequency, dau_ratio, features_used, time_in_app, last_active_days
@@ -44,11 +44,11 @@ DATA QUALITY: 12 accounts missing usage data (free trial) — flagged
 
 ### 2. Analyze historical churn patterns
 
-```
+```text
 Look at the 47 customers who churned in the last 6 months. What patterns predicted their churn? Compare against retained customers.
 ```
 
-```
+```text
 CHURN PATTERN ANALYSIS — 47 churned vs 293 retained
 
 STRONGEST PREDICTORS:
@@ -64,11 +64,11 @@ SEGMENTS: Ghost accounts (34%), Frustrated users (40%), Budget cuts (26%)
 
 ### 3. Build the health scoring model
 
-```
+```text
 Create a weighted health score (0-100) for each customer based on the churn predictors. Categorize as Healthy, At Risk, or Critical.
 ```
 
-```
+```text
 HEALTH SCORE MODEL:
 
 Weights:
@@ -93,11 +93,11 @@ TOP 10 CRITICAL ACCOUNTS:
 
 ### 4. Create the CS team dashboard
 
-```
+```text
 Build a dashboard showing customer health distribution, trending accounts, and daily priority list for the CS team.
 ```
 
-```
+```text
 Generated: customer-health-dashboard.html (interactive)
 
 Panels:
@@ -113,11 +113,11 @@ Export: CSV of priority list for CRM import
 
 ### 5. Set up automated alerts and playbooks
 
-```
+```text
 Create alert rules: notify CS when a customer's score drops below 40 or drops more than 20 points in a week. Include suggested actions.
 ```
 
-```
+```text
 Alert rules configured:
 
   CRITICAL ALERT (score < 40):

@@ -25,13 +25,13 @@ npx terminal-skills install docker-optimizer docker-helper
 
 ### 1. Audit your current images
 
-```
+```text
 Analyze all Dockerfiles in this repository. For each one, report: current base image and tag, estimated image size, number of layers, identified issues (dev dependencies in production, missing .dockerignore, unnecessary files copied, inefficient layer ordering). Show me the total registry footprint.
 ```
 
 The agent examines your Dockerfiles and produces a report:
 
-```
+```text
 Image Audit Report:
 ┌──────────────────┬─────────────────┬──────────┬────────┬──────────────────────────┐
 │ Service          │ Base Image      │ Est Size │ Layers │ Issues                   │
@@ -46,7 +46,7 @@ Total registry footprint: ~4.9 GB per tag
 
 ### 2. Rewrite Dockerfiles with multi-stage builds
 
-```
+```text
 Rewrite the api Dockerfile using a multi-stage build. Stage 1: install all dependencies and compile TypeScript. Stage 2: production-only node_modules with npm ci --omit=dev. Stage 3: copy compiled JS and prod node_modules into a node:18-alpine base. Pin the Alpine version. Add proper HEALTHCHECK, non-root USER, and labels.
 ```
 
@@ -54,7 +54,7 @@ The agent rewrites the Dockerfile, reducing the API image from 1.4 GB to 180 MB.
 
 ### 3. Optimize the .dockerignore and layer caching
 
-```
+```text
 Create or update .dockerignore files for all services. Then reorder the COPY instructions in each Dockerfile to maximize layer caching — dependencies file first, install, then source code. Show me the expected cache hit scenarios for common changes (code change, dependency change, config change).
 ```
 
@@ -62,11 +62,11 @@ The agent creates `.dockerignore` files excluding `.git`, `node_modules`, test f
 
 ### 4. Choose minimal base images
 
-```
+```text
 For each service, recommend the smallest viable base image. Compare node:18-alpine vs node:18-slim vs distroless for the Node services, and python:3.11-slim vs python:3.11-alpine vs distroless/python3 for the worker. Consider native dependency compatibility (bcrypt, sharp, psycopg2) and debugging needs. Show size comparisons.
 ```
 
-```
+```text
 Base Image Comparison:
 - node:18          → 992 MB (full Debian, includes build tools)
 - node:18-slim     → 243 MB (minimal Debian, no build tools)
@@ -79,11 +79,11 @@ distroless for frontend (static nginx serving, no shell needed)
 
 ### 5. Validate and measure results
 
-```
+```text
 Build all optimized images and compare sizes against the originals. Run the test suite against the optimized images to verify nothing is broken. Check that native modules (bcrypt, sharp) work correctly on Alpine. Generate a summary with before/after sizes and percentage reduction.
 ```
 
-```
+```text
 Optimization Results:
 ┌──────────────────┬────────────┬───────────┬───────────┐
 │ Service          │ Before     │ After     │ Reduction │

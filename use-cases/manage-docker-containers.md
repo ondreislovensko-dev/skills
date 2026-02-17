@@ -29,11 +29,11 @@ npx terminal-skills install docker-helper docker-optimizer cicd-pipeline
 
 ### 1. Container audit and optimization analysis
 
-```
+```text
 Analyze all our Docker setups across 6 services. Identify bottlenecks in build time, image size, and deployment efficiency.
 ```
 
-```
+```text
 DOCKER AUDIT RESULTS:
 
 Service Analysis:
@@ -59,11 +59,11 @@ TOTAL WASTE IDENTIFIED: 89% of image content unnecessary in production
 
 ### 2. Multi-stage build optimization
 
-```
+```text
 Implement optimized multi-stage Dockerfiles with intelligent layer caching and minimal production images.
 ```
 
-```
+```text
 DOCKERFILE OPTIMIZATION RESULTS:
 
 Node.js Frontend - Optimized Build:
@@ -116,11 +116,11 @@ RESULTS: 967MB → 12.3MB (99% reduction), build time 18m → 2m 31s
 
 ### 3. Intelligent orchestration with docker-compose
 
-```
+```text
 Create production-ready docker-compose configuration with health checks, proper networking, and development optimizations.
 ```
 
-```
+```text
 ORCHESTRATION IMPROVEMENTS:
 
 docker-compose.yml - Optimized Configuration:
@@ -172,11 +172,11 @@ STARTUP TIME: 11m → 1m 43s (local development)
 
 ### 4. CI/CD pipeline optimization
 
-```
+```text
 Implement Docker layer caching, parallel builds, and optimized deployment strategies in our CI/CD pipeline.
 ```
 
-```
+```text
 CI/CD PIPELINE OPTIMIZATION:
 
 GitHub Actions - Optimized Workflow:
@@ -217,11 +217,11 @@ MONTHLY SAVINGS: Docker Hub costs $340 → $67, AWS bandwidth $234 → $41
 
 ### 5. Development workflow automation
 
-```
+```text
 Create development scripts and documentation for consistent Docker workflows across the team.
 ```
 
-```
+```text
 DEVELOPER EXPERIENCE IMPROVEMENTS:
 
 Scripts Created:
