@@ -29,7 +29,7 @@ npx terminal-skills install voice-to-text
 
 Tell your AI agent what you need:
 
-```
+```text
 Transcribe meeting-recording.mp3 to text
 ```
 
@@ -45,7 +45,7 @@ The agent handles format conversion (via FFmpeg), selects the appropriate model 
 
 ### 4. You get clean text output
 
-```
+```text
 Transcription complete!
 - Duration: 45:32
 - Words: 6,847
@@ -66,12 +66,12 @@ Ask the agent to summarize, extract action items, or search for specific topics 
 
 A product manager records weekly standups on Zoom. After each meeting:
 
-```
+```text
 Transcribe standup-2024-01-15.mp4 and extract action items
 ```
 
 Output:
-```
+```text
 ACTION ITEMS:
 - @john: Fix login bug by Friday
 - @sarah: Send design specs to engineering
@@ -82,7 +82,7 @@ ACTION ITEMS:
 
 A podcaster needs SRT subtitles for accessibility:
 
-```
+```text
 Create subtitles for episode-42.mp3 in SRT format
 ```
 
@@ -92,7 +92,7 @@ The agent generates `episode-42.srt` with timestamps for each line.
 
 You record ideas on your phone while commuting:
 
-```
+```text
 Transcribe all files in ~/Voice-Memos/ and combine into notes.md
 ```
 
@@ -102,7 +102,7 @@ The agent batch-processes all M4A files and produces organized notes.
 
 A journalist has 3 hours of interview recordings:
 
-```
+```text
 Transcribe interview-part1.wav interview-part2.wav interview-part3.wav
 Then find all mentions of "budget" or "funding"
 ```

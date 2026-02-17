@@ -25,13 +25,13 @@ npx terminal-skills install api-doc-generator api-tester code-reviewer
 
 ### 1. Scan the codebase for documentation drift
 
-```
+```text
 Compare our OpenAPI spec at docs/openapi.yaml against the actual route handlers in src/routes/ and src/controllers/. List every discrepancy — missing endpoints, removed endpoints, and schema changes.
 ```
 
 The agent parses the existing OpenAPI file, walks through every route handler, and produces a drift report:
 
-```
+```text
 Documentation Drift Report
 ===========================
 5 discrepancies found across 34 endpoints.
@@ -50,7 +50,7 @@ Schema changes:
 
 ### 2. Generate the updated OpenAPI spec
 
-```
+```text
 Generate an updated openapi.yaml that fixes all 5 discrepancies. Keep the existing descriptions and examples where they're still accurate. Add realistic examples for new fields.
 ```
 
@@ -58,13 +58,13 @@ The agent produces a clean OpenAPI 3.0.3 document with properly referenced schem
 
 ### 3. Validate endpoints against the new spec
 
-```
+```text
 Hit each of the 5 changed endpoints on our staging server at https://staging-api.internal:3000 and verify the responses match the updated spec. Use the test auth token from .env.staging.
 ```
 
 The agent runs targeted requests and reports:
 
-```
+```text
 Endpoint Validation Results
 ============================
 ✓ POST /api/v2/teams/:teamId/invites — 201, schema matches
@@ -78,13 +78,13 @@ Endpoint Validation Results
 
 ### 4. Review the diff for quality
 
-```
+```text
 Review the diff between the old and new openapi.yaml. Flag any breaking changes that need a version bump or client notification.
 ```
 
 The agent identifies:
 
-```
+```text
 Breaking Change Analysis
 =========================
 1 BREAKING: POST /api/v2/users now requires "workspaceId"

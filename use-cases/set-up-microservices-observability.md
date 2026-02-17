@@ -27,13 +27,13 @@ npx terminal-skills install cicd-pipeline
 
 ### 1. Instrument services with OpenTelemetry
 
-```
+```text
 I have 4 Node.js services (api-gateway, user-service, order-service, payment-service) and 1 Python service (notification-service). Add OpenTelemetry auto-instrumentation to each. Configure trace propagation using W3C TraceContext. Set up metric collection for: HTTP request duration, request count by status code, and active database connections. Add structured JSON logging with trace_id and span_id in every log line.
 ```
 
 The agent configures each service:
 
-```
+```text
 Instrumentation complete for 5 services:
 
 api-gateway (Node.js):
@@ -54,13 +54,13 @@ notification-service (Python):
 
 ### 2. Deploy the observability stack
 
-```
+```text
 Write a docker-compose.yml for the observability backend: OpenTelemetry Collector receiving OTLP, Tempo for traces, Loki for logs, Mimir for metrics, and Grafana with pre-provisioned data sources. Pin all versions. Add a collector config that routes traces to Tempo, metrics to Mimir, and logs to Loki. Include health checks and resource limits.
 ```
 
 ### 3. Build the dashboards
 
-```
+```text
 Create three Grafana dashboards as JSON provisioning files:
 
 1. Service Overview — panels: request rate per service, p50/p95/p99 latency, error rate, top 5 slowest endpoints
@@ -72,13 +72,13 @@ Use variables for service name and time range. Add alert rules: error rate > 5% 
 
 ### 4. Add correlation between signals
 
-```
+```text
 Configure Grafana so that: clicking a spike in the error rate metric jumps to Loki logs filtered by that time range and service, and log lines with trace_ids link directly to the full trace in Tempo. Set up derived fields in the Loki data source to parse trace_id and create a Tempo link.
 ```
 
 ### 5. Create a runbook for common incidents
 
-```
+```text
 Based on the dashboards, write a troubleshooting runbook in docs/runbook.md covering these scenarios:
 1. High error rate on a single service — how to find the trace, identify the root span, check downstream dependencies
 2. Latency spike across all services — how to check if it's database, network, or code

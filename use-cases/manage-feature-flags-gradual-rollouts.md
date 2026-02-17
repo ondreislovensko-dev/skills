@@ -27,56 +27,54 @@ Build a feature flag system with percentage-based rollouts, user targeting rules
 
 ### Prompt for Your AI Agent
 
-```
-I need to implement a feature flag system for our Node.js/React invoicing platform. Here's what we need:
-
-**Current stack:**
-- Backend: Node.js (Express), PostgreSQL, Redis
-- Frontend: React (Next.js)
-- 12,000 active accounts, ~45,000 monthly active users
-- Deploy via GitHub Actions → Kubernetes
-
-**Requirements:**
-
-1. **Flag types:**
-   - Boolean (on/off) — simple kill switches
-   - Percentage rollout — show to X% of users, deterministic (same user always gets same result)
-   - User targeting — enable for specific user IDs, account IDs, or email domains
-   - Rule-based — enable based on user attributes (plan tier, country, account age, etc.)
-
-2. **Flags we need right now:**
-   - `new-pdf-engine` — rollout new PDF export, starting at 5% of accounts
-   - `redesigned-dashboard` — A/B test: 50% see old, 50% see new
-   - `ai-chatbot` — enable only for free-tier accounts in US and UK
-   - `bulk-invoice-api` — enable for 3 specific enterprise account IDs
-   - `maintenance-mode` — global kill switch, off by default
-
-3. **SDK requirements:**
-   - Server-side evaluation (Node.js) — flags checked in API handlers
-   - Client-side SDK (React) — flags available via hook: `useFeatureFlag('new-pdf-engine')`
-   - Deterministic bucketing — user sees the same variant across sessions and devices
-   - Local evaluation with cached rules — no network call per flag check (latency budget: <1ms)
-
-4. **Rollout workflow:**
-   - Create flag with targeting rules
-   - Start at 5% → monitor error rates and latency for 24h
-   - If metrics are green, increase to 25% → 50% → 100%
-   - If metrics spike, kill switch to 0% instantly (no redeploy)
-   - After full rollout and 2 weeks stable, remove flag from code (flag hygiene)
-
-5. **Analytics integration:**
-   - Track which flag variant each user is in
-   - Send flag assignments to analytics (Mixpanel/Amplitude)
-   - Compare conversion rates, error rates, latency between flag-on and flag-off groups
-   - Dashboard showing: flag status, rollout %, users affected, key metrics per variant
-
-6. **Implementation options (pick the best fit):**
-   - Self-hosted with Redis/PostgreSQL (we control everything, no vendor)
-   - OR use LaunchDarkly/Unleash SDK (managed, less maintenance)
-   - Either way, build the evaluation logic, React hook, and rollout automation
-
-Build the flag evaluation engine, targeting rules, React SDK hook, and the gradual rollout automation that monitors metrics and auto-progresses or auto-rolls-back.
-```
+> I need to implement a feature flag system for our Node.js/React invoicing platform. Here's what we need:
+>
+> **Current stack:**
+> - Backend: Node.js (Express), PostgreSQL, Redis
+> - Frontend: React (Next.js)
+> - 12,000 active accounts, ~45,000 monthly active users
+> - Deploy via GitHub Actions → Kubernetes
+>
+> **Requirements:**
+>
+> 1. **Flag types:**
+>    - Boolean (on/off) — simple kill switches
+>    - Percentage rollout — show to X% of users, deterministic (same user always gets same result)
+>    - User targeting — enable for specific user IDs, account IDs, or email domains
+>    - Rule-based — enable based on user attributes (plan tier, country, account age, etc.)
+>
+> 2. **Flags we need right now:**
+>    - `new-pdf-engine` — rollout new PDF export, starting at 5% of accounts
+>    - `redesigned-dashboard` — A/B test: 50% see old, 50% see new
+>    - `ai-chatbot` — enable only for free-tier accounts in US and UK
+>    - `bulk-invoice-api` — enable for 3 specific enterprise account IDs
+>    - `maintenance-mode` — global kill switch, off by default
+>
+> 3. **SDK requirements:**
+>    - Server-side evaluation (Node.js) — flags checked in API handlers
+>    - Client-side SDK (React) — flags available via hook: `useFeatureFlag('new-pdf-engine')`
+>    - Deterministic bucketing — user sees the same variant across sessions and devices
+>    - Local evaluation with cached rules — no network call per flag check (latency budget: <1ms)
+>
+> 4. **Rollout workflow:**
+>    - Create flag with targeting rules
+>    - Start at 5% → monitor error rates and latency for 24h
+>    - If metrics are green, increase to 25% → 50% → 100%
+>    - If metrics spike, kill switch to 0% instantly (no redeploy)
+>    - After full rollout and 2 weeks stable, remove flag from code (flag hygiene)
+>
+> 5. **Analytics integration:**
+>    - Track which flag variant each user is in
+>    - Send flag assignments to analytics (Mixpanel/Amplitude)
+>    - Compare conversion rates, error rates, latency between flag-on and flag-off groups
+>    - Dashboard showing: flag status, rollout %, users affected, key metrics per variant
+>
+> 6. **Implementation options (pick the best fit):**
+>    - Self-hosted with Redis/PostgreSQL (we control everything, no vendor)
+>    - OR use LaunchDarkly/Unleash SDK (managed, less maintenance)
+>    - Either way, build the evaluation logic, React hook, and rollout automation
+>
+> Build the flag evaluation engine, targeting rules, React SDK hook, and the gradual rollout automation that monitors metrics and auto-progresses or auto-rolls-back.
 
 ### What Your Agent Will Do
 

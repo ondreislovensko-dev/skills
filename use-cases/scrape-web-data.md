@@ -29,11 +29,11 @@ npx terminal-skills install web-scraper data-analysis batch-processor
 
 ### 1. Multi-site scraper architecture development
 
-```
+```text
 Build adaptive scrapers for 12 major retailers. Handle JavaScript rendering, anti-bot detection, and varying site structures.
 ```
 
-```
+```text
 SCRAPER DEVELOPMENT COMPLETE:
 
 Target Sites Analyzed:
@@ -59,11 +59,11 @@ SCRAPER PERFORMANCE:
 
 ### 2. Intelligent data extraction and validation
 
-```
+```text
 Extract pricing, availability, reviews, and specifications with quality validation and anomaly detection.
 ```
 
-```
+```text
 DATA EXTRACTION RESULTS:
 
 Product Data Schema Standardized:
@@ -90,11 +90,11 @@ DAILY DATASET: 34,164 validated data points across 2,847 products
 
 ### 3. Competitive analysis and pricing intelligence
 
-```
+```text
 Analyze pricing patterns, identify market opportunities, and generate competitive positioning recommendations.
 ```
 
-```
+```text
 COMPETITIVE INTELLIGENCE GENERATED:
 
 Price Analysis Results:
@@ -123,11 +123,11 @@ Customer Sentiment Analysis:
 
 ### 4. Automated monitoring and alert system
 
-```
+```text
 Set up real-time monitoring with intelligent alerts for significant market changes and opportunities.
 ```
 
-```
+```text
 MONITORING SYSTEM DEPLOYED:
 
 Alert Categories Configured:
@@ -157,11 +157,11 @@ BUSINESS IMPACT TRACKING:
 
 ### 5. Scalable batch processing and data pipeline
 
-```
+```text
 Build robust data processing pipeline that handles site changes, scales to new products, and maintains data quality at scale.
 ```
 
-```
+```text
 SCALABLE ARCHITECTURE DEPLOYED:
 
 Batch Processing Pipeline:

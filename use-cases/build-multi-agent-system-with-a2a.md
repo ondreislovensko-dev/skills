@@ -25,7 +25,7 @@ npx terminal-skills install a2a-protocol coding-agent mcp-server-builder
 
 ### 1. Create Agent Cards and wrap existing agents
 
-```
+```text
 We have 4 agents on different frameworks:
 1. Research agent (LangGraph) — searches web, summarizes papers
 2. Code agent (Google ADK) — generates and refactors code
@@ -45,7 +45,7 @@ The agent wraps the LangGraph research agent in an A2A server using the a2a-sdk'
 
 ### 2. Build the orchestrator agent
 
-```
+```text
 Create an A2A orchestrator that:
 1. Discovers all available agents by fetching their Agent Cards from a
    registry (a JSON file listing agent URLs for now)
@@ -65,7 +65,7 @@ The agent builds an orchestrator that loads Agent Cards from a registry, uses an
 
 ### 3. Implement agent-to-agent delegation
 
-```
+```text
 Add the ability for agents to delegate to each other directly (not just
 through the orchestrator). For example: the writer agent needs data to
 include in a report, so it sends an A2A message to the data agent asking
@@ -82,7 +82,7 @@ The agent modifies the writer agent to include A2A client capabilities. When the
 
 ### 4. Add push notifications for long-running tasks
 
-```
+```text
 The data analysis agent can take 5-10 minutes for complex queries. Set up
 push notifications so:
 1. Client sends a task to the orchestrator
@@ -100,7 +100,7 @@ The agent implements push notification handlers on the orchestrator, configures 
 
 ### 5. Add security and production hardening
 
-```
+```text
 Secure the multi-agent system:
 1. Agent-to-agent authentication: each agent has a service account token,
    declared in its Agent Card's authentication section

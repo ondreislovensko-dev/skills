@@ -29,11 +29,11 @@ npx terminal-skills install webhook-processor batch-processor error-monitoring
 
 ### 1. Set up reliable webhook ingestion with immediate acknowledgment
 
-```
+```text
 Create a webhook processing system for Stripe events. I need to handle 5 types: payment_intent.succeeded, payment_intent.failed, charge.dispute.created, invoice.payment_succeeded, and customer.subscription.updated. Each webhook should be acknowledged immediately (200 OK) then processed asynchronously. Include signature verification, deduplication, and high-availability considerations.
 ```
 
-```
+```text
 🔗 WEBHOOK INGESTION SYSTEM SETUP...
 
 Created webhook endpoints (src/routes/webhooks.ts):
@@ -67,11 +67,11 @@ High-availability features:
 
 ### 2. Implement async processing with batch capabilities
 
-```
+```text
 Create background workers to process the queued webhook events. Payment events need individual processing with user balance updates and email notifications. For high-volume events like subscription updates, process them in batches of 50 to improve efficiency. Include proper error handling, progress tracking, and retry logic.
 ```
 
-```
+```text
 ⚙️ ASYNC WEBHOOK PROCESSING WORKERS...
 
 Created specialized workers:
@@ -112,11 +112,11 @@ PROCESSING CAPACITY:
 
 ### 3. Add comprehensive error monitoring and alerting
 
-```
+```text
 Set up error monitoring for the webhook system. Track processing failures, identify patterns in failed webhooks, monitor system health metrics, and create intelligent alerting that escalates based on error severity. Include automated recovery for transient failures and detailed error reporting.
 ```
 
-```
+```text
 🔍 ERROR MONITORING & ALERTING SYSTEM...
 
 Error tracking setup (src/monitoring/webhook-errors.ts):
@@ -167,11 +167,11 @@ ERROR ANALYSIS DASHBOARD:
 
 ### 4. Implement automatic recovery and manual intervention tools
 
-```
+```text
 Build automated recovery mechanisms for common failure scenarios and admin tools for manual intervention when needed. Include webhook replay capabilities, failed job analysis, and emergency processing controls.
 ```
 
-```
+```text
 🔄 AUTOMATED RECOVERY & ADMIN TOOLS...
 
 Automatic recovery systems:

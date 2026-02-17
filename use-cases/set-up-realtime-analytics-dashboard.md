@@ -27,7 +27,7 @@ npx terminal-skills install docker-helper
 
 ### 1. Design the event schema
 
-```
+```text
 Design an analytics event schema for a SaaS product. Events include page_view, button_click, signup_started, signup_completed, feature_used, and error_occurred. Each event needs: event_name, timestamp, session_id, user_id (nullable for anonymous), device_type, country_code, and a properties JSON column for event-specific data. Output a ClickHouse CREATE TABLE statement optimized for time-range queries.
 ```
 
@@ -51,13 +51,13 @@ TTL date + INTERVAL 90 DAY;
 
 ### 2. Build the ingestion endpoint
 
-```
+```text
 Create a Node.js ingestion service in src/ingest/ that accepts POST /events with a JSON array of up to 500 events. Validate each event against the schema. Batch-insert into ClickHouse every 2 seconds or when the buffer reaches 1000 events, whichever comes first. Add a health check at GET /health that returns buffer size and last flush time.
 ```
 
 ### 3. Create aggregation queries
 
-```
+```text
 Write ClickHouse SQL queries for these dashboard panels:
 1. Active users in the last 5 minutes (count distinct session_id)
 2. Signup funnel: signup_started → signup_completed, grouped by hour for the last 24h
@@ -68,13 +68,13 @@ Return each query as a named .sql file in src/queries/.
 
 ### 4. Build the dashboard frontend
 
-```
+```text
 Create a React dashboard with four chart panels matching the aggregation queries. Use recharts for rendering. Each panel polls its API endpoint every 5 seconds. Add a connection status indicator and a time-range selector (last 1h, 6h, 24h). Style it with Tailwind — dark theme, grid layout, responsive for tablet and desktop.
 ```
 
 ### 5. Containerize and deploy
 
-```
+```text
 Write a docker-compose.yml that runs ClickHouse, the ingestion service, and the dashboard frontend. Pin ClickHouse to version 24.1. Add volume mounts for ClickHouse data persistence. Include an init script that creates the events table on first boot. Add a .env.example with all required environment variables.
 ```
 

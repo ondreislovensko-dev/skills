@@ -25,7 +25,7 @@ npx terminal-skills install s3-storage coding-agent security-audit
 
 ### 1. Design the storage architecture and migrate existing files
 
-```
+```text
 We have 280 GB of user files on a local disk in /uploads/{userId}/{filename}.
 Design an S3 bucket structure and migrate everything. Requirements:
 - Separate buckets for user uploads, processed images, and system backups
@@ -42,7 +42,7 @@ The agent designs a 3-bucket architecture (uploads-raw, uploads-processed, syste
 
 ### 2. Implement secure direct uploads with presigned URLs
 
-```
+```text
 Replace our current upload flow (file → API server → disk) with direct-to-S3
 uploads using presigned URLs. The flow should be:
 1. Client requests upload URL from our API (sends filename, size, content type)
@@ -61,7 +61,7 @@ The agent implements the full flow: an Express endpoint that validates requests 
 
 ### 3. Build the image processing pipeline
 
-```
+```text
 When a user uploads an image, automatically generate:
 - Thumbnail: 150x150, cropped to square, WebP format
 - Medium: max 800px width, WebP format
@@ -81,7 +81,7 @@ The agent creates a worker service that listens for S3 ObjectCreated events, pro
 
 ### 4. Set up lifecycle policies and cost optimization
 
-```
+```text
 Configure lifecycle policies for all buckets:
 - Raw uploads: move to Infrequent Access after 30 days, delete after 1 year
   (unless the user has a premium plan)
@@ -99,7 +99,7 @@ The agent configures lifecycle rules for all three buckets, enables versioning w
 
 ### 5. Secure the storage and add CDN delivery
 
-```
+```text
 Security audit all bucket configurations:
 - Block all public access on raw uploads bucket
 - Processed images served through CloudFront (or Cloudflare R2 public URL)

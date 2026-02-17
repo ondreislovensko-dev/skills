@@ -29,7 +29,7 @@ npx terminal-skills install report-generator
 
 Tell the agent what sources to pull from:
 
-```
+```text
 Generate my weekly status report. Pull data from:
 - GitHub: merged PRs in our-org/api and our-org/web repos this week
 - This summary of key decisions: moved auth to JWT, postponed mobile launch to March
@@ -38,7 +38,7 @@ Generate my weekly status report. Pull data from:
 
 ### 2. The agent collects and organizes
 
-```
+```text
 Data collected for week of Feb 10-14, 2026:
 
 GitHub Activity:
@@ -56,7 +56,7 @@ Categorizing into: Shipped, In Progress, Blocked, Decisions Made...
 
 ### 3. Review the draft report
 
-```
+```text
 Weekly Status Report — Engineering
 Week of February 10-14, 2026
 
@@ -87,7 +87,7 @@ Week of February 10-14, 2026
 
 ### 4. Adjust the tone for different audiences
 
-```
+```text
 Create an executive version — shorter, no technical details, focused on business impact and timelines.
 ```
 

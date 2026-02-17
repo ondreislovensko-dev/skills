@@ -27,13 +27,11 @@ npx terminal-skills install proposal-writer markdown-writer data-analysis
 
 After a discovery call, give the agent your notes:
 
-```
-Create a project proposal from these requirements: Client is a 50-person logistics company. They need a driver dispatch dashboard — real-time map view, route optimization, driver availability status, and integration with their existing Oracle ERP. They want a web app and a mobile companion app. Budget range mentioned: $80K-$120K. Timeline: launch in 4 months.
-```
+> Create a project proposal from these requirements: Client is a 50-person logistics company. They need a driver dispatch dashboard — real-time map view, route optimization, driver availability status, and integration with their existing Oracle ERP. They want a web app and a mobile companion app. Budget range mentioned: $80K-$120K. Timeline: launch in 4 months.
 
 ### 2. The agent structures the scope
 
-```
+```text
 Proposal Draft — Driver Dispatch Dashboard
 
 Scope Summary:
@@ -48,11 +46,9 @@ Out of scope: 4 items clarified
 
 ### 3. Estimate based on historical data
 
-```
-Compare this scope against our last 12 completed projects. What's a realistic timeline and budget based on similar work? Adjust estimates if our actual delivery times exceeded initial estimates.
-```
+> Compare this scope against our last 12 completed projects. What's a realistic timeline and budget based on similar work? Adjust estimates if our actual delivery times exceeded initial estimates.
 
-```
+```text
 Historical Comparison:
 - Similar dashboard projects averaged 18% over initial timeline estimates
 - Oracle integrations averaged 25% over estimate (API documentation quality varies)
@@ -65,13 +61,11 @@ Risk factors:
 
 ### 4. Generate the polished proposal
 
-```
-Generate the full proposal document with: executive summary, scope breakdown with deliverables per phase, timeline with milestones, pricing table, team composition, assumptions, and terms. Use a professional but approachable tone. Export as both markdown and PDF.
-```
+> Generate the full proposal document with: executive summary, scope breakdown with deliverables per phase, timeline with milestones, pricing table, team composition, assumptions, and terms. Use a professional but approachable tone. Export as both markdown and PDF.
 
 ### 5. The agent produces a complete proposal
 
-```
+```text
 Generated: Driver Dispatch Dashboard — Project Proposal
 
 Document structure (6 pages):
@@ -89,9 +83,7 @@ Files exported:
 
 ### 6. Create proposal variants for different budgets
 
-```
-The client might push back on price. Create a "lite" version that hits $80K by reducing scope — suggest what to cut with least impact on the core value proposition.
-```
+> The client might push back on price. Create a "lite" version that hits $80K by reducing scope — suggest what to cut with least impact on the core value proposition.
 
 The agent generates an alternative scope that defers the mobile app to a future phase and simplifies route optimization to basic suggestions rather than full optimization, bringing the price to $78K while preserving the core dispatch dashboard value.
 

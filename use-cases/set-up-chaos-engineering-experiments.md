@@ -27,13 +27,13 @@ npx terminal-skills install coding-agent docker-helper cicd-pipeline
 
 Start by telling the agent about your architecture:
 
-```
+```text
 We run 12 microservices on Kubernetes. Critical path: API gateway → auth-service → payment-service → PostgreSQL. We also depend on Redis for session caching and RabbitMQ for async jobs. List the top 10 failure scenarios we should test, ranked by business impact.
 ```
 
 ### 2. The agent produces a failure catalog
 
-```
+```text
 Failure Scenarios (ranked by impact):
 1. payment-service → PostgreSQL connection timeout (revenue impact: direct)
 2. Redis cluster complete outage (session loss for all users)
@@ -51,7 +51,7 @@ Failure Scenarios (ranked by impact):
 
 Pick the first experiment:
 
-```
+```text
 Generate a Chaos Mesh experiment for scenario 1: inject a 30-second network delay between payment-service and PostgreSQL. The blast radius should be 1 pod only. Include a rollback mechanism and steady-state hypothesis.
 ```
 
@@ -86,11 +86,11 @@ spec:
 
 Before running any experiment, you need to know what "normal" looks like:
 
-```
+```text
 For each of the top 3 experiments, define a steady-state hypothesis with specific metrics. What response times, error rates, and throughput numbers should hold true even under failure conditions?
 ```
 
-```
+```text
 Steady-State Hypotheses:
 1. Payment DB latency test:
    - Payment API p99 latency stays under 2s (current baseline: 340ms)
@@ -110,7 +110,7 @@ Steady-State Hypotheses:
 
 ### 6. Set up a safe local test first
 
-```
+```text
 Create a docker-compose setup that mimics our payment-service → PostgreSQL flow so we can run the chaos experiment locally before touching staging.
 ```
 
@@ -118,7 +118,7 @@ The agent generates a docker-compose file with the payment service, a PostgreSQL
 
 ### 7. Integrate into CI pipeline
 
-```
+```text
 Add a chaos testing stage to our GitHub Actions pipeline that runs the top 3 experiments against staging after every deployment, with automatic rollback if error rate exceeds 5%.
 ```
 

@@ -27,7 +27,7 @@ npx terminal-skills install data-analysis excel-processor report-generator
 
 Tell the agent what to analyze:
 
-```
+```text
 I have 6 months of email campaign data exported as CSV files in the campaigns/ folder. Each file has: campaign name, send date, subject line, recipient count, opens, clicks, unsubscribes, and conversions. Analyze all of them together and tell me what's working and what's not.
 ```
 
@@ -35,7 +35,7 @@ I have 6 months of email campaign data exported as CSV files in the campaigns/ f
 
 The agent reads all CSV files, merges them, and cleans up inconsistencies:
 
-```
+```text
 Processed 142 campaigns from 6 CSV files (Jan-Jun 2026):
 - Total sends: 847,000
 - Average open rate: 24.3%
@@ -48,7 +48,7 @@ Processed 142 campaigns from 6 CSV files (Jan-Jun 2026):
 
 The agent identifies patterns in your best and worst performing subject lines:
 
-```
+```text
 Subject Line Analysis:
 
 Top patterns by open rate:
@@ -66,11 +66,11 @@ Best performing subject line: "Did you see this, {first_name}?" — 38.4% open r
 
 ### 4. Analyze send time and day performance
 
-```
+```text
 Break down performance by day of week and time of day. When should I be sending emails?
 ```
 
-```
+```text
 Send Time Analysis:
 
 Best days by click rate:
@@ -90,7 +90,7 @@ Avoid: Friday after 3 PM (17.2% open rate), weekends (15.8% open rate)
 
 The agent produces a comprehensive report with recommendations:
 
-```
+```text
 Report generated: email-campaign-analysis-h1-2026.md
 
 Key Recommendations:

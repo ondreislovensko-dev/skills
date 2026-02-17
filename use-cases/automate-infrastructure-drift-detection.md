@@ -27,13 +27,11 @@ npx terminal-skills install coding-agent cicd-pipeline report-generator
 
 Tell the agent to analyze your infrastructure:
 
-```
-Run terraform plan on our ./infrastructure directory and parse the output. For each drifted resource, classify the change as: security-related, performance-related, configuration-related, or unknown. Show me what changed and when it might have been changed manually.
-```
+> Run terraform plan on our ./infrastructure directory and parse the output. For each drifted resource, classify the change as: security-related, performance-related, configuration-related, or unknown. Show me what changed and when it might have been changed manually.
 
 ### 2. The agent categorizes the drift
 
-```
+```text
 Infrastructure Drift Report — 23 resources out of sync:
 
 SECURITY (fix in IaC immediately):
@@ -55,15 +53,13 @@ UNKNOWN:
 
 ### 3. Reconcile drift into code
 
-```
-For the 6 security and performance changes: update the Terraform code to match the current cloud state where the change was intentional. For the 3 security issues (port 9090, S3 public access, extra IAM policy), flag them as likely unauthorized and create a plan to revert.
-```
+> For the 6 security and performance changes: update the Terraform code to match the current cloud state where the change was intentional. For the 3 security issues (port 9090, S3 public access, extra IAM policy), flag them as likely unauthorized and create a plan to revert.
 
 ### 4. The agent updates Terraform files
 
 The agent modifies the Terraform HCL to codify the intentional changes and generates a targeted plan to revert the risky ones:
 
-```
+```text
 Updated files:
 - infrastructure/autoscaling.tf — min_size updated to 4
 - infrastructure/rds.tf — instance_class updated to db.r5.2xlarge
@@ -77,11 +73,9 @@ Revert plan (apply with caution):
 
 ### 5. Generate compliance documentation
 
-```
-For each reconciled change, generate a change record documenting: what changed, why (incident reference if applicable), who approved the reconciliation, and the date codified. We need this for our SOC 2 audit trail.
-```
+> For each reconciled change, generate a change record documenting: what changed, why (incident reference if applicable), who approved the reconciliation, and the date codified. We need this for our SOC 2 audit trail.
 
-```
+```text
 Change Records Generated:
 - CR-001: ASG min_size 2→4, Incident INC-2024-089 (Jan 15 traffic spike), codified Feb 17
 - CR-002: RDS instance upgrade, Incident INC-2024-091 (slow query cascade), codified Feb 17
@@ -95,9 +89,7 @@ Exported to: infrastructure/drift-records/2025-02-17.md
 
 ### 6. Set up automated drift detection
 
-```
-Create a GitHub Actions workflow that runs terraform plan every 6 hours, compares against last known state, and posts a Slack notification if any new drift is detected. Include the drift classification in the alert.
-```
+> Create a GitHub Actions workflow that runs terraform plan every 6 hours, compares against last known state, and posts a Slack notification if any new drift is detected. Include the drift classification in the alert.
 
 ## Real-World Example
 

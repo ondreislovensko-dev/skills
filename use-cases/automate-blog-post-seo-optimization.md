@@ -30,13 +30,11 @@ npx terminal-skills install web-scraper
 
 Tell your AI agent:
 
-```
-Scrape all blog post URLs from https://ourblog.example.com/sitemap.xml. For each URL extract the title tag, meta description, h1, h2s, word count, and any existing internal links. Output as a CSV.
-```
+> Scrape all blog post URLs from https://ourblog.example.com/sitemap.xml. For each URL extract the title tag, meta description, h1, h2s, word count, and any existing internal links. Output as a CSV.
 
 The agent uses **web-scraper** to fetch the sitemap, visit each URL, and extract on-page elements. You get a CSV like:
 
-```
+```csv
 url,title_tag,meta_description,h1,h2_count,word_count,internal_links
 /blog/api-rate-limiting-guide,API Rate Limiting | Our Blog,,API Rate Limiting Guide,4,1820,1
 /blog/caching-strategies,Caching Strategies for 2025 | Our Blog,Learn about caching,Caching Strategies,6,2340,0
@@ -45,13 +43,11 @@ url,title_tag,meta_description,h1,h2_count,word_count,internal_links
 
 ### 2. Run an SEO audit on every post
 
-```
-Run an SEO audit on each blog post in the CSV. Flag posts with missing meta descriptions, title tags over 60 characters, missing h1, thin content under 1000 words, and no internal links. Rank posts by number of issues, worst first.
-```
+> Run an SEO audit on each blog post in the CSV. Flag posts with missing meta descriptions, title tags over 60 characters, missing h1, thin content under 1000 words, and no internal links. Rank posts by number of issues, worst first.
 
 The agent uses **seo-audit** to evaluate each page:
 
-```
+```text
 SEO Audit Results — 72 posts analyzed
 
 Critical (3+ issues):
@@ -68,28 +64,22 @@ Passing:
 
 ### 3. Generate optimized metadata for flagged posts
 
-```
-For each critical and warning post, write an SEO-optimized title tag (under 60 chars), a meta description (under 155 chars), and suggest a better h1 if needed. Output as a markdown table.
-```
+> For each critical and warning post, write an SEO-optimized title tag (under 60 chars), a meta description (under 155 chars), and suggest a better h1 if needed. Output as a markdown table.
 
 The **content-writer** skill generates metadata tuned to search intent:
 
-```
 | URL | New Title Tag | New Meta Description | New H1 |
 |-----|--------------|---------------------|--------|
 | /blog/monitoring-microservices | Monitor Microservices: A Practical Guide | Learn how to set up monitoring for microservices with Prometheus, Grafana, and distributed tracing. Step-by-step. | How to Monitor Microservices in Production |
 | /blog/api-rate-limiting-guide | API Rate Limiting: Patterns and Implementation | Protect your API from abuse with token bucket, sliding window, and fixed window rate limiting patterns. | API Rate Limiting Patterns You Can Implement Today |
-```
 
 ### 4. Build an internal linking map
 
-```
-Group all 72 blog posts by topic cluster. For each post, suggest 2-3 internal links to related posts that are currently missing. Show the anchor text and target URL for each suggestion.
-```
+> Group all 72 blog posts by topic cluster. For each post, suggest 2-3 internal links to related posts that are currently missing. Show the anchor text and target URL for each suggestion.
 
 The agent cross-references post content and outputs:
 
-```
+```text
 Topic Cluster: API Design (8 posts)
   /blog/api-rate-limiting-guide
     → Add link: "caching strategies" → /blog/caching-strategies (paragraph 3)
@@ -102,9 +92,7 @@ Topic Cluster: API Design (8 posts)
 
 ### 5. Apply fixes and verify
 
-```
-Generate a patch file for each blog post that adds the new meta description and inserts the suggested internal links. Show me a before/after diff for the top 5 worst posts.
-```
+> Generate a patch file for each blog post that adds the new meta description and inserts the suggested internal links. Show me a before/after diff for the top 5 worst posts.
 
 The agent produces ready-to-apply diffs that the team can review and merge in one batch. Each diff shows the exact line where a link should be inserted and the metadata tag being replaced, so reviewers can approve changes without re-reading every article.
 

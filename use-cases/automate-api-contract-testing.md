@@ -25,7 +25,7 @@ npx terminal-skills install api-tester test-generator cicd-pipeline
 
 ### 1. Map existing API surface
 
-```
+```text
 Here's our users service OpenAPI spec (paste or link). Crawl every endpoint,
 document request/response schemas, and flag any fields that have inconsistent
 naming conventions (camelCase vs snake_case mix). List every consumer service
@@ -36,7 +36,7 @@ The agent parses the spec, maps 23 endpoints across 4 resource groups, and flags
 
 ### 2. Generate consumer contract tests
 
-```
+```text
 For each consumer-provider pair in the matrix, generate Pact contract tests.
 The billing service consumes GET /users/{id} and POST /users/{id}/subscription.
 The dashboard consumes GET /users, GET /users/{id}, and GET /users/{id}/activity.
@@ -48,7 +48,7 @@ The agent generates 34 contract test files: one per consumer-endpoint combinatio
 
 ### 3. Set up the contract broker and CI integration
 
-```
+```text
 Configure a Pact broker using the free Pactflow starter. Add CI pipeline steps
 so that: consumer tests run on consumer PRs, provider verification runs on
 provider PRs, and deployment is blocked if any contract is broken. Use GitHub
@@ -60,7 +60,7 @@ The agent generates GitHub Actions workflows for all 4 repos: consumers publish 
 
 ### 4. Handle the first breaking change safely
 
-```
+```text
 I need to rename the "userName" field to "username" across all endpoints.
 Generate a migration plan: add the new field alongside the old one, update
 consumer contracts one by one, then deprecate the old field. Show me the
@@ -71,7 +71,7 @@ The agent produces a 3-phase migration: phase 1 adds `username` as an alias (bot
 
 ### 5. Add contract coverage reporting
 
-```
+```text
 Add a CI step that reports contract coverage: what percentage of endpoints
 have consumer contracts, which endpoints are untested, and which consumers
 are missing contracts. Output as a markdown table in PR comments.

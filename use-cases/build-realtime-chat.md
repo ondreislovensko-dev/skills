@@ -25,7 +25,7 @@ npx terminal-skills install websocket-builder realtime-database
 
 ### 1. Set up the WebSocket server with rooms
 
-```
+```text
 I have a Node.js/Express app with PostgreSQL. I need to add real-time chat.
 Users can have direct messages and group channels (up to 50 members).
 Set up the WebSocket server with room management and authentication.
@@ -33,7 +33,7 @@ Set up the WebSocket server with room management and authentication.
 
 The agent builds the WebSocket layer:
 
-```
+```text
 Created ws/server.ts — WebSocket server with authentication handshake
 Created ws/rooms.ts — Room manager (join, leave, broadcast, member tracking)
 Created ws/handlers/message.ts — Message send/receive handler
@@ -48,13 +48,13 @@ Architecture:
 
 ### 2. Design the message storage schema
 
-```
+```text
 Design the database schema for chat. I need: channels (direct + group),
 messages with text and attachments, read receipts per user, and efficient
 pagination for loading message history (latest messages first).
 ```
 
-```
+```text
 Created migrations/002_chat_schema.sql:
 
   channels: id, type (direct|group), name, created_at
@@ -74,14 +74,14 @@ Created migrations/002_chat_schema.sql:
 
 ### 3. Implement message delivery with ordering guarantees
 
-```
+```text
 Implement the message sending flow. I need: messages delivered in order,
 no duplicates if the client reconnects, and message delivery confirmation
 back to the sender. Handle the case where a user is offline — they should
 see messages when they reconnect.
 ```
 
-```
+```text
 Created chat/services/message.service.ts — Message create, list, mark-read
 Created ws/handlers/message.ts (updated) — Delivery with idempotency
 
@@ -100,13 +100,13 @@ Reconnection sync:
 
 ### 4. Add typing indicators and presence
 
-```
+```text
 Add typing indicators and online presence. Typing should show "Alex is typing..."
 and disappear after 3 seconds of inactivity. Presence should show who's online
 in a channel without hammering the database.
 ```
 
-```
+```text
 Created ws/handlers/typing.ts — Typing indicator with auto-timeout
 Created ws/handlers/presence.ts (updated) — Redis-backed presence
 
@@ -127,13 +127,13 @@ Presence (using Redis):
 
 ### 5. Write integration tests
 
-```
+```text
 Write tests covering: sending a message and receiving it in another client,
 reconnection with message sync, duplicate message prevention, and typing
 indicator timeout.
 ```
 
-```
+```text
 Created tests/chat/messaging.test.ts — 12 test cases
 Created tests/chat/presence.test.ts — 6 test cases
 

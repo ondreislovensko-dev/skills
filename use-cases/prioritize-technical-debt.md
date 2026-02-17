@@ -25,7 +25,7 @@ npx terminal-skills install tech-debt-analyzer code-complexity-scanner
 
 ### 1. Scan the codebase for debt signals
 
-```
+```text
 Analyze our TypeScript monorepo at ./src for technical debt. Look for cyclomatic
 complexity over 15, functions longer than 80 lines, TODO/HACK/FIXME comments,
 duplicated code blocks, and any deprecated API usage. Cross-reference with git
@@ -34,7 +34,7 @@ log to find which files change most often.
 
 The agent scans the repo and correlates code quality with change frequency:
 
-```
+```text
 Technical Debt Scan — src/ (247 files, 48,200 LOC)
 ───────────────────────────────────────────────────
 
@@ -58,14 +58,14 @@ Files above complexity threshold (15): 14 files
 
 ### 2. Score debt by business impact
 
-```
+```text
 Now score each debt item by business impact. Consider: how often does this file
 cause bugs (check git blame for bug-fix commits), how many developers touch it
 weekly, and does it block feature development? Give me a prioritized list with
 estimated remediation effort.
 ```
 
-```
+```text
 Prioritized Technical Debt Backlog
 ──────────────────────────────────
 
@@ -83,7 +83,7 @@ Scoring formula: (change_frequency × 0.3) + (bug_density × 0.3) +
 
 ### 3. Generate remediation plans
 
-```
+```text
 For the top 3 P0/P1 items, create specific remediation tickets. Each should
 have a description, acceptance criteria, suggested approach, and estimated
 story points. Format them ready to paste into our issue tracker.
@@ -91,7 +91,7 @@ story points. Format them ready to paste into our issue tracker.
 
 The agent produces structured tickets:
 
-```
+```text
 TICKET: Refactor invoice-calculator into composable functions
 Priority: P0 | Estimate: 5 points | Sprint: current
 
@@ -115,7 +115,7 @@ Suggested Approach:
 
 ### 4. Track debt trends over time
 
-```
+```text
 Set up a debt tracking baseline. Generate a JSON snapshot of current metrics
 so we can compare next month and see if debt is growing or shrinking.
 ```

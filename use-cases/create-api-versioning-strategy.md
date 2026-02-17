@@ -25,7 +25,7 @@ npx terminal-skills install coding-agent api-tester markdown-writer
 
 ### 1. Describe your API and the breaking change
 
-```
+```text
 Our Express REST API has 30 endpoints. Current base: /api/v1/
 We need to introduce v2 of the user endpoints because we're adding
 team-based accounts. The changes:
@@ -40,7 +40,7 @@ We have ~200 active API consumers. Help me version this without breaking anyone.
 
 ### 2. The agent designs the versioning architecture
 
-```
+```text
 Versioning Strategy: URL path versioning with response transformers
 
 Why URL path (not headers):
@@ -71,7 +71,7 @@ Transformers handle response shape per version. No code duplication.
 
 ### 3. The agent implements the versioning layer
 
-```
+```text
 Generated versioning infrastructure:
 
 1. Version middleware (src/middleware/version.ts):
@@ -96,7 +96,7 @@ Generated versioning infrastructure:
 
 ### 4. The agent generates backward compatibility tests
 
-```
+```text
 Generated test suite: tests/api-versioning/
 
 v1 Backward Compatibility (23 tests):
@@ -122,7 +122,7 @@ Cross-version (6 tests):
 
 ### 5. The agent writes migration documentation
 
-```
+```text
 Generated docs:
 - docs/api/migration-v1-to-v2.md  (developer migration guide)
 - docs/api/changelog-v2.md        (what changed and why)

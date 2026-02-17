@@ -27,7 +27,7 @@ npx terminal-skills install contract-review pdf-analyzer report-generator
 
 Point the agent at your contracts folder:
 
-```
+```text
 Analyze all vendor contracts in ./contracts/ — extract vendor name, contract value, start date, end date, auto-renewal clause, cancellation notice period, price escalation terms, and SLA guarantees from each document.
 ```
 
@@ -35,7 +35,7 @@ Analyze all vendor contracts in ./contracts/ — extract vendor name, contract v
 
 The agent processes PDFs, Word docs, and even email confirmations, extracting structured data:
 
-```
+```text
 Processed 28 contracts:
 - 22 PDFs parsed successfully
 - 4 Word documents parsed
@@ -49,13 +49,13 @@ Key findings:
 
 ### 3. Generate a comparison report
 
-```
+```text
 Create a side-by-side comparison of our three cloud hosting vendors: their pricing tiers, SLA uptime guarantees, support response times, and data residency terms. Highlight which vendor offers the best value for our usage level of 50TB bandwidth and 99.9% uptime requirement.
 ```
 
 ### 4. The agent produces a structured comparison
 
-```
+```text
 Cloud Hosting Vendor Comparison:
 
                     Vendor A        Vendor B        Vendor C
@@ -75,11 +75,11 @@ need the 99.99% SLA for compliance reasons.
 
 ### 5. Build a renewal calendar
 
-```
+```text
 Create a renewal calendar for all 28 contracts. For each, show the renewal date, the last date to cancel without penalty, and the estimated annual cost. Sort by urgency — closest deadlines first. Export as a CSV I can import into our project management tool.
 ```
 
-```
+```text
 Renewal Calendar (next 12 months):
 1. DataDog alternative — Renews Mar 15, cancel by Feb 13, $8,400/yr
 2. Email platform — Renews Apr 1, cancel by Mar 1, $6,200/yr
@@ -91,11 +91,11 @@ Exported to: vendor_renewal_calendar.csv
 
 ### 6. Set up renewal alerts
 
-```
+```text
 Create a recurring reminder system: 90 days before each renewal, generate a summary of the contract terms, current market alternatives, and a recommendation to renew, renegotiate, or cancel. Include the last date to act without penalty.
 ```
 
-```
+```text
 Automated Renewal Alerts configured for 28 contracts:
 - 90-day alert: Full contract summary + market comparison + recommendation
 - 60-day alert: Reminder if no action taken, updated market data

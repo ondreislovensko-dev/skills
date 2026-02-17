@@ -25,7 +25,7 @@ npx terminal-skills install ansible-automation security-audit coding-agent
 
 ### 1. Audit current servers and create inventory
 
-```
+```text
 We have 12 Ubuntu 22.04 servers: 6 web servers, 2 API servers, 2 PostgreSQL
 (primary + replica), 1 Redis, 1 worker. They're on Hetzner Cloud with
 private networking. SSH access via deploy user with key auth.
@@ -40,7 +40,7 @@ The agent creates a structured inventory with host groups, writes an audit playb
 
 ### 2. Write roles for the base server configuration
 
-```
+```text
 Create Ansible roles for our standard server setup:
 
 1. common: deploy user, SSH hardening (disable root login, password auth),
@@ -62,7 +62,7 @@ The agent generates 5 complete roles with tasks, handlers, templates, defaults, 
 
 ### 3. Create the deployment playbook with rolling updates
 
-```
+```text
 Write a deployment playbook for our Node.js API that:
 1. Deploys to 2 servers at a time (serial)
 2. Drains connections from the Hetzner load balancer before each batch
@@ -81,7 +81,7 @@ The agent writes a deployment playbook with `serial: 2`, pre-task LB drain via H
 
 ### 4. Encrypt secrets and set up Ansible Vault
 
-```
+```text
 We have sensitive data: database passwords, API keys, SSL private keys,
 Hetzner API token. Set up Ansible Vault for all secrets. Structure it so:
 - Each environment (staging/production) has its own vault file
@@ -97,7 +97,7 @@ The agent creates vault files for each environment, restructures all sensitive v
 
 ### 5. Set up CI/CD and scheduled compliance checks
 
-```
+```text
 Create a GitHub Actions pipeline that:
 1. On PR: run ansible-lint and molecule tests for all changed roles
 2. On merge to main: deploy to staging automatically

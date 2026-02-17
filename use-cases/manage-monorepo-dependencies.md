@@ -26,13 +26,13 @@ npx terminal-skills install security-audit
 
 ### 1. Map the monorepo structure
 
-```
+```text
 Analyze our monorepo structure. Show me all packages, their internal dependencies, and the tooling we're using.
 ```
 
 The agent scans the workspace and produces a map:
 
-```
+```text
 Monorepo: pnpm workspaces + Turborepo
 Root: 14 packages across apps/ and packages/
 
@@ -50,11 +50,11 @@ No circular dependencies detected ✅
 
 ### 2. Audit dependency versions
 
-```
+```text
 Find all dependency version mismatches across our packages. Show the worst offenders.
 ```
 
-```
+```text
 ## Version Mismatches (7 found)
 
 | Dependency    | Versions in use           | Packages affected |
@@ -72,7 +72,7 @@ Highest risk: date-fns (major version split), eslint (major version split)
 
 ### 3. Fix mismatches with a plan
 
-```
+```text
 Sync all dependencies to their latest compatible versions. Show me what will change before applying.
 ```
 
@@ -80,7 +80,7 @@ The agent produces a migration plan with breaking change warnings, then updates 
 
 ### 4. Check for security issues in the unified deps
 
-```
+```text
 Now run a security audit on our updated dependencies.
 ```
 
@@ -88,7 +88,7 @@ The agent scans for known CVEs in the dependency tree and reports any vulnerable
 
 ### 5. Set up ongoing enforcement
 
-```
+```text
 How do I prevent version drift from happening again?
 ```
 

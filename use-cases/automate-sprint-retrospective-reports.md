@@ -27,11 +27,11 @@ npx terminal-skills install github data-analysis report-generator
 
 ### 1. Gather sprint data from GitHub
 
-```
+```text
 Pull all activity from our repo for sprint 23 (Feb 3-14). Get PRs merged, review times, commit patterns, and CI failure rates.
 ```
 
-```
+```text
 SPRINT 23 DATA (Feb 3-14):
 
 PRs: 34 opened, 31 merged, 3 still open
@@ -46,11 +46,11 @@ Deploys: 7 production deploys (3.5 per week)
 
 ### 2. Analyze patterns and bottlenecks
 
-```
+```text
 Analyze the sprint data. Compare against the last 3 sprints. Identify trends, bottlenecks, and anomalies.
 ```
 
-```
+```text
 SPRINT 23 vs PREVIOUS 3 SPRINTS:
 
   Metric              | S20    | S21    | S22    | S23    | Trend
@@ -71,11 +71,11 @@ POSITIVE: Zero incidents (first in 6 sprints), Kai ramped up fast (3 PRs in week
 
 ### 3. Generate the retrospective report
 
-```
+```text
 Create a sprint retrospective report with sections for what went well, what needs attention, specific action items, and team shoutouts. Include the data.
 ```
 
-```
+```text
 # Sprint 23 Retrospective Report (Feb 3-14)
 
 ## Dashboard
@@ -111,11 +111,11 @@ Create a sprint retrospective report with sections for what went well, what need
 
 ### 4. Track action item follow-through
 
-```
+```text
 Check which action items from the last 3 retros were actually completed. Show the follow-through rate.
 ```
 
-```
+```text
 ACTION ITEM TRACKING:
 
 Sprint 20: 4 items → 2 completed, 1 partial, 1 abandoned (50%)

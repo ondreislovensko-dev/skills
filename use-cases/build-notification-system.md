@@ -25,13 +25,13 @@ npx terminal-skills install notification-system template-engine
 
 ### 1. Define your notification types and channels
 
-```
+```text
 Analyze my application in src/ and identify all places where we notify users. Group them into notification types: transactional (password reset, email verification, order confirmation), activity (new comment, mention, follower), and marketing (weekly digest, feature announcement). For each type, recommend which channels to use (email, push, in-app) and the default user preference.
 ```
 
 The agent scans your codebase for email sends, socket emissions, and notification-related code:
 
-```
+```text
 Notification Inventory:
 - password-reset       → email (always, cannot disable)
 - email-verification   → email (always, cannot disable)
@@ -47,7 +47,7 @@ Total: 8 notification types across 3 channels
 
 ### 2. Generate the notification service architecture
 
-```
+```text
 Create a notification service with these components: a NotificationRouter that accepts a notification event and routes it to the correct channels based on user preferences, channel-specific adapters for email (via SendGrid), push (via Firebase Cloud Messaging), and in-app (via PostgreSQL + WebSocket), a preference store in PostgreSQL, and a retry queue using a job system. Use TypeScript and make the adapters pluggable so we can swap providers later.
 ```
 
@@ -55,7 +55,7 @@ The agent generates the full service structure: `src/notifications/router.ts`, c
 
 ### 3. Create notification templates
 
-```
+```text
 Using the template engine, create templates for all 8 notification types. Each template should render for three formats: email (HTML with inline CSS), push (title + body limited to 178 characters), and in-app (short message with action URL). Use a shared data schema per notification type so one event triggers consistent content across all channels.
 ```
 
@@ -63,13 +63,13 @@ The agent generates template files with a shared context interface per notificat
 
 ### 4. Implement user preference management
 
-```
+```text
 Create a preferences API with endpoints: GET /api/notifications/preferences (returns current settings), PATCH /api/notifications/preferences (updates channel toggles per notification type), and POST /api/notifications/unsubscribe/:token (one-click email unsubscribe per CAN-SPAM). Include a React component that renders the preference matrix as a table with toggles. Transactional notifications should show as locked/always-on.
 ```
 
 ### 5. Add delivery tracking and failure handling
 
-```
+```text
 Add delivery tracking to the notification system. Store delivery status (queued, sent, delivered, failed, read) in PostgreSQL. Implement retry with exponential backoff: 3 retries for email (1min, 5min, 30min), 2 retries for push (30s, 2min), no retry for in-app. Add a dead letter queue for permanently failed notifications. Create a monitoring query that shows delivery success rates by channel and notification type for the last 7 days.
 ```
 

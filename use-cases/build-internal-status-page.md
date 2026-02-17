@@ -27,11 +27,11 @@ npx terminal-skills install coding-agent frontend-design api-tester
 
 ### 1. Map services and health check endpoints
 
-```
+```text
 List all our services, their health check endpoints, dependencies, and what "healthy" means for each. Include databases, queues, and third-party services.
 ```
 
-```
+```text
 SERVICE MAP — 14 components
 
 SERVICES (6): api-gateway, auth, orders, payments, worker, frontend
@@ -45,11 +45,11 @@ Each with health endpoint, threshold, and dependency mapping:
 
 ### 2. Build the health check system
 
-```
+```text
 Create a health check runner that probes all 14 components every 30 seconds. Store results with latency and error details. Detect degraded states, not just up/down.
 ```
 
-```
+```text
 Created: status-service/
 
   src/checker.ts — Parallel health checks every 30 seconds
@@ -70,11 +70,11 @@ Created: status-service/
 
 ### 3. Build the dashboard UI
 
-```
+```text
 Create a clean status page dashboard showing all services, current status, uptime percentages, and a 90-day incident timeline. Make it fast-loading and auto-refreshing.
 ```
 
-```
+```text
 Created: status-service/frontend/
 
   ServiceGrid — colored status indicators for all 14 components
@@ -87,11 +87,11 @@ Created: status-service/frontend/
 
 ### 4. Add incident management
 
-```
+```text
 Add incident creation and tracking. When a service goes red, auto-create an incident. Let engineers add updates and mark resolved.
 ```
 
-```
+```text
 Incident system:
 
   Auto-detection: service goes 🔴 → incident created, impact calculated from deps
@@ -106,11 +106,11 @@ Incident system:
 
 ### 5. Deploy and configure alerts
 
-```
+```text
 Deploy the status page internally. Set up Slack alerts for state changes and a daily health summary.
 ```
 
-```
+```text
 Deployed: status.internal.company.com (Docker Compose, single server)
 
 Alerts:

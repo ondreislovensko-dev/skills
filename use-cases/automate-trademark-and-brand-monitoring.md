@@ -29,7 +29,7 @@ npx terminal-skills install report-generator
 
 Tell your AI agent:
 
-```
+```text
 Our brand name is "Lightbeam" and our domain is lightbeam.io. Monitor for: (1) domains containing "lightbeam" or common typosquats (lightbeam.co, lightbearn.com, etc.), (2) marketplace listings on Amazon, Shopify stores, and Gumroad using our name or logo, (3) social media accounts on Twitter, LinkedIn, and Instagram using "lightbeam" in the handle, (4) any GitHub repos using "lightbeam" in a way that implies official affiliation.
 ```
 
@@ -37,7 +37,7 @@ Our brand name is "Lightbeam" and our domain is lightbeam.io. Monitor for: (1) d
 
 The agent uses **web-research** to search across multiple channels:
 
-```
+```text
 Brand Monitoring Scan — "Lightbeam"
 
 Domain squatting:
@@ -61,13 +61,13 @@ Code/repos:
 
 ### 3. Capture evidence for each case
 
-```
+```text
 For each 🔴 and ⚠️ finding, capture a screenshot, save the full page HTML, record the current WHOIS data for domains, and note the date. Store everything in /brand-monitoring/evidence/2025-01-20/.
 ```
 
 The **web-scraper** skill archives each page:
 
-```
+```text
 Evidence captured:
 
 lightbeam.co/
@@ -83,13 +83,13 @@ Amazon ASIN B0CX4R2T/
 
 ### 4. Generate takedown-ready reports
 
-```
+```text
 Compile all findings into a brand monitoring report. For each confirmed infringement, draft a DMCA takedown notice template with the specific URLs, evidence file paths, and a description of the infringement. Separate findings by priority: impersonation (highest), trademark use in products, domain squatting.
 ```
 
 The **report-generator** produces:
 
-```
+```text
 Brand Monitoring Report — January 20, 2025
 
 Priority 1 — Impersonation (2 cases):
@@ -112,7 +112,7 @@ Priority 3 — Unauthorized use (2 cases):
 
 ### 5. Set up recurring scans
 
-```
+```text
 Create a monitoring schedule that runs this scan weekly. Compare each week's results against the previous scan and only surface new findings. Track the status of previously reported cases (submitted, acknowledged, resolved).
 ```
 

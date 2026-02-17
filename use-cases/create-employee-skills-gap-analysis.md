@@ -29,21 +29,19 @@ npx terminal-skills install web-research
 
 Tell the agent what skills matter for your team:
 
-```
-Create a skills gap analysis for our 12-person engineering team. Required skills for the next quarter's projects:
-- Kubernetes (deployment, scaling, debugging)
-- Event-driven architecture (Kafka, message queues)
-- Real-time data processing (streaming, WebSockets)
-- TypeScript (advanced types, generics)
-- PostgreSQL (query optimization, partitioning)
-- CI/CD (GitHub Actions, automated testing)
-
-Here's the team skills survey results: skills-survey.csv
-```
+> Create a skills gap analysis for our 12-person engineering team. Required skills for the next quarter's projects:
+> - Kubernetes (deployment, scaling, debugging)
+> - Event-driven architecture (Kafka, message queues)
+> - Real-time data processing (streaming, WebSockets)
+> - TypeScript (advanced types, generics)
+> - PostgreSQL (query optimization, partitioning)
+> - CI/CD (GitHub Actions, automated testing)
+> 
+> Here's the team skills survey results: skills-survey.csv
 
 ### 2. The agent analyzes the data
 
-```
+```text
 Skills Gap Analysis — Engineering Team (12 members)
 
 Skill Coverage Map (1-5 scale, 3+ = proficient):
@@ -63,13 +61,11 @@ and only 1 can handle real-time data processing independently.
 
 ### 3. Get individual development plans
 
-```
-Generate a personalized development plan for each team member based on their current skills and the team's gaps. Prioritize so we cover the critical gaps fastest.
-```
+> Generate a personalized development plan for each team member based on their current skills and the team's gaps. Prioritize so we cover the critical gaps fastest.
 
 ### 4. The agent creates targeted plans
 
-```
+```text
 Individual Development Plans:
 
 ALEX (Current: TypeScript 5, PostgreSQL 4, Kubernetes 1)
@@ -91,9 +87,7 @@ Target: Real-time processing level 3 within 6 weeks
 
 ### 5. Generate the management summary
 
-```
-Create an executive summary with hiring recommendations if training alone won't close the gaps in time.
-```
+> Create an executive summary with hiring recommendations if training alone won't close the gaps in time.
 
 The agent produces a report showing which gaps training can close, which require hiring, and the estimated timeline and cost for each option.
 

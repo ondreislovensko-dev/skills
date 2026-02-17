@@ -25,7 +25,7 @@ npx terminal-skills install code-reviewer data-analysis coding-agent docker-help
 
 ### 1. Analyze the monolith's module structure
 
-```
+```text
 Analyze this Rails monolith codebase. Map every model, controller, and service
 object to a domain concept. Build a dependency graph showing which modules
 call each other, which models are shared across controllers, and where the
@@ -38,7 +38,7 @@ The agent scans 142 models, 67 controllers, and 93 service objects. It produces 
 
 ### 2. Identify bounded contexts and service boundaries
 
-```
+```text
 Based on the dependency graph, propose service boundaries following DDD principles.
 For each proposed service: list the models it owns, the API calls it would need
 to make to other services, the shared database tables that would need to be
@@ -50,7 +50,7 @@ The agent proposes 6 services with clear ownership. It identifies 3 circular dep
 
 ### 3. Generate the strangler fig migration plan
 
-```
+```text
 Create a phased migration plan using the strangler fig pattern. Start with
 the easiest service to extract (Search). For each phase: what gets extracted,
 what API contracts need to be defined, what data needs to be replicated or
@@ -62,7 +62,7 @@ The agent produces a 5-phase plan spanning 16 weeks. Phase 1 extracts Search beh
 
 ### 4. Scaffold the first extracted service
 
-```
+```text
 Scaffold the Search service based on the migration plan. It should be a
 standalone Node.js service with: the Elasticsearch integration extracted from
 the monolith, a REST API matching the OpenAPI spec, health checks, structured
@@ -75,7 +75,7 @@ The agent generates a complete service with 12 endpoint handlers, Elasticsearch 
 
 ### 5. Set up cross-service testing and monitoring
 
-```
+```text
 Generate integration tests that verify the Search service returns identical
 results to the monolith for the same queries. Create a traffic comparison
 tool that sends production queries to both the monolith and new service,

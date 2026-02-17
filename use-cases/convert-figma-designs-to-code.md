@@ -27,14 +27,12 @@ npx terminal-skills install figma-to-code frontend-design
 
 Give the agent your Figma file and specify your stack:
 
-```
-Here's our new pricing page design: https://figma.com/file/abc123/Pricing-Page
-We use React, TypeScript, Tailwind CSS, and shadcn/ui. Generate production-ready components.
-```
+> Here's our new pricing page design: https://figma.com/file/abc123/Pricing-Page
+> We use React, TypeScript, Tailwind CSS, and shadcn/ui. Generate production-ready components.
 
 ### 2. The agent extracts design structure
 
-```
+```text
 Analyzed Figma file "Pricing Page" — 3 frames detected:
 
 Frame 1: Hero Section (1440×480)
@@ -57,7 +55,7 @@ Extracting design tokens and generating components...
 
 ### 3. Receive production-ready components
 
-```
+```text
 Generated 5 files:
 
 components/PricingHero.tsx (32 lines)
@@ -86,11 +84,9 @@ All components use your Tailwind config. No hardcoded colors or magic numbers.
 
 ### 4. Refine responsive behavior
 
-```
-The cards should stack on mobile but I want a horizontal scroll on tablet instead of stacking. Can you adjust?
-```
+> The cards should stack on mobile but I want a horizontal scroll on tablet instead of stacking. Can you adjust?
 
-```
+```text
 Updated PricingGrid.tsx:
 
 - Mobile (< 640px): Single column stack

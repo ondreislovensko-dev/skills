@@ -29,11 +29,9 @@ npx terminal-skills install markdown-writer code-documenter github
 
 ### 1. Codebase analysis and documentation audit
 
-```
-Analyze our entire codebase across 43 services. Generate a comprehensive README for each service and a master architecture guide.
-```
+> Analyze our entire codebase across 43 services. Generate a comprehensive README for each service and a master architecture guide.
 
-```
+```text
 CODEBASE ANALYSIS COMPLETE:
 
 Service Discovery (43 repositories):
@@ -55,11 +53,9 @@ PRIORITY QUEUE: Start with auth service (most dependencies), payment (regulatory
 
 ### 2. Intelligent API documentation extraction
 
-```
-Extract all API endpoints, analyze request/response schemas, and generate OpenAPI documentation with examples.
-```
+> Extract all API endpoints, analyze request/response schemas, and generate OpenAPI documentation with examples.
 
-```
+```text
 API DOCUMENTATION GENERATED:
 
 Authentication Service (23 endpoints):
@@ -88,14 +84,15 @@ Validation Results:
 
 ### 3. Comprehensive README generation
 
-```
-Create detailed README files for each service including setup, configuration, testing, and deployment instructions.
-```
+> Create detailed README files for each service including setup, configuration, testing, and deployment instructions.
 
-```
+```text
 README GENERATION RESULTS:
 
 Authentication Service README.md (Generated):
+```
+
+```markdown
 # Authentication Service
 
 High-performance JWT-based authentication with MFA support.
@@ -129,17 +126,17 @@ npm run test:load     # Load testing (100 req/s)
 
 ## Deployment
 Deployed via GitHub Actions on merge to main. See [deployment guide](./DEPLOY.md).
+```text
 
+```text
 TEMPLATE APPLIED TO ALL 43 SERVICES: Consistent structure, auto-updated dependencies, working examples
 ```
 
 ### 4. Master architecture documentation
 
-```
-Create a system-wide architecture guide showing service relationships, data flows, and integration patterns.
-```
+> Create a system-wide architecture guide showing service relationships, data flows, and integration patterns.
 
-```
+```text
 ARCHITECTURE GUIDE GENERATED:
 
 System Overview Created:
@@ -164,11 +161,9 @@ Integration Patterns Documented:
 
 ### 5. Automated documentation maintenance
 
-```
-Set up GitHub Actions to automatically update documentation when code changes, and validate examples still work.
-```
+> Set up GitHub Actions to automatically update documentation when code changes, and validate examples still work.
 
-```
+```text
 DOCUMENTATION CI/CD PIPELINE:
 
 GitHub Actions Workflows Created:

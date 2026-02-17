@@ -25,7 +25,7 @@ Build a stateful RAG agent with LangGraph for multi-step reasoning, LangChain fo
 
 ### Prompt for Your AI Agent
 
-```
+```text
 I need to build a production support agent for our SaaS documentation. Here's the setup:
 
 **Documentation:**
@@ -76,7 +76,7 @@ class SupportState(TypedDict):
 ```
 
 Start with the LangGraph agent, then add the evaluation pipeline, then set up monitoring.
-```
+```text
 
 ### What Your Agent Will Do
 

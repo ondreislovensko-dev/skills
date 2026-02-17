@@ -27,13 +27,11 @@ npx terminal-skills install test-generator cicd-pipeline coding-agent
 
 Tell the agent to scan your app:
 
-```
-Run an accessibility audit on our web app. Test all pages listed in our sitemap. Capture every WCAG 2.1 AA violation with its severity, element, and page. Save this as our baseline — future tests should catch any new violations that aren't in this baseline.
-```
+> Run an accessibility audit on our web app. Test all pages listed in our sitemap. Capture every WCAG 2.1 AA violation with its severity, element, and page. Save this as our baseline — future tests should catch any new violations that aren't in this baseline.
 
 ### 2. The agent scans and creates a baseline
 
-```
+```text
 Accessibility baseline created: a11y/baseline.json
 
 Scan results across 34 pages:
@@ -47,13 +45,11 @@ Baseline saved with 11 known issues. Future scans will alert on anything new.
 
 ### 3. Generate accessibility regression tests
 
-```
-Generate accessibility tests for our key user flows: signup, login, dashboard, settings, and checkout. Test keyboard navigation, screen reader compatibility, color contrast, and form labeling.
-```
+> Generate accessibility tests for our key user flows: signup, login, dashboard, settings, and checkout. Test keyboard navigation, screen reader compatibility, color contrast, and form labeling.
 
 The agent creates targeted a11y tests:
 
-```
+```text
 Generated 28 accessibility tests across 5 flows:
 
 - Signup flow: 6 tests (form labels, error announcements, keyboard submit)
@@ -67,7 +63,7 @@ Generated 28 accessibility tests across 5 flows:
 
 The agent adds accessibility testing as a required CI check:
 
-```
+```text
 CI integration configured: .github/workflows/a11y-tests.yml
 
 Pipeline stages:
@@ -84,7 +80,7 @@ Warning: new moderate violations are flagged but don't block
 
 When a PR introduces a new accessibility issue, the CI posts a clear comment:
 
-```
+```text
 ⚠️ New accessibility violation detected in this PR:
 
 Page: /dashboard
@@ -98,9 +94,7 @@ This issue was not in the baseline. Please fix before merging.
 
 ### 6. Generate accessibility fix suggestions
 
-```
-For each new violation caught in the last sprint, generate a code fix suggestion with before/after examples and link to the relevant WCAG criterion.
-```
+> For each new violation caught in the last sprint, generate a code fix suggestion with before/after examples and link to the relevant WCAG criterion.
 
 The agent reads violation reports from recent CI runs and produces developer-friendly fix guides with specific code changes.
 

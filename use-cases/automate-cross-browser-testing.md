@@ -25,7 +25,7 @@ npx terminal-skills install test-generator coding-agent web-scraper
 
 ### 1. Ask the agent to analyze your app for cross-browser risk areas
 
-```
+```text
 Our app is a Next.js dashboard at http://localhost:3000. Key user flows:
 login, dashboard overview, create report, export to PDF. We have zero
 cross-browser tests. Set up automated testing across Chrome, Firefox,
@@ -34,7 +34,7 @@ and Safari. Focus on the areas most likely to break.
 
 ### 2. The agent identifies high-risk components
 
-```
+```text
 Cross-Browser Risk Analysis:
 
 High risk (CSS features with known browser differences):
@@ -53,7 +53,7 @@ Low risk: Standard layouts, form submissions, navigation
 
 ### 3. The agent generates Playwright test suites
 
-```
+```text
 Generated test files:
 
 tests/
@@ -77,7 +77,7 @@ Browser matrix:
 
 ### 4. The agent captures visual baselines
 
-```
+```text
 Capturing baseline screenshots across 5 browser configurations...
 
 Screenshots saved to tests/screenshots/baseline/:
@@ -95,7 +95,7 @@ Generated fallback CSS for 2 detected issues:
 
 ### 5. The agent integrates tests into CI
 
-```
+```text
 Updated .github/workflows/test.yml:
 
 Cross-browser tests run on every PR:

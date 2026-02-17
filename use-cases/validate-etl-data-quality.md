@@ -27,13 +27,13 @@ npx terminal-skills install data-analysis
 
 ### 1. Profile the incoming data
 
-```
+```text
 Profile this CSV export from our payments provider. We receive this daily and load it into our warehouse. Show me the data shape and any red flags.
 ```
 
 The agent scans the file and reports:
 
-```
+```text
 Dataset: payments_20260217.csv
 Rows: 34,219 | Columns: 11
 
@@ -48,11 +48,11 @@ Rows: 34,219 | Columns: 11
 
 ### 2. Define and run validation rules
 
-```
+```text
 Validate this data with these rules: transaction_id must be unique, amount_cents cannot be null, customer_email null rate must be under 1%, and all dates must be today.
 ```
 
-```
+```text
 ## Validation Report
 
 ### ❌ Failed (2)
@@ -68,7 +68,7 @@ Pipeline verdict: BLOCK — fix nulls in amount_cents before loading.
 
 ### 3. Investigate the root cause
 
-```
+```text
 Show me the 137 rows with null amount_cents. Is there a pattern?
 ```
 
@@ -76,7 +76,7 @@ The agent finds all 137 records share `payment_method: bank_transfer` and `statu
 
 ### 4. Build a validation query for the warehouse
 
-```
+```text
 Write a SQL validation query I can run after each load to catch these issues automatically.
 ```
 
@@ -100,7 +100,7 @@ FROM checks;
 
 ### 5. Set up ongoing monitoring rules
 
-```
+```text
 Summarize a data contract for this payments feed that we can share with the provider and use for automated checks.
 ```
 

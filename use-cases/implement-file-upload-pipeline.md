@@ -25,14 +25,14 @@ npx terminal-skills install file-upload-processor media-transcoder batch-process
 
 ### 1. Build the upload endpoint with validation
 
-```
+```text
 I have a Node.js/Express API. I need a file upload endpoint that handles images
 (jpg, png, webp up to 10MB), videos (mp4, webm up to 500MB), and documents
 (pdf up to 25MB). Upload to S3-compatible storage. Include validation for file
 type, size, and basic malware scanning via magic bytes.
 ```
 
-```
+```text
 Created upload/routes.ts — POST /api/files/upload with multer streaming
 Created upload/validators.ts — File type detection via magic bytes, size limits
 Created upload/storage.ts — S3 client with presigned URL generation
@@ -54,7 +54,7 @@ Validation rules:
 
 ### 2. Add image processing pipeline
 
-```
+```text
 When an image is uploaded, generate these variants:
 - thumbnail: 150x150, cropped to center, webp, quality 80
 - medium: max 800px wide, preserve aspect ratio, webp, quality 85
@@ -63,7 +63,7 @@ When an image is uploaded, generate these variants:
 Run this asynchronously after upload. Update the file record with variant URLs.
 ```
 
-```
+```text
 Created processing/image.processor.ts — Sharp-based image pipeline
 Created processing/jobs/process-image.job.ts — BullMQ job handler
 Updated upload/models/file.ts — Added variants JSON field
@@ -82,13 +82,13 @@ Processing time: ~2s for a 5MB JPEG on a 2-core server
 
 ### 3. Add video transcoding
 
-```
+```text
 For video uploads, transcode to H.264/AAC MP4 at 720p and generate a
 thumbnail from the 2-second mark. Videos over 100MB should use multipart
 upload to S3. Show progress via webhook or polling endpoint.
 ```
 
-```
+```text
 Created processing/video.processor.ts — FFmpeg-based transcoder
 Created processing/jobs/process-video.job.ts — Long-running job with progress
 Created upload/routes/status.ts — GET /api/files/:id/status (polling)
@@ -112,13 +112,13 @@ Status endpoint returns:
 
 ### 4. Set up the job queue
 
-```
+```text
 Set up BullMQ with Redis for the processing jobs. Image jobs should have
 concurrency 5, video jobs concurrency 2 (CPU-heavy). Add retry with backoff,
 dead letter queue for failed jobs, and cleanup of temp files.
 ```
 
-```
+```text
 Created queue/setup.ts — BullMQ queues for image and video processing
 Created queue/workers/image.worker.ts — Concurrency 5, 3 retries
 Created queue/workers/video.worker.ts — Concurrency 2, 2 retries

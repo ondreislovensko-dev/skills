@@ -25,7 +25,7 @@ npx terminal-skills install data-analysis excel-processor report-generator
 
 ### 1. Export your billing data and team mappings
 
-```
+```text
 Here's our AWS Cost and Usage Report for January (cost-usage-2026-01.csv.gz),
 our team-service ownership spreadsheet (service-owners.xlsx), and our tagging
 policy document. Break down costs by team, identify untagged spend, and show
@@ -36,7 +36,7 @@ month-over-month trends for the last 3 months.
 
 The agent cross-references billing line items with your ownership spreadsheet:
 
-```
+```text
 Service-to-Team Mapping:
 - Platform Team: EKS cluster, RDS primary, ElastiCache, CloudFront
 - Product Team: 3x ECS services (api, web, worker), S3 media bucket
@@ -51,7 +51,7 @@ Untagged Resources (23% of spend):
 
 ### 3. The agent calculates per-team cost allocation
 
-```
+```text
 January 2026 Cost Allocation:
 
 | Team          | Direct Cost | Shared Cost | Total     | % of Bill | MoM Change |
@@ -68,7 +68,7 @@ Key finding: Data Team costs jumped 31.2% due to a new EMR cluster
 
 ### 4. The agent identifies optimization opportunities
 
-```
+```text
 Cost Optimization Recommendations:
 
 1. Convert EMR cluster to spot instances + auto-scaling: save ~$2,800/mo
@@ -82,7 +82,7 @@ Total potential savings: $6,610/mo (14% of current bill)
 
 ### 5. The agent generates the monthly report
 
-```
+```text
 Generated: cost-allocation-january-2026.xlsx
 
 Sheets:

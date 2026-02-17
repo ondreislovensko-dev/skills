@@ -29,11 +29,11 @@ npx terminal-skills install git-commit-pro code-reviewer cicd-pipeline
 
 ### 1. Intelligent commit message generation
 
-```
+```text
 Analyze my staged changes and generate a conventional commit message that explains what changed and why.
 ```
 
-```
+```text
 COMMIT ANALYSIS COMPLETE:
 
 Staged Changes Detected:
@@ -67,11 +67,11 @@ Closes #156, addresses security requirements from audit
 
 ### 2. Automated code review and quality validation
 
-```
+```text
 Review the changes before committing to catch potential issues and ensure code quality standards.
 ```
 
-```
+```text
 CODE REVIEW ANALYSIS:
 
 Quality Assessment:
@@ -98,11 +98,11 @@ RECOMMENDATION: Safe to commit. Consider addressing caching optimization in futu
 
 ### 3. Conventional commit enforcement
 
-```
+```text
 Ensure all team commits follow conventional format and integrate with CI/CD for automated changelog generation.
 ```
 
-```
+```text
 COMMIT STANDARDS ENFORCEMENT:
 
 Team Commit Analysis (Last 50 commits):
@@ -133,11 +133,11 @@ TEAM ADOPTION STRATEGY:
 
 ### 4. CI/CD integration and automated workflows
 
-```
+```text
 Integrate commit analysis with deployment pipeline for automated quality gates and release management.
 ```
 
-```
+```text
 CI/CD PIPELINE INTEGRATION:
 
 Automated Quality Gates:
@@ -175,11 +175,11 @@ Deployment Pipeline Benefits:
 
 ### 5. Team collaboration and review workflow optimization
 
-```
+```text
 Create documentation and training materials to improve team commit practices and code review efficiency.
 ```
 
-```
+```text
 TEAM WORKFLOW IMPROVEMENTS:
 
 Commit Message Training Program:

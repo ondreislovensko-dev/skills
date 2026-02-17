@@ -30,13 +30,13 @@ npx terminal-skills install web-research
 
 Give the agent your pricing URL:
 
-```
+```text
 Analyze our pricing page at https://app.example.com/pricing. Evaluate the tier structure, feature presentation, CTAs, and any conversion friction. Compare against SaaS pricing best practices.
 ```
 
 ### 2. The agent identifies issues
 
-```
+```text
 Pricing Page Audit — 7 issues found:
 
 1. CRITICAL: No free tier or trial CTA — 68% of top SaaS products offer a free entry point
@@ -50,13 +50,13 @@ Pricing Page Audit — 7 issues found:
 
 ### 3. Research competitor pricing
 
-```
+```text
 Find 5 direct competitors in the project management SaaS space and compare their pricing tiers, feature packaging, and price points against ours.
 ```
 
 ### 4. The agent delivers a comparison matrix
 
-```
+```text
 Competitor Pricing Comparison:
 
 | Feature         | You ($29/$79/$199) | Comp A ($12/$25/$59) | Comp B (Free/$15/$49) | Comp C ($19/$49/$99) |
@@ -72,7 +72,7 @@ API access gated to Enterprise is unusual — 3 of 4 competitors include it in m
 
 ### 5. Generate an optimized pricing page spec
 
-```
+```text
 Based on the audit and competitor research, propose a new pricing structure with copy for each tier, feature allocation, and CTA text. Include the rationale for each change.
 ```
 

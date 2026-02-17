@@ -29,11 +29,11 @@ npx terminal-skills install sql-optimizer data-analysis report-generator
 
 ### 1. Audit current index usage
 
-```
+```text
 Analyze our PostgreSQL database indexes. Show which are used, which are unused, which are duplicates, and the overall index bloat.
 ```
 
-```
+```text
 INDEX AUDIT — 67 indexes across 24 tables
 
 UNUSED INDEXES (no scans in 30 days): 12
@@ -56,11 +56,11 @@ WRITE OVERHEAD: ~15% slower inserts on orders table due to 8 indexes
 
 ### 2. Identify missing indexes from slow queries
 
-```
+```text
 Analyze the slow query log from the past 7 days. Find the top queries that would benefit from new indexes.
 ```
 
-```
+```text
 SLOW QUERY ANALYSIS — 1,247 slow queries (>500ms) in 7 days
 
 TOP 5 BY TOTAL TIME:
@@ -83,11 +83,11 @@ PROJECTED IMPROVEMENT: 87% reduction in total slow query time
 
 ### 3. Generate and validate the migration
 
-```
+```text
 Create a migration that drops unused indexes and adds recommended ones. Include rollback steps and estimated lock times.
 ```
 
-```
+```text
 Migration: 20260217_optimize_indexes.sql
 
 -- Phase 1: Drop unused (no locks needed, instant)
@@ -109,11 +109,11 @@ Total estimated execution: 3-5 minutes, zero downtime
 
 ### 4. Set up weekly index health monitoring
 
-```
+```text
 Create a weekly report that tracks index usage, identifies new slow queries, and recommends adjustments.
 ```
 
-```
+```text
 Weekly Index Health Report — scheduled every Monday 6:00 AM
 
 Sections:

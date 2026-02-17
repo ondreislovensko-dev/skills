@@ -25,7 +25,7 @@ npx terminal-skills install code-documenter coding-agent changelog-generator
 
 ### 1. Map the architecture first
 
-```
+```text
 Analyze the codebase in src/ and generate an architecture overview. Show me the module dependency graph, entry points, external service dependencies, key data flows, and environment variables. I want a new engineer to understand the system in 10 minutes.
 ```
 
@@ -73,7 +73,7 @@ Monolithic Node.js/Express app with PostgreSQL, Redis, and Stripe integration.
 
 ### 2. Add docstrings to the most critical modules
 
-```
+```text
 Add comprehensive JSDoc documentation to every exported function in src/services/orders.ts and src/services/payments.ts. Include parameter types, return types, thrown errors, side effects, and example usage.
 ```
 
@@ -117,11 +117,11 @@ The agent reads each function, analyzes its behavior, and generates:
 
 ### 3. Document the tricky parts — the business logic nobody understands
 
-```
+```text
 Find the 10 most complex functions in the codebase (highest cyclomatic complexity) and add inline comments explaining the business logic. Focus on WHY, not WHAT.
 ```
 
-```
+```text
 Top 10 Complex Functions (by cyclomatic complexity):
 
 1. services/orders.ts:calculateShipping() — complexity: 23
@@ -150,7 +150,7 @@ Top 10 Complex Functions (by cyclomatic complexity):
 
 ### 4. Generate the onboarding guide
 
-```
+```text
 Based on everything we've documented, generate a GETTING_STARTED.md for new engineers. Cover: local setup, architecture overview, key files to read first, how to run and test, common tasks, and who to ask about each domain.
 ```
 

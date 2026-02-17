@@ -29,11 +29,11 @@ npx terminal-skills install voice-to-text data-analysis report-generator content
 
 ### 1. Batch transcribe all sales recordings
 
-```
+```text
 Transcribe all .mp3 files in /sales-calls/2024-Q4/. Each file is a recorded Gong call between our sales rep and a prospect. Generate speaker-labeled transcripts with timestamps and save as markdown files in /transcripts/. Include call metadata from filename patterns (rep name, prospect company, call type, date).
 ```
 
-```
+```text
 PROCESSING 238 RECORDINGS (avg 28m each)...
 
 ✓ discovery_sarah_techcorp_2024-11-05.mp3 → transcripts/2024-11-05_discovery_sarah_techcorp.md
@@ -57,11 +57,11 @@ Next: Analyze transcripts for product insights...
 
 ### 2. Extract structured insights across all transcripts
 
-```
+```text
 Analyze all 238 transcripts in /transcripts/. Extract and categorize: specific feature requests (with quotes), objections that killed deals, competitor mentions, pricing feedback, integration needs. Count frequency across calls and identify patterns. Export as structured JSON for further analysis.
 ```
 
-```
+```text
 ANALYZING 238 CALL TRANSCRIPTS (847,432 total words)...
 
 FEATURE REQUESTS IDENTIFIED (top 10 by mention frequency):
@@ -103,11 +103,11 @@ Saved analysis to: insights/sales_call_analysis_2024_Q4.json
 
 ### 3. Generate comprehensive insights report
 
-```
+```text
 Generate a product insights report from the sales call analysis. Rank feature requests by business impact (frequency × average deal size), identify the biggest revenue blockers, and create data-driven recommendations for Q1 roadmap prioritization.
 ```
 
-```
+```text
 📊 SALES CALL INSIGHTS REPORT - Q4 2024
 Generated from 238 calls, 111 hours of audio, 67 unique prospects
 
@@ -146,11 +146,11 @@ Generated from 238 calls, 111 hours of audio, 67 unique prospects
 
 ### 4. Create executive summary for leadership
 
-```
+```text
 Write a 1-page executive summary of the Q4 sales call analysis for our CEO and board presentation. Focus on the biggest revenue opportunities, include specific customer quotes, and provide clear recommendations with projected ROI.
 ```
 
-```
+```text
 🎯 EXECUTIVE SUMMARY: Q4 Sales Call Intelligence
 238 calls analyzed • 67 prospects • $4.2M total pipeline reviewed
 

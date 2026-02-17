@@ -29,13 +29,13 @@ npx terminal-skills install sql-optimizer
 
 Tell your AI agent:
 
-```
+```text
 Connect to our staging database (PostgreSQL, connection details in .env). Scan all 45 tables — for each column, sample 100 rows and classify whether it contains PII. Check for: email addresses, phone numbers, full names, national ID patterns, bank account numbers, IP addresses, and free-text fields that might contain personal info. Output a report grouped by sensitivity level.
 ```
 
 The agent uses **data-analysis** to inspect column names, data types, and actual content:
 
-```
+```text
 PII Scan Results — 45 tables, 312 columns
 
 HIGH sensitivity (must anonymize):
@@ -56,11 +56,11 @@ LOW sensitivity:
 
 ### 2. Generate anonymization rules
 
-```
+```text
 For each HIGH and MEDIUM sensitivity column, propose an anonymization strategy. Use deterministic hashing for foreign key columns so relationships are preserved. Use synthetic data for names and addresses. Mask emails to keep the domain but replace the local part. Redact free-text PII with pattern replacement.
 ```
 
-```
+```text
 Anonymization Rules:
 
 | Table.Column | Strategy | Example |
@@ -76,7 +76,7 @@ Anonymization Rules:
 
 ### 3. Build efficient SQL migration scripts
 
-```
+```text
 Generate SQL scripts that apply these anonymization rules. Optimize for batch processing — we have 2 million rows in users and 8 million in orders. Use UPDATE ... FROM with batch commits of 10,000 rows to avoid lock contention. Preserve referential integrity by hashing users.email consistently everywhere it appears.
 ```
 
@@ -99,11 +99,11 @@ END $$;
 
 ### 4. Validate anonymization completeness
 
-```
+```text
 After running the anonymization scripts, re-scan all HIGH and MEDIUM columns. Verify that no real PII remains. Also check logs tables and any materialized views. Produce a compliance report showing before/after sample data.
 ```
 
-```
+```text
 Validation Report — Post-Anonymization
 
 ✅ users.email — 0 real emails detected (was 2,000,000)
@@ -115,7 +115,7 @@ Validation Report — Post-Anonymization
 
 ### 5. Fix gaps and automate for next time
 
-```
+```text
 Add email_logs.recipient to the anonymization rules. Then create a pre-copy hook script that runs the full anonymization pipeline automatically after every production-to-staging data copy. Include the PII scan as a validation gate that blocks access until it passes.
 ```
 

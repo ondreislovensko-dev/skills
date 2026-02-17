@@ -29,13 +29,13 @@ npx terminal-skills install batch-processor
 
 Export your historical tickets and let the agent learn the patterns:
 
-```
+```text
 Analyze the last 3 months of support tickets from tickets-export.csv. Columns are: id, subject, body, category, priority, assigned_team. Find the patterns that predict category and priority.
 ```
 
 ### 2. The agent identifies classification signals
 
-```
+```text
 Ticket Classification Analysis — 18,432 tickets analyzed:
 
 Category Distribution:
@@ -56,7 +56,7 @@ Classification accuracy on historical data: 91.3%
 
 ### 3. Build the classification pipeline
 
-```
+```text
 Create a ticket classification script that takes a new ticket (subject + body) and returns: category, priority, suggested team, and confidence score. Use the patterns from the analysis.
 ```
 
@@ -81,7 +81,7 @@ def classify_ticket(subject: str, body: str) -> dict:
 
 ### 5. Process the ticket backlog
 
-```
+```text
 Run the classifier on all 47 unprocessed tickets in today's queue and show me the results sorted by priority.
 ```
 

@@ -27,15 +27,13 @@ npx terminal-skills install stripe-testing api-tester
 
 Start with the symptom — a customer reports their payment didn't go through:
 
-```
-A customer says they were charged but didn't get access to the Pro plan. Their email is jane@example.com. Can you check what happened in Stripe?
-```
+> A customer says they were charged but didn't get access to the Pro plan. Their email is jane@example.com. Can you check what happened in Stripe?
 
 ### 2. The agent traces the payment
 
 The agent searches Stripe for the customer and their recent payment intents:
 
-```
+```text
 Found customer cus_QrT9xWm (jane@example.com)
 
 Recent payment intents:
@@ -55,13 +53,11 @@ your app never activated their plan.
 
 ### 3. Replay the webhook locally to find the bug
 
-```
-Can you replay that webhook against my local server so I can debug it?
-```
+> Can you replay that webhook against my local server so I can debug it?
 
 The agent forwards webhooks and triggers the event:
 
-```
+```text
 Listening on localhost:3000/api/webhooks/stripe...
 Replayed checkout.session.completed for pi_3P1kR9KX8dVqS71m0def5678
 
@@ -81,11 +77,9 @@ Fix: Add a guard before accessing the subscription field:
 
 ### 4. Verify the fix works
 
-```
-I applied the fix. Can you test all the critical webhook flows?
-```
+> I applied the fix. Can you test all the critical webhook flows?
 
-```
+```text
 Testing 5 critical webhook events against localhost:3000:
 
 ✓ checkout.session.completed (subscription)  → 200 OK, subscription created

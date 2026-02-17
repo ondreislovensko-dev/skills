@@ -27,13 +27,11 @@ npx terminal-skills install env-manager doppler security-audit
 
 Start with a full scan:
 
-```
-Audit all environment variables in this project. Check what's referenced in code vs what's documented in .env.example vs what's actually set in our Vercel project.
-```
+> Audit all environment variables in this project. Check what's referenced in code vs what's documented in .env.example vs what's actually set in our Vercel project.
 
 ### 2. The agent maps your entire configuration surface
 
-```
+```text
 Scanned 142 source files. Found 38 unique environment variables.
 
 Documented in .env.example:          31 of 38 (82%)
@@ -57,11 +55,9 @@ Breakdown by category:
 
 ### 3. Compare across environments
 
-```
-Now compare what's set in development, staging (Vercel preview), and production (Vercel production).
-```
+> Now compare what's set in development, staging (Vercel preview), and production (Vercel production).
 
-```
+```text
 Cross-environment comparison (38 variables):
 
 🔴 Missing in production (2):
@@ -82,11 +78,9 @@ Generating fix commands...
 
 ### 4. Apply fixes safely
 
-```
-Fix the critical issues. Generate new secrets where needed and set them in Vercel.
-```
+> Fix the critical issues. Generate new secrets where needed and set them in Vercel.
 
-```
+```text
 Generated rotation plan:
 
 1. JWT_SECRET for production:

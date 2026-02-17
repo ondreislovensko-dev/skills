@@ -25,7 +25,7 @@ npx terminal-skills install terraform-iac security-audit cicd-pipeline
 
 ### 1. Import existing infrastructure into Terraform
 
-```
+```text
 We have 40+ AWS resources created manually: a VPC with 6 subnets, 2 NAT
 gateways, an ECS Fargate cluster running 5 services behind an ALB, an RDS
 PostgreSQL instance, an ElastiCache Redis cluster, 3 S3 buckets, a CloudFront
@@ -39,7 +39,7 @@ The agent generates import blocks for all 40+ resources, writes the correspondin
 
 ### 2. Create reusable modules with multi-environment support
 
-```
+```text
 Refactor the imported code into reusable modules. I want to deploy identical
 infrastructure to dev, staging, and production with different sizing:
 - Dev: single AZ, t3.small instances, db.t3.micro RDS, no Redis
@@ -55,7 +55,7 @@ The agent creates the directory-per-environment structure with shared modules th
 
 ### 3. Audit security and fix misconfigurations
 
-```
+```text
 Run a security audit on all Terraform configurations. Check for:
 - Security groups with 0.0.0.0/0 on non-HTTP ports
 - Unencrypted S3 buckets or RDS instances
@@ -72,7 +72,7 @@ The agent scans all `.tf` files and produces a prioritized findings report: 3 cr
 
 ### 4. Set up CI/CD for infrastructure changes
 
-```
+```text
 Create a GitHub Actions pipeline for Terraform:
 - On PR: run fmt check, validate, plan, post plan output as PR comment
 - On merge to main: apply the exact plan that was reviewed
@@ -90,7 +90,7 @@ The agent generates GitHub Actions workflows with reusable composite actions for
 
 ### 5. Spin up a new environment on demand
 
-```
+```text
 Create a "terraform workspace" command or script that provisions a complete
 isolated environment from scratch for load testing or client demos. It should:
 1. Accept a name and sizing tier (small/medium/large)

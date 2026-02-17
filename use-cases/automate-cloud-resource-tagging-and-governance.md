@@ -27,13 +27,11 @@ npx terminal-skills install coding-agent report-generator hetzner-cloud
 
 Tell the agent to scan your infrastructure:
 
-```
-Audit all our cloud resources for tagging compliance. Required tags are: team, environment, project, and cost-center. Show me which resources are missing tags, which have inconsistent values, and what percentage are fully compliant.
-```
+> Audit all our cloud resources for tagging compliance. Required tags are: team, environment, project, and cost-center. Show me which resources are missing tags, which have inconsistent values, and what percentage are fully compliant.
 
 ### 2. The agent scans and reports
 
-```
+```text
 Tagging Audit Complete — 214 resources scanned:
 
 Compliance: 58% fully tagged (124/214)
@@ -55,13 +53,11 @@ Top untagged resource types:
 
 ### 3. Auto-fix tagging issues
 
-```
-Fix the inconsistent tag values — normalize environment to prod/staging/dev and team names to their canonical forms. For resources missing tags, infer what you can from resource names, VPC placement, and creation metadata. Show me what you'd change before applying.
-```
+> Fix the inconsistent tag values — normalize environment to prod/staging/dev and team names to their canonical forms. For resources missing tags, infer what you can from resource names, VPC placement, and creation metadata. Show me what you'd change before applying.
 
 The agent proposes a fix plan:
 
-```
+```text
 Proposed tag fixes (dry run):
 
 Auto-inferred (high confidence):
@@ -81,7 +77,7 @@ Review file generated: untagged-resources-review.csv
 
 The agent creates infrastructure-as-code policies that prevent untagged resources:
 
-```
+```text
 Governance policies created:
 
 1. Pre-deploy check: Terraform plan validator rejects resources missing required tags
@@ -92,11 +88,9 @@ Governance policies created:
 
 ### 5. Identify orphaned resources for cleanup
 
-```
-Find all resources that appear to be orphaned — no traffic, no connections, created more than 90 days ago, and associated with completed or unknown projects.
-```
+> Find all resources that appear to be orphaned — no traffic, no connections, created more than 90 days ago, and associated with completed or unknown projects.
 
-```
+```text
 Orphaned Resource Report:
 
 High confidence (safe to delete):

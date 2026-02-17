@@ -25,13 +25,13 @@ npx terminal-skills install email-deliverability-debugger dns-record-analyzer
 
 ### 1. Audit DNS email authentication records
 
-```
+```text
 Check the email authentication setup for our domain app.example.com.
 We send transactional email through SendGrid and marketing email through
 Mailchimp. Verify SPF, DKIM, and DMARC records are correctly configured.
 ```
 
-```
+```text
 Email Authentication Audit — app.example.com
 ─────────────────────────────────────────────
 
@@ -65,7 +65,7 @@ Priority fixes:
 
 ### 2. Diagnose a specific delivery failure
 
-```
+```text
 A customer at bigcorp.com says they never receive our password reset emails.
 Our SendGrid dashboard shows the email was delivered. Help me trace what's
 happening. Their IT team shared this bounce-back header:
@@ -74,7 +74,7 @@ X-MS-Exchange-Organization-SCL: 9
 Authentication-Results: spf=pass; dkim=fail (body hash mismatch); dmarc=fail
 ```
 
-```
+```text
 Delivery Failure Analysis — emails to bigcorp.com
 ──────────────────────────────────────────────────
 
@@ -107,13 +107,13 @@ Fix:
 
 ### 3. Check sending IP reputation
 
-```
+```text
 Check the reputation of our SendGrid sending IPs. We're on a dedicated IP
 149.72.x.x. Last month our marketing team sent a blast to 50,000 contacts
 including old, unverified addresses. Could that have damaged our reputation?
 ```
 
-```
+```text
 IP Reputation Check — 149.72.x.x
 ─────────────────────────────────
 
@@ -144,7 +144,7 @@ Immediate mitigation:
 
 ### 4. Create a deliverability monitoring checklist
 
-```
+```text
 Create a weekly deliverability monitoring checklist and the DNS records I need
 to update. Give me the exact DNS changes to make right now.
 ```

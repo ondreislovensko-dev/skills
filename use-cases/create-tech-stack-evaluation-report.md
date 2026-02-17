@@ -30,15 +30,13 @@ npx terminal-skills install report-generator
 
 Tell the agent what you're evaluating and what matters:
 
-```
-We need to choose a message queue for our event-driven architecture. Compare RabbitMQ, Apache Kafka, Amazon SQS, and Redis Streams. Our criteria: throughput (>50k msgs/sec), latency (<10ms p99), operational complexity, cost at our scale (500M messages/month), and ecosystem maturity.
-```
+> We need to choose a message queue for our event-driven architecture. Compare RabbitMQ, Apache Kafka, Amazon SQS, and Redis Streams. Our criteria: throughput (>50k msgs/sec), latency (<10ms p99), operational complexity, cost at our scale (500M messages/month), and ecosystem maturity.
 
 ### 2. The agent researches each option
 
 The agent searches for recent benchmarks, documentation, pricing pages, and community discussions for each technology:
 
-```
+```text
 Research complete. Sources analyzed:
 - 12 benchmark articles (2024-2025)
 - Official documentation for all 4 options
@@ -49,7 +47,7 @@ Research complete. Sources analyzed:
 
 ### 3. Review the scoring matrix
 
-```
+```text
 Tech Stack Evaluation — Message Queue
 
 | Criteria              | Weight | Kafka  | RabbitMQ | SQS    | Redis Streams |
@@ -65,9 +63,7 @@ Tech Stack Evaluation — Message Queue
 
 ### 4. Get the detailed recommendation
 
-```
-Give me the full recommendation with trade-offs for each option and your top pick for our use case.
-```
+> Give me the full recommendation with trade-offs for each option and your top pick for our use case.
 
 ### 5. The agent delivers a structured report
 

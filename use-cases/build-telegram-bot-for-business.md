@@ -25,7 +25,7 @@ npx terminal-skills install telegram-bot-builder coding-agent data-analysis
 
 ### 1. Build the customer-facing order tracker
 
-```
+```text
 Build a Telegram bot using grammY that lets customers check their order
 status. When a user sends /start, show a welcome message with two inline
 keyboard buttons: "Track Order" and "New Order". For order tracking: ask
@@ -40,7 +40,7 @@ The agent creates a grammY bot with a conversation plugin for multi-step order t
 
 ### 2. Add appointment booking with calendar
 
-```
+```text
 Add a booking flow to the bot. When the user taps "Book Appointment":
 1. Show service categories as inline keyboard buttons (Consultation, Follow-up, Review)
 2. Show available dates for the next 14 days (skip weekends and fully booked days)
@@ -57,7 +57,7 @@ The agent implements a full booking engine with date picker keyboards (showing d
 
 ### 3. Build internal team coordination
 
-```
+```text
 Create a separate bot (or admin mode in the same bot) for the team:
 - /tasks — show today's tasks assigned to each team member
 - /assign @person "task description" — create and assign a task
@@ -74,7 +74,7 @@ The agent adds an admin middleware checking user IDs against a config list, task
 
 ### 4. Implement payment collection
 
-```
+```text
 Add payment integration using Telegram's built-in payments (Stripe provider).
 When a customer places a new order through the bot:
 1. Show order summary with itemized pricing
@@ -90,7 +90,7 @@ The agent integrates Telegram Payments API with Stripe as the provider, generati
 
 ### 5. Generate weekly business analytics
 
-```
+```text
 Every Monday at 8am, generate a weekly report and post it to the team group:
 - Total orders: count and revenue
 - Bookings: completed vs cancelled vs no-show

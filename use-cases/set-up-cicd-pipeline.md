@@ -27,11 +27,11 @@ npx terminal-skills install cicd-pipeline docker-helper test-generator security-
 
 ### 1. Generate tests for the pipeline to run
 
-```
+```text
 Generate integration tests for the core API: user management, billing, and webhook processing.
 ```
 
-```
+```text
   tests/integration/users.test.js    — 16 tests (CRUD, validation, pagination)
   tests/integration/billing.test.js  — 14 tests (subscriptions, invoices, retries)
   tests/integration/webhooks.test.js — 11 tests (signatures, idempotency, dead letters)
@@ -41,11 +41,11 @@ Total: 41 tests, all passing. Coverage: 64%. Run time: 12 seconds.
 
 ### 2. Optimize the Docker build
 
-```
+```text
 Optimize our Dockerfile. Currently 1.4GB, 8 minutes to build. Needs smaller images, faster builds, security hardening.
 ```
 
-```
+```text
   Image size:  1.4GB → 156MB (89% reduction)
   Build time:  8:12 → 1:43 (79% faster)
 
@@ -60,11 +60,11 @@ Optimize our Dockerfile. Currently 1.4GB, 8 minutes to build. Needs smaller imag
 
 ### 3. Build the CI/CD pipeline
 
-```
+```text
 Create a GitHub Actions pipeline: lint, test, build Docker image, deploy to staging on merge, production on release tag. Cache node_modules and Docker layers.
 ```
 
-```
+```text
 Created: .github/workflows/ci.yml
 
   1. LINT (30s) — ESLint + Prettier
@@ -80,11 +80,11 @@ Total: ~4 minutes commit-to-staging
 
 ### 4. Add security scanning gates
 
-```
+```text
 Add security scanning to the pipeline. SAST, dependency audit, Docker image scan, secret detection. Block on critical findings.
 ```
 
-```
+```text
 Security gates added between TEST and BUILD:
 
   ✓ SAST — Semgrep with Node.js + Express rulesets
@@ -102,11 +102,11 @@ Initial scan found 2 issues:
 
 ### 5. Validate the complete pipeline
 
-```
+```text
 Run the full pipeline end-to-end. Deploy to staging and verify everything works together.
 ```
 
-```
+```text
 Full Pipeline — SUCCESS ✓
 
   ✓ Lint:           32s (0 issues)

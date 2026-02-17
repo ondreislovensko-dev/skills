@@ -27,13 +27,13 @@ npx terminal-skills install analytics-tracking data-analysis data-analysis
 
 Tell the agent about your product:
 
-```
+```text
 We're a project management SaaS. Define a user activation funnel with these stages: signup → email verified → first project created → first team member invited → first task completed → returned within 7 days. Also suggest any stages I might be missing.
 ```
 
 ### 2. The agent designs the funnel
 
-```
+```text
 Recommended Activation Funnel:
 1. Signup completed
 2. Email verified
@@ -50,7 +50,7 @@ Suggested additional tracking:
 
 ### 3. Instrument the tracking events
 
-```
+```text
 Generate the tracking code for these funnel events. We use a Node.js backend with Express and a React frontend. Use a provider-agnostic approach so we can send events to any analytics backend.
 ```
 
@@ -60,11 +60,11 @@ The agent generates event-tracking functions for both frontend and backend, with
 
 Once data is flowing (or using historical data if available):
 
-```
+```text
 Analyze our funnel data from the last 90 days. Show conversion rates between each stage, median time between stages, and segment by signup source (organic, paid, referral).
 ```
 
-```
+```text
 Funnel Analysis (last 90 days, 1,847 signups):
 
 Signup → Email verified:      78% (1,441) — median: 4 min
@@ -83,11 +83,11 @@ Biggest drop-offs:
 
 Dig deeper into the data:
 
-```
+```text
 Break down the funnel by signup source and company size. Are enterprise trial users behaving differently from self-serve signups?
 ```
 
-```
+```text
 Segment Analysis:
 
 Self-serve (organic): 1,200 signups
@@ -108,7 +108,7 @@ the activation rate. Self-serve users need in-product guidance to match.
 
 ### 6. Visualize and share findings
 
-```
+```text
 Create a funnel visualization showing these conversion rates with absolute numbers. Also create a retention curve chart showing weekly retention for cohorts from the last 3 months. Include the segment breakdown.
 ```
 

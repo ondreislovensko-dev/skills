@@ -25,7 +25,7 @@ npx terminal-skills install coding-agent data-analysis n8n-workflow
 
 ### 1. Ask the agent to audit your current pipelines
 
-```
+```text
 I have 15 dbt models that run daily at 06:00 UTC, loading data from Postgres
 into BigQuery. Help me build health checks for these pipelines. Here's my
 dbt manifest: manifest.json
@@ -35,7 +35,7 @@ dbt manifest: manifest.json
 
 The agent parses your pipeline graph and flags the highest-risk nodes:
 
-```
+```text
 Pipeline Analysis:
 - 15 models, 4 source tables, 3 exposure endpoints
 - Critical path: raw_transactions -> stg_transactions -> fct_revenue (feeds exec dashboard)
@@ -69,7 +69,7 @@ HAVING row_count < avg_7d * 0.7;
 
 ### 4. The agent wires checks into an n8n workflow
 
-```
+```text
 Created n8n workflow: pipeline-health-monitor
 Triggers: runs at 07:00 UTC daily (1 hour after dbt completes)
 Steps:
@@ -84,7 +84,7 @@ Steps:
 
 The agent analyzes 30 days of historical data to calibrate thresholds:
 
-```
+```text
 Baseline Report:
 - raw_transactions: avg 45,200 rows/day (σ = 3,100), alert threshold set at < 35,900
 - stg_users: avg null rate on email = 0.3%, alert threshold set at > 2%

@@ -25,13 +25,13 @@ npx terminal-skills install web-vitals-analyzer frontend-design code-reviewer
 
 ### 1. Get the baseline diagnosis
 
-```
+```text
 Analyze the Core Web Vitals for our product page. Here's the Lighthouse JSON report and the page source from src/pages/product/[id].tsx. Tell me exactly what's failing and why.
 ```
 
 The agent parses the report and source:
 
-```
+```text
 Core Web Vitals Baseline
 =========================
 LCP:  4.8s  (target: < 2.5s) ❌  Element: <img> hero product photo
@@ -50,11 +50,11 @@ Lighthouse Score: 34/100
 
 ### 2. Fix LCP — the biggest impact first
 
-```
+```text
 Show me exactly how to fix the hero image and render-blocking CSS. Give me the code changes.
 ```
 
-```
+```text
 Fix 1: Hero Product Image (estimated LCP improvement: -2.8s)
 =============================================================
 
@@ -92,11 +92,11 @@ Combined expected LCP: 4.8s → ~1.6s
 
 ### 3. Fix CLS — stop the layout shifts
 
-```
+```text
 Fix the 0.28 CLS score. Show me every element causing shifts and the exact CSS changes needed.
 ```
 
-```
+```text
 CLS Fix Plan (0.28 → estimated 0.04)
 ======================================
 
@@ -124,11 +124,11 @@ Shift 3: Dynamic pricing badge (contribution: 0.05)
 
 ### 4. Fix INP — make interactions feel instant
 
-```
+```text
 The Add to Cart button has 340ms INP. Profile what's happening on click and show me how to fix it.
 ```
 
-```
+```text
 INP Analysis: "Add to Cart" Click (340ms → estimated 80ms)
 ============================================================
 

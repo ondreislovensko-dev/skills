@@ -25,14 +25,14 @@ npx terminal-skills install saas-architecture-advisor database-schema-designer
 
 ### 1. Evaluate tenancy strategies for your context
 
-```
+```text
 We're building a project management SaaS. Expected: 500 tenants in year 1,
 scaling to 5,000. Most tenants are 5-20 users, but 3-5 enterprise clients
 need strict data isolation for SOC2. Stack: Node.js, PostgreSQL, Redis.
 Monthly budget for infrastructure: $3,000. Recommend a multi-tenancy strategy.
 ```
 
-```
+```text
 Multi-Tenancy Strategy Analysis
 ───────────────────────────────
 
@@ -68,7 +68,7 @@ Option C: Hybrid — Shared schema for standard + dedicated DB for enterprise
 
 ### 2. Generate the database schema with tenant isolation
 
-```
+```text
 Generate the PostgreSQL schema for the hybrid approach. Include the shared
 tenant table, row-level security policies, and the middleware pattern for
 tenant context injection. Our main entities: projects, tasks, members, comments.
@@ -120,7 +120,7 @@ export async function tenantContext(req: Request, res: Response, next: NextFunct
 
 ### 3. Add tenant-aware data access patterns
 
-```
+```text
 Generate a repository pattern that works transparently with both shared and
 dedicated databases. Include examples for CRUD operations on projects and
 handling tenant-specific feature flags.
@@ -128,7 +128,7 @@ handling tenant-specific feature flags.
 
 ### 4. Generate tenant onboarding and offboarding flows
 
-```
+```text
 Create the tenant provisioning flow: when a new enterprise tenant signs up,
 automatically create their dedicated database, run migrations, and configure
 the routing. Include cleanup for tenant deletion with data export.

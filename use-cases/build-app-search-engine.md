@@ -27,7 +27,7 @@ npx terminal-skills install data-analysis
 
 ### 1. Design the search index
 
-```
+```text
 I have a products table with 500K rows. Columns: id, name, description, category, brand, price_cents, rating, in_stock, created_at. Design an Elasticsearch index mapping optimized for: full-text search on name and description with typo tolerance, exact filtering on category and brand, range filtering on price and rating, and boosting in-stock items. Include a custom analyzer for handling common misspellings.
 ```
 
@@ -72,31 +72,31 @@ The agent generates:
 
 ### 2. Build the sync pipeline
 
-```
+```text
 Create a sync service that keeps Elasticsearch in sync with PostgreSQL. On app boot, do a full re-index of all products. After that, listen to database change events (using pg_notify or polling updated_at) and update individual documents. Handle deletions by tracking soft-deleted records. Add a CLI command to trigger a full re-index manually.
 ```
 
 ### 3. Implement the search API
 
-```
+```text
 Build a search endpoint at GET /api/search?q=wireless+keyboard&category=electronics&min_price=2000&max_price=10000&sort=relevance. Support: full-text query with fuzziness auto, faceted filters (category, brand, price range, rating, in_stock), pagination with cursor-based approach, and highlight matching terms in results. Return total count, facet counts, and highlighted snippets.
 ```
 
 ### 4. Add autocomplete and suggestions
 
-```
+```text
 Add a typeahead endpoint at GET /api/search/suggest?q=wir that returns the top 5 completion suggestions from product names as the user types. Use Elasticsearch's completion suggester. Also add a "did you mean" feature using the phrase suggester for queries that return few results.
 ```
 
 ### 5. Tune relevance with query analysis
 
-```
+```text
 I have a log of the 200 most common search queries and their click-through rates in search_queries.csv (columns: query, result_count, ctr, avg_position_clicked). Analyze which queries perform poorly (low CTR or zero results). Suggest specific tuning actions: synonym additions, boost adjustments, or missing data fixes. Output a priority-ranked list of improvements.
 ```
 
 The agent reports:
 
-```
+```text
 Search Quality Analysis — 200 queries reviewed:
 
 Zero-result queries (17):

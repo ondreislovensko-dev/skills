@@ -29,11 +29,11 @@ npx terminal-skills install pdf-analyzer data-analysis excel-processor
 
 ### 1. Bulk document analysis
 
-```
+```text
 Process all 12 vendor reports in ./monthly-reports/. Extract revenue tables, client metrics, and KPI summaries. Combine into one master dataset.
 ```
 
-```
+```text
 ANALYZING 12 PDF REPORTS (804 pages total):
 
 Document Structure Detected:
@@ -51,11 +51,11 @@ EXTRACTION RESULTS:
 
 ### 2. Intelligent table extraction
 
-```
+```text
 Handle complex table structures: merged headers, split pages, embedded subtotals. Clean and normalize all data.
 ```
 
-```
+```text
 COMPLEX TABLE PROCESSING:
 
 Multi-page table (Gamma_Insights.pdf, pages 23-26):
@@ -77,11 +77,11 @@ Chart-embedded data extraction:
 
 ### 3. Data quality validation
 
-```
+```text
 Cross-check extracted numbers against document totals, flag inconsistencies, and verify calculation accuracy.
 ```
 
-```
+```text
 DATA VALIDATION RESULTS:
 
 Consistency checks:
@@ -100,11 +100,11 @@ CLEANED DATASET: 2,843 validated data points ready for analysis
 
 ### 4. Automated analysis and insights
 
-```
+```text
 Generate executive summary with key trends, outliers, and actionable insights from the combined dataset.
 ```
 
-```
+```text
 EXECUTIVE SUMMARY GENERATED:
 
 Key Trends Identified:
@@ -126,11 +126,11 @@ Recommended Actions:
 
 ### 5. Automated dashboard creation
 
-```
+```text
 Create an Excel dashboard with pivot tables, charts, and automated monthly update process.
 ```
 
-```
+```text
 DASHBOARD CREATED: vendor_analysis_dashboard.xlsx
 
 Sheet Structure:

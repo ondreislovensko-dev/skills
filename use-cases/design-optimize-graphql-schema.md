@@ -25,13 +25,13 @@ npx terminal-skills install graphql sql-optimizer
 
 ### 1. Audit your existing schema
 
-```
+```text
 Here's our GraphQL schema (schema.graphql, 820 lines). Analyze it for: naming inconsistencies, missing pagination on list fields, overly nested types that cause deep query chains, nullable fields that should be non-null, and any anti-patterns.
 ```
 
 The agent reviews your schema and produces a detailed audit:
 
-```
+```text
 Schema Audit — 47 types, 23 queries, 14 mutations
 
 Naming Issues:
@@ -57,19 +57,19 @@ Missing Non-Null:
 
 ### 2. Fix the schema structure
 
-```
+```text
 Redesign the schema following your recommendations. Keep backward compatibility where possible — add @deprecated directives for fields we'll remove later. Add Relay-style pagination, input types for mutations, and a query complexity limit of 1000 points.
 ```
 
 ### 3. Detect and fix N+1 queries
 
-```
+```text
 Here are our resolver files (resolvers/ directory). Find every N+1 query pattern and generate DataLoader implementations to batch them. Show me the before/after SQL query counts for a typical "list projects with tasks and assignees" request.
 ```
 
 The agent analyzes resolver code and SQL logs:
 
-```
+```text
 N+1 Query Analysis:
 
 Query: { projects(first: 20) { tasks { assignee { name } } } }
@@ -94,7 +94,7 @@ Generated DataLoaders:
 
 ### 4. Add query complexity and depth limits
 
-```
+```text
 Configure query complexity analysis. Assign costs: scalar fields = 0, object fields = 1, list fields with pagination = cost × first argument. Set max depth to 7 and max complexity to 1000. Generate the middleware code.
 ```
 

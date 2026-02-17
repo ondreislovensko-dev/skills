@@ -25,7 +25,7 @@ npx terminal-skills install auth-system-setup jwt-handler security-audit
 
 ### 1. Define the auth requirements
 
-```
+```text
 I'm building a project management app with a Node.js/Express backend and PostgreSQL.
 I need: Google OAuth login, JWT access/refresh tokens, and three roles — admin, manager, member.
 Admins manage users, managers manage projects, members view and update tasks assigned to them.
@@ -36,7 +36,7 @@ Set up the full auth system.
 
 The agent generates the Google OAuth integration with PKCE, callback handling, and user provisioning:
 
-```
+```text
 Created auth/providers/google.ts — OAuth 2.0 with PKCE flow
 Created auth/middleware/authenticate.ts — JWT verification middleware
 Created auth/middleware/authorize.ts — Role-based access guard
@@ -49,7 +49,7 @@ Access token TTL: 15 minutes | Refresh token TTL: 7 days with rotation
 
 ### 3. Configure role-based access control
 
-```
+```text
 Add RBAC with these permissions:
 - admin: users.read, users.write, users.delete, projects.*, tasks.*
 - manager: projects.create, projects.update, tasks.*, members.read
@@ -59,7 +59,7 @@ Include row-level filtering so members only see their assigned tasks.
 
 The agent creates the permission matrix and row-level security policies:
 
-```
+```text
 Created auth/rbac/permissions.ts — Permission definitions and role mapping
 Created auth/rbac/policies.ts — Row-level security filters
 Updated auth/middleware/authorize.ts — Now checks granular permissions
@@ -72,14 +72,14 @@ Example usage in routes:
 
 ### 4. Harden the token lifecycle
 
-```
+```text
 Review the JWT implementation for security issues. I want refresh token rotation
 with reuse detection, proper token revocation on logout, and secure cookie settings.
 ```
 
 The agent audits and hardens the token flow:
 
-```
+```text
 Security review of token.service.ts:
 
 Fixed: Refresh tokens now use one-time rotation — each refresh invalidates the old token
@@ -96,12 +96,12 @@ Created: tests/auth/token-rotation.test.ts — 8 test cases including reuse dete
 
 ### 5. Run a security audit on the full auth flow
 
-```
+```text
 Run a security audit on the auth implementation. Check against OWASP top 10
 and common auth vulnerabilities.
 ```
 
-```
+```text
 Security Audit Results — Auth System
 
 ✅ PASS: OAuth state parameter prevents CSRF on login flow

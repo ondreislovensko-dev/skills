@@ -26,7 +26,7 @@ npx terminal-skills install data-analysis
 
 ### 1. Feed the agent your logs
 
-```
+```text
 Analyze these application logs from the last 30 minutes. We're getting reports of failed checkouts. The logs are in /var/log/app/checkout-service.log
 ```
 
@@ -34,7 +34,7 @@ Analyze these application logs from the last 30 minutes. We're getting reports o
 
 It scans the logs chronologically, filters errors and warnings, and groups them by type:
 
-```
+```text
 Found 3 distinct error types in the last 30 minutes:
 
 | Error Type                  | Count | First Seen | Last Seen |
@@ -48,24 +48,24 @@ First error: Redis ConnectionTimeout at 14:02:03
 
 ### 3. Ask for cross-service correlation
 
-```
+```text
 Now check the Redis server logs at /var/log/redis/redis-server.log for the same time window.
 ```
 
 The agent finds that Redis hit max memory at 14:01:58, five seconds before the checkout errors started:
 
-```
+```text
 14:01:58.332 # WARNING: maxmemory reached, eviction policy: noeviction
 14:01:58.333 # Client connection rejected: OOM command not allowed
 ```
 
 ### 4. Generate the incident timeline
 
-```
+```text
 Build an incident timeline and recommend immediate fixes.
 ```
 
-```
+```text
 ## Incident Timeline
 - 14:01:58 — Redis hit maxmemory limit (16GB), started rejecting connections
 - 14:02:03 — Checkout service: first ConnectionTimeout to Redis
@@ -86,7 +86,7 @@ into checkout and payment failures.
 
 ### 5. Analyze error rate trends
 
-```
+```text
 Parse the error counts per minute from the logs and show me the trend.
 ```
 

@@ -25,7 +25,7 @@ npx terminal-skills install data-analysis report-generator cicd-pipeline
 
 ### 1. Define SLIs from existing metrics
 
-```
+```text
 We run 6 production services behind an API gateway. We have Prometheus metrics
 for request latency (histogram), HTTP status codes (counter), and uptime
 (gauge). We also have business metrics in Datadog: checkout completion rate,
@@ -40,7 +40,7 @@ The agent defines 14 SLIs across 6 services. For the API gateway: availability (
 
 ### 2. Set SLO targets based on historical data
 
-```
+```text
 Pull the last 90 days of data for each SLI and calculate the baseline
 reliability. For each one, recommend an SLO target that's achievable but
 meaningful. Show me: current performance (p50, p95, p99 over 90 days),
@@ -52,7 +52,7 @@ The agent analyzes historical data and recommends SLOs: API availability at 99.9
 
 ### 3. Build error budget dashboards
 
-```
+```text
 Create Grafana dashboard JSON for each service showing:
 - Current SLO compliance (rolling 30-day window)
 - Error budget remaining (percentage and absolute)
@@ -67,7 +67,7 @@ The agent generates complete Grafana dashboard JSON with 6 panels per service. T
 
 ### 4. Gate deployments on error budget
 
-```
+```text
 Add a deployment gate to our GitHub Actions pipeline. Before deploying to
 production, check the current error budget status via Prometheus API.
 If error budget is below 20%, block the deployment and post a Slack message
@@ -80,7 +80,7 @@ The agent generates a GitHub Actions job that queries Prometheus for the current
 
 ### 5. Create the weekly reliability report
 
-```
+```text
 Generate a weekly report template that automatically pulls data and shows:
 - SLO compliance across all services
 - Error budget consumed this week vs. previous weeks (trend)

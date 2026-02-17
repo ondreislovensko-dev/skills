@@ -27,13 +27,13 @@ npx terminal-skills install code-reviewer coding-agent report-generator
 
 Tell the agent to analyze the codebase:
 
-```
+```text
 Analyze the entire ./src directory for code complexity. For each file, calculate cyclomatic complexity, lines of code, function length, nesting depth, and coupling (number of imports/dependencies). Flag anything above industry thresholds.
 ```
 
 ### 2. The agent maps the complexity landscape
 
-```
+```text
 Codebase Analysis: 400 files, 60,247 lines
 
 Critical Complexity (immediate attention):
@@ -52,11 +52,11 @@ Coupling hotspots:
 
 ### 3. Correlate complexity with bug history
 
-```
+```text
 Cross-reference these complexity results with our git log. Which high-complexity files have the most bug-fix commits in the last 6 months? That tells us where complexity is actively causing problems.
 ```
 
-```
+```text
 Complexity × Bug Frequency:
 1. invoice-engine.js — 94 CC, 31 bug-fix commits (highest risk)
 2. auth.js — 67 CC, 18 bug-fix commits
@@ -66,7 +66,7 @@ Complexity × Bug Frequency:
 
 ### 4. Generate a refactoring plan
 
-```
+```text
 Create a refactoring plan for the top 3 risk files. For each, suggest specific decomposition strategies, estimate effort in story points, and show a before/after code example for one function.
 ```
 
@@ -74,7 +74,7 @@ Create a refactoring plan for the top 3 risk files. For each, suggest specific d
 
 For each file, the agent provides a concrete breakdown:
 
-```
+```text
 Refactoring Plan: invoice-engine.js (CC: 94 → target CC: 15)
 
 Decomposition:
@@ -105,11 +105,11 @@ Prerequisite: Add integration tests before refactoring (test-generator)
 
 ### 5. Track complexity over time
 
-```
+```text
 Set up a complexity tracking baseline. Generate a JSON snapshot of all complexity metrics so we can compare after each sprint and measure whether refactoring is actually improving things.
 ```
 
-```
+```text
 Baseline snapshot saved to: metrics/complexity-baseline-2025-02-17.json
 - Average file CC: 14.2
 - Max file CC: 94 (invoice-engine.js)

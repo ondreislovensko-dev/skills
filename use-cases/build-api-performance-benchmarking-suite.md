@@ -29,7 +29,7 @@ npx terminal-skills install data-analysis
 
 Tell the agent which endpoints to benchmark:
 
-```
+```text
 Create a performance benchmark suite for our REST API. Critical endpoints:
 - GET /api/v1/products (list, paginated, ~2000 products)
 - GET /api/v1/products/:id (single product with relations)
@@ -41,7 +41,7 @@ Target: p50 < 100ms, p95 < 300ms, p99 < 500ms for all endpoints.
 
 ### 2. The agent generates the benchmark scripts
 
-```
+```text
 Generated benchmark suite: benchmarks/api-performance/
 
 Files created:
@@ -57,13 +57,13 @@ Each scenario includes realistic payloads, authentication headers, and data setu
 
 ### 3. Run the benchmark suite
 
-```
+```text
 Run the full benchmark suite against our staging API at https://staging-api.example.com and show me the results.
 ```
 
 ### 4. The agent executes and analyzes results
 
-```
+```text
 API Performance Benchmark Results — 2026-02-14
 
 | Endpoint              | p50    | p95    | p99    | Throughput  | Status |
@@ -84,7 +84,7 @@ query for line items. Recommendation: add eager loading for the line_items relat
 
 ### 5. Generate a performance trend dashboard
 
-```
+```text
 Create a chart showing p95 latency trends for all endpoints over the last 10 benchmark runs.
 ```
 

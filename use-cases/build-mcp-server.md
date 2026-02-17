@@ -25,11 +25,11 @@ npx terminal-skills install mcp-server-builder api-tester test-generator
 
 ### 1. Scaffold the MCP server
 
-```
+```text
 Build an MCP server with three tools: inventory-lookup (search by SKU or name), order-status (track by ID), customer-search (find by email or phone). TypeScript with @modelcontextprotocol/sdk, PostgreSQL backend.
 ```
 
-```
+```text
 Created: mcp-warehouse-server/
 
   src/index.ts           — Server entry with stdio transport
@@ -43,11 +43,11 @@ Created: mcp-warehouse-server/
 
 ### 2. Test each tool with realistic requests
 
-```
+```text
 Test each MCP tool with realistic requests. Try normal lookups, empty results, invalid inputs, and edge cases like SQL injection and oversized payloads.
 ```
 
-```
+```text
 inventory-lookup:
   ✓ SKU "WH-4521" → 1 result (Wireless Headphones, $79.99)
   ✓ Name "cable" → 23 results, paginated correctly
@@ -70,11 +70,11 @@ customer-search:
 
 ### 3. Test protocol edge cases
 
-```
+```text
 Test MCP protocol compliance: malformed JSON-RPC, unsupported methods, concurrent calls, connection handling.
 ```
 
-```
+```text
   ✓ Malformed JSON → parse error (-32700)
   ✓ Invalid method → method-not-found (-32601)
   ✓ Missing params → invalid-params (-32602)
@@ -89,11 +89,11 @@ Protocol compliance: 8/8 required behaviors verified ✓
 
 ### 4. Generate automated test suite
 
-```
+```text
 Generate a test suite covering all tools, validation, error responses, and database edge cases. Vitest with test database.
 ```
 
-```
+```text
   tests/tools/inventory.test.ts  — 18 tests (search, pagination, validation, DB errors)
   tests/tools/orders.test.ts     — 15 tests (lookup, compound validation, status flow)
   tests/tools/customers.test.ts  — 13 tests (multi-field search, masking, normalization)
@@ -105,11 +105,11 @@ Total: 55 tests, all passing. Coverage: 87% statements. Run time: 3.2s.
 
 ### 5. Finalize and verify end-to-end
 
-```
+```text
 Add test scripts, README with setup guide, and verify the server works with Claude Desktop.
 ```
 
-```
+```text
   package.json — "test": "vitest run", "test:watch": "vitest"
   README.md — setup, tool docs, Claude Desktop config example
 

@@ -25,7 +25,7 @@ npx terminal-skills install coding-agent security-audit data-analysis
 
 ### 1. Define your audit requirements
 
-```
+```text
 We're a fintech startup preparing for SOC 2 Type II. We need an audit trail for:
 - All authentication events (login, logout, failed attempts, password changes)
 - PII access (viewing, exporting, or modifying customer data)
@@ -37,7 +37,7 @@ Our stack: Express API, Postgres, React frontend. Show me how to build this.
 
 ### 2. The agent designs the audit event schema
 
-```
+```text
 Audit Event Schema:
 
 {
@@ -71,7 +71,7 @@ Retention: 7 years (configurable per compliance framework).
 
 ### 3. The agent generates audit middleware
 
-```
+```text
 Generated audit infrastructure:
 
 src/audit/
@@ -92,7 +92,7 @@ Key features:
 
 ### 4. The agent instruments your critical endpoints
 
-```
+```text
 Instrumented 34 endpoints across 6 route files:
 
 Authentication (8 events):
@@ -113,7 +113,7 @@ Admin Actions (12 events):
 
 ### 5. The agent creates auditor-facing query interface
 
-```
+```text
 Generated audit query endpoints and reports:
 
 GET /audit/events?actor=usr_123&from=2026-01-01&to=2026-02-01

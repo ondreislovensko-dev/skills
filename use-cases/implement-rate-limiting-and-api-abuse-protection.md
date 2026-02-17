@@ -29,11 +29,11 @@ npx terminal-skills install rate-limiter security-audit
 
 ### 1. Implement multi-tier rate limiting with user-based controls
 
-```
+```text
 Set up rate limiting for our Node.js API with different limits for different user tiers and endpoints. Free users get 100 requests/hour, paid users get 1000 requests/hour, enterprise users get 10,000 requests/hour. High-cost endpoints like payment validation should have stricter limits. Include IP-based limits as a backstop against abuse.
 ```
 
-```
+```text
 🛡️  MULTI-TIER RATE LIMITING SETUP...
 
 Rate limiting architecture (src/middleware/rate-limiter.ts):
@@ -79,11 +79,11 @@ GRADUATED RESPONSES:
 
 ### 2. Add behavioral analysis and abuse detection
 
-```
+```text
 Implement intelligent abuse detection that identifies suspicious patterns beyond simple rate limits. Detect scrapers, bot behavior, distributed attacks, and API key abuse. Include automatic escalation from warnings to temporary blocks to permanent bans based on threat severity.
 ```
 
-```
+```text
 🔍 BEHAVIORAL ANALYSIS & ABUSE DETECTION...
 
 Abuse detection patterns (src/security/abuse-detector.ts):
@@ -134,11 +134,11 @@ ESCALATION WORKFLOW:
 
 ### 3. Implement automatic blocking and response mechanisms
 
-```
+```text
 Set up automated response systems that can block attacks in real-time without manual intervention. Include IP blocking, API key suspension, geographic blocking, and emergency lockdown modes. Ensure legitimate users aren't affected while stopping abusive traffic.
 ```
 
-```
+```text
 ⚡ AUTOMATED BLOCKING & RESPONSE SYSTEMS...
 
 Automatic blocking mechanisms (src/security/auto-blocker.ts):
@@ -191,11 +191,11 @@ ATTACK MITIGATION RESULTS:
 
 ### 4. Add monitoring, alerting, and forensic analysis
 
-```
+```text
 Create comprehensive monitoring for API abuse attempts, successful blocks, system performance during attacks, and detailed forensics for security analysis. Include real-time dashboards, automated incident response, and detailed attack attribution.
 ```
 
-```
+```text
 📊 MONITORING, ALERTING & FORENSIC ANALYSIS...
 
 Security monitoring dashboard (src/monitoring/security-dashboard.ts):
