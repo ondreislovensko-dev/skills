@@ -11,7 +11,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Any SQL database (PostgreSQL, MySQL, SQLite, MSSQL)"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["migration", "database", "etl", "data-pipeline", "schema"]
