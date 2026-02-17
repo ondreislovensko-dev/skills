@@ -1,93 +1,129 @@
 ---
 title: "Set Up Database Backup and Disaster Recovery with AI"
 slug: set-up-database-backup-and-disaster-recovery
-description: "Implement automated database backups with tested recovery procedures, retention policies, and point-in-time restore capabilities."
-skills: [db-backup, security-audit]
+description: "Implement automated database backups, point-in-time recovery, and disaster recovery runbooks for production databases."
+skills: [db-backup, docker-helper, cicd-pipeline]
 category: devops
-tags: [database, backup, disaster-recovery, postgresql, automation]
+tags: [database, backup, disaster-recovery, postgresql, devops]
 ---
 
 # Set Up Database Backup and Disaster Recovery with AI
 
 ## The Problem
 
-Your PostgreSQL database holds 3 years of customer data, financial transactions, and application state. Your current "backup strategy" is whatever your cloud provider does by default — daily snapshots you've never tested restoring. You don't know your Recovery Point Objective (how much data you can afford to lose) or your Recovery Time Objective (how long the application can be down). When a developer accidentally runs a migration that drops a column in production, you discover your backups are stored in the same region as your database, the restore process isn't documented, and nobody has ever tested whether the backups actually work.
+Your production database holds everything — user data, transactions, years of business history. But your backup strategy is a cron job someone wrote two years ago that nobody has tested. When a junior engineer accidentally runs a DELETE without a WHERE clause on the orders table, you discover the backups have been silently failing for three weeks because the disk filled up. Even when backups exist, nobody knows the exact steps to restore, and the one person who set it up left the company. The difference between a 30-minute recovery and a company-ending data loss event comes down to whether you invested a day in proper backup infrastructure.
 
 ## The Solution
 
-Use the **db-backup** skill to implement automated backups with verified restore procedures, and the **security-audit** skill to validate backup security and access controls. Install both:
+Use the **db-backup** skill to implement automated backup schedules with verification, the **docker-helper** skill to containerize backup and restore tooling, and the **cicd-pipeline** skill to integrate backup verification into your CI workflow.
 
 ```bash
-npx terminal-skills install db-backup security-audit
+npx terminal-skills install db-backup docker-helper cicd-pipeline
 ```
 
 ## Step-by-Step Walkthrough
 
-### 1. Assess current state and define recovery objectives
+### 1. Assess your current backup situation
+
+Start by understanding what you have and what you need:
 
 ```
-Review my database infrastructure: PostgreSQL 15 on a managed cloud instance, approximately 80 GB of data, ~500 transactions per minute during peak hours. Help me define appropriate RPO and RTO targets based on our use case (a B2B SaaS platform handling customer project data and billing). Also audit what backup mechanisms are currently active from the cloud provider.
+Audit my current database backup setup. I have a PostgreSQL 15 database (180GB) running on an AWS RDS instance. There's a cron job in /etc/cron.d/db-backup that runs pg_dump nightly. Check the backup script, verify recent backups exist and are valid, and identify gaps in our disaster recovery readiness. Also tell me our current RPO and RTO.
 ```
 
-The agent evaluates the setup and recommends:
+The agent examines the setup and reports:
 
 ```
-Recovery Objectives:
-- RPO (Recovery Point Objective): 1 hour — maximum acceptable data loss
-- RTO (Recovery Time Objective): 30 minutes — maximum acceptable downtime
+Backup Audit Results:
 
-Current State:
-- Cloud provider: daily automated snapshots at 03:00 UTC (RPO = 24 hours!)
-- No WAL archiving configured
-- No cross-region backup copies
-- Restore process: undocumented, never tested
+Current setup:
+  ✗ pg_dump runs at 02:00 UTC via cron
+  ✗ Dumps stored locally at /backups/ (same server as database)
+  ✗ No encryption, no compression
+  ✗ No backup verification — last 3 backups are 0 bytes (disk full since Jan 28)
+  ✗ No WAL archiving — only nightly full dumps
+  ✗ No documented restore procedure
 
-Gap: Current 24-hour RPO is 24x worse than the recommended 1-hour target.
+Current RPO: ~24 hours (nightly dump only, no WAL archiving)
+Current RTO: Unknown — no restore has ever been tested
+
+Critical issues:
+  1. Backups on same server as database — useless if server fails
+  2. Last valid backup is 23 days old
+  3. No point-in-time recovery capability
+  4. No one can restore without researching the process
+
+Recommended target: RPO < 5 minutes (WAL archiving), RTO < 30 minutes (tested runbook)
 ```
 
-### 2. Implement automated backup pipeline
+### 2. Implement a proper backup strategy
+
+Now build the real backup infrastructure:
 
 ```
-Set up a backup pipeline for our PostgreSQL database with three tiers: continuous WAL archiving to S3 for point-in-time recovery (meets 1-hour RPO), daily logical backups using pg_dump with custom format for selective restores, and weekly full base backups using pg_basebackup. Store all backups in a different region with encryption at rest. Include a retention policy: WAL segments for 7 days, daily dumps for 30 days, weekly base backups for 90 days.
+Set up a comprehensive backup strategy for our PostgreSQL 15 database on RDS. I need: continuous WAL archiving to S3 for point-in-time recovery (RPO < 5 minutes), daily full backups with compression and encryption uploaded to S3 in a different region (us-west-2, database is in us-east-1), backup rotation keeping 7 daily, 4 weekly, and 12 monthly backups, and automated cleanup of expired backups. Use a containerized backup runner so it's portable. Store the encryption key in AWS Secrets Manager.
 ```
 
-The agent generates backup scripts, cron configurations, and S3 lifecycle policies. Each backup is encrypted with AES-256 using a key stored in the cloud provider's key management service.
+The agent generates a complete backup system: a Docker container with pg_basebackup and WAL-G configured for S3 streaming, a rotation policy script, and AWS infrastructure setup with cross-region replication.
 
-### 3. Create restore procedures and runbooks
+### 3. Add automated backup verification
 
-```
-Write detailed restore runbooks for three scenarios: (1) point-in-time recovery to undo an accidental data deletion from 2 hours ago, (2) full database restore from the latest daily backup after a catastrophic failure, and (3) selective table restore from a logical backup when only one table is corrupted. Each runbook should have exact commands, estimated completion time, verification steps, and a rollback plan if the restore itself fails.
-```
-
-The agent produces three runbooks with step-by-step commands, including connection strings with placeholder credentials, expected output at each step, and post-restore verification queries that check row counts and data integrity.
-
-### 4. Automate backup verification
+Backups you have not restored are just hopes:
 
 ```
-Create an automated backup verification job that runs daily: restore the latest backup to an isolated test database instance, run data integrity checks (row counts for critical tables, checksum of recent transactions, schema comparison against production), and send an alert if verification fails. The test instance should automatically terminate after verification to control costs.
+Create an automated backup verification job that runs daily after the backup completes. It should: download the latest backup from S3, restore it to a temporary RDS instance (db.t3.medium), run integrity checks comparing row counts of the 10 largest tables against production, verify that the most recent transaction timestamp is within 24 hours, then tear down the temporary instance. Send a Slack notification with results. If verification fails, page the on-call engineer.
 ```
 
-### 5. Security audit for backup infrastructure
+The agent produces a verification script:
 
 ```
-Run a security audit on the backup system. Check: Are backups encrypted at rest and in transit? Who has access to the backup S3 bucket (IAM policy review)? Are backup credentials rotated? Is the KMS key access logged? Can a compromised application server access or delete backups? Implement fixes for any issues found.
+Backup Verification Report — Feb 17, 2026
+
+  ✓ Backup downloaded: 18.2 GB compressed (180 GB uncompressed)
+  ✓ Restore completed in 22 minutes to temp instance
+  ✓ Table row counts match production (10/10 tables verified)
+    users:         2,847,291 (prod: 2,847,291) ✓
+    orders:        8,412,056 (prod: 8,412,103) ✓ (delta: 47, within 24h window)
+    transactions: 14,209,881 (prod: 14,210,002) ✓
+    ...
+  ✓ Latest transaction: 2026-02-17 01:58:42 UTC (within 24h threshold)
+  ✓ Temporary instance terminated
+
+Status: ALL CHECKS PASSED
+Verified RPO: 4 hours 12 minutes (time since last full backup)
+Verified RTO: 22 minutes (restore time)
 ```
 
-The agent identifies that the application's IAM role has `s3:DeleteObject` permission on the backup bucket and recommends a separate backup IAM role with Object Lock enabled to prevent ransomware-style deletion.
+### 4. Create a disaster recovery runbook
+
+Document exact recovery steps so anyone on the team can execute under pressure:
+
+```
+Create a disaster recovery runbook for our PostgreSQL database. Cover these scenarios: 1) accidental data deletion (restore specific tables from backup), 2) database corruption (full restore from latest backup), 3) point-in-time recovery (restore to a specific timestamp before an incident), 4) complete region failure (failover to cross-region replica). Include exact commands, estimated time per step, verification queries, and a stakeholder communication template.
+```
+
+The agent produces a detailed runbook with four scenario playbooks, each with numbered steps, commands to copy-paste, checkpoints, and estimated durations.
+
+### 5. Integrate backup monitoring into your infrastructure
+
+```
+Set up monitoring and alerting for the backup system. Track: backup job completion/failure, backup size trend (alert if size drops more than 20% — indicates partial backup), time since last successful verified backup (alert if over 26 hours), S3 storage usage and costs, and restore drill results. Create a CloudWatch dashboard with these metrics and PagerDuty alerts for failures.
+```
 
 ## Real-World Example
 
-A CTO at a 30-person B2B SaaS company wakes up to a Slack alert: a developer ran an unreviewed migration in production that truncated the `invoices` table — 18 months of billing data, gone. Their cloud provider's daily snapshot is from 22 hours ago, meaning they'd lose a full day of data across all tables, not just invoices.
+A backend lead at a growing e-commerce company gets a panicked message from support: a database migration script dropped the wrong column in production, deleting shipping addresses for 50,000 orders placed in the last month. The team's "backup" is a weekly pg_dump that nobody has tested.
 
-1. They ask the agent to assess their backup gap — the 24-hour RPO is immediately flagged as dangerous for financial data
-2. The agent sets up continuous WAL archiving, achieving a 5-minute actual RPO
-3. Three runbooks are generated: the point-in-time recovery runbook lets them restore just the `invoices` table to 10 minutes before the bad migration
-4. Automated daily verification catches a corrupted backup file 3 weeks later — the backup cron had silently started failing due to a disk space issue
-5. The security audit adds Object Lock to prevent backup deletion and separates backup credentials from application credentials
+1. They ask the agent to audit their backup setup — it reveals the weekly dump has been silently failing, and the last valid backup is 6 weeks old
+2. The agent sets up WAL-G continuous archiving to S3 with cross-region replication, achieving a 5-minute RPO
+3. Automated daily verification catches a backup corruption issue on day 3, before it would have gone unnoticed for weeks
+4. A disaster recovery runbook with four scenario playbooks means any team member can execute a restore — they practice with a drill and achieve a 25-minute RTO
+5. Three months later, when a similar migration issue occurs, they restore the affected table from a point-in-time backup in 18 minutes with zero data loss
 
-The invoice table is restored in 22 minutes with zero data loss. The CTO mandates monthly restore drills, which the verification automation handles without manual effort.
+The total setup took one day. It prevented what could have been a business-ending data loss.
 
 ## Related Skills
 
-- [security-audit](../skills/security-audit/) — Validates backup encryption and access controls
-- [docker-helper](../skills/docker-helper/) — Containerizes backup scripts for consistent execution
+- [docker-helper](../skills/docker-helper/) — Containerize backup tooling for portability
+- [cicd-pipeline](../skills/cicd-pipeline/) — Integrate backup verification into CI workflows
+- [security-audit](../skills/security-audit/) — Verify backup encryption and access controls

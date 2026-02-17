@@ -1,156 +1,165 @@
 ---
 name: db-backup
 description: >-
-  Implements database backup strategies, restore procedures, and disaster
-  recovery plans. Use when you need to set up automated backups, configure
-  WAL archiving, create restore runbooks, define retention policies, test
-  backup integrity, or plan for point-in-time recovery. Trigger words:
-  database backup, disaster recovery, pg_dump, pg_basebackup, WAL archiving,
-  point-in-time recovery, RPO, RTO, backup verification, restore runbook.
+  Set up automated database backup, restore, and disaster recovery procedures
+  for PostgreSQL, MySQL, MongoDB, and Redis. Use when you need to implement backup
+  schedules, point-in-time recovery, cross-region replication, backup verification,
+  or disaster recovery runbooks. Trigger words: database backup, pg_dump, mysqldump,
+  mongodump, disaster recovery, point-in-time recovery, WAL archiving, backup rotation,
+  restore database, RTO, RPO, backup verification.
 license: Apache-2.0
-compatibility: "PostgreSQL 13+, MySQL 8+, or MongoDB 6+. S3-compatible storage for remote backups."
+compatibility: "Linux/macOS; target database CLI tools must be installed"
 metadata:
   author: carlos
   version: "1.0.0"
   category: devops
-  tags: ["database", "backup", "disaster-recovery"]
+  tags: ["database", "backup", "disaster-recovery", "postgresql", "mysql"]
 ---
 
 # Database Backup
 
 ## Overview
 
-This skill enables AI agents to design, implement, and verify database backup and disaster recovery systems. It covers backup strategy selection, automated backup pipelines, restore runbook generation, backup verification, and retention policy management for PostgreSQL, MySQL, and MongoDB.
+This skill helps you implement comprehensive database backup and disaster recovery strategies. It covers automated backup scheduling, storage management, backup verification, point-in-time recovery, and disaster recovery runbooks for PostgreSQL, MySQL, MongoDB, and Redis.
 
 ## Instructions
 
-### 1. Define Recovery Objectives First
+### 1. Assess Requirements
 
-Before writing any backup scripts, establish:
+Determine the backup strategy based on:
+- **RPO** (Recovery Point Objective): How much data loss is acceptable? (minutes → WAL/binlog streaming, hours → periodic dumps)
+- **RTO** (Recovery Time Objective): How fast must recovery complete? (minutes → hot standby, hours → restore from backup)
+- **Database size**: Small (<10GB) → full dumps; Large (>100GB) → incremental/WAL archiving
+- **Compliance**: Retention requirements (30 days, 1 year, 7 years for financial data)
 
-- **RPO (Recovery Point Objective)**: Maximum acceptable data loss measured in time. Financial data: < 1 hour. User content: < 4 hours. Analytics: < 24 hours.
-- **RTO (Recovery Time Objective)**: Maximum acceptable downtime. Critical SaaS: < 30 minutes. Internal tools: < 4 hours.
+### 2. Implement Backup Strategy
 
-These drive every subsequent decision.
+#### PostgreSQL
+```bash
+# Full logical backup (small-medium databases)
+pg_dump -Fc --no-owner --no-acl -h $DB_HOST -U $DB_USER $DB_NAME | \
+  gzip | aws s3 cp - s3://backups/pg/$(date +%Y%m%d_%H%M%S).dump.gz
 
-### 2. Three-Tier Backup Strategy
+# WAL archiving for point-in-time recovery (large databases)
+# postgresql.conf:
+#   archive_mode = on
+#   archive_command = 'aws s3 cp %p s3://backups/pg-wal/%f'
 
-Implement all three tiers for production databases:
-
-**Tier 1 — Continuous (WAL/Binlog archiving)**:
-- PostgreSQL: `archive_mode = on`, ship WAL to S3 via `pgBackRest` or `wal-g`
-- MySQL: Enable binary logging, ship to S3
-- Enables point-in-time recovery (PITR)
-- Typical RPO: 5 minutes
-
-**Tier 2 — Daily logical backups**:
-- `pg_dump --format=custom` (PostgreSQL) or `mysqldump --single-transaction` (MySQL)
-- Allows selective table/schema restore
-- Store compressed and encrypted
-
-**Tier 3 — Weekly physical backups**:
-- `pg_basebackup` (PostgreSQL) or XtraBackup (MySQL)
-- Fastest full restore path
-- Required base for PITR with WAL replay
-
-### 3. Storage and Encryption
-
-- Store backups in a **different region** from the primary database
-- Encrypt at rest with AES-256 via cloud KMS
-- Encrypt in transit (TLS for all transfers)
-- Enable **S3 Object Lock** (WORM) to prevent deletion — even by admins
-- Use a dedicated IAM role for backups, separate from the application role
-
-### 4. Retention Policy
-
-| Tier | Retention | Storage Class |
-|------|-----------|--------------|
-| WAL segments | 7 days | S3 Standard |
-| Daily logical | 30 days | S3 Standard-IA after 7 days |
-| Weekly physical | 90 days | S3 Glacier after 30 days |
-| Monthly snapshot | 1 year | S3 Glacier Deep Archive |
-
-Implement via S3 lifecycle policies, not manual cleanup scripts.
-
-### 5. Restore Runbooks
-
-Generate three standard runbooks:
-
-**Runbook 1 — Point-in-Time Recovery**:
-```
-Scenario: Accidental data deletion (e.g., dropped table)
-Steps:
-1. Identify the target timestamp (before the incident)
-2. Restore latest base backup to isolated instance
-3. Replay WAL up to target timestamp
-4. Verify data integrity on restored instance
-5. Export affected tables and import into production
-Estimated time: 15-45 minutes depending on database size
+# Base backup + WAL for PITR
+pg_basebackup -D /backups/base -Ft -z -P -h $DB_HOST -U replication
 ```
 
-**Runbook 2 — Full Disaster Recovery**:
-```
-Scenario: Complete database loss (region outage, corruption)
-Steps:
-1. Provision new database instance in backup region
-2. Restore latest weekly physical backup
-3. Replay WAL/binlog from last physical backup to latest available
-4. Update application connection strings
-5. Verify full application functionality
-Estimated time: 30-120 minutes depending on database size
+#### MySQL
+```bash
+# Full logical backup
+mysqldump --single-transaction --routines --triggers --all-databases \
+  -h $DB_HOST -u $DB_USER -p$DB_PASS | gzip > backup_$(date +%Y%m%d).sql.gz
+
+# Binary log for point-in-time recovery
+mysqlbinlog --read-from-remote-server --host=$DB_HOST --raw binlog.000001
 ```
 
-**Runbook 3 — Selective Table Restore**:
-```
-Scenario: Single table corrupted or accidentally modified
-Steps:
-1. Restore daily logical backup to temporary database
-2. Export target table(s) from temporary database
-3. Import into production with appropriate conflict handling
-4. Verify row counts and data integrity
-Estimated time: 10-30 minutes
+#### MongoDB
+```bash
+# Full backup with oplog for PITR
+mongodump --uri="$MONGO_URI" --oplog --gzip --archive | \
+  aws s3 cp - s3://backups/mongo/$(date +%Y%m%d_%H%M%S).archive.gz
 ```
 
-### 6. Backup Verification (Critical)
+### 3. Backup Rotation Policy
 
-**Unverified backups are not backups.** Automate daily verification:
+Implement grandfather-father-son rotation:
+- **Daily**: Keep last 7 days
+- **Weekly**: Keep last 4 Sundays
+- **Monthly**: Keep last 12 first-of-months
+- **Yearly**: Keep indefinitely (or per compliance)
 
-1. Restore latest backup to an ephemeral test instance
-2. Run integrity checks:
-   - Row counts for top 10 tables (compare against production)
-   - Schema comparison (diff against production)
-   - Checksum of recent high-value records
-   - Application health check against restored database
-3. Alert on any discrepancy
-4. Terminate test instance after verification
-5. Log verification results with timestamps
+### 4. Backup Verification
 
-### 7. Common Pitfalls
+Every backup strategy must include automated verification:
+```bash
+# Download latest backup
+# Restore to temporary database
+# Run integrity checks (row counts, checksum of critical tables)
+# Compare against production counts
+# Alert if variance > 0.1%
+# Tear down temporary database
+```
 
-- **pg_dump without --format=custom**: Plain SQL dumps are slower to restore and can't do selective table restore
-- **Backups in same region**: A region outage takes out both your database and your backups
-- **No Object Lock**: Ransomware or compromised credentials can delete your backups
-- **Untested restores**: 37% of backup restores fail when first attempted (Databarracks survey). Test monthly at minimum
-- **Missing WAL segments**: Gaps in WAL archiving break PITR chains. Monitor archive_command failures
+### 5. Disaster Recovery Runbook
+
+Generate a step-by-step runbook covering:
+- How to identify which backup to restore
+- Exact restore commands with parameters
+- How to verify the restored data
+- How to redirect application traffic to the restored instance
+- Communication template for stakeholders
+- Post-incident review checklist
 
 ## Examples
 
-### Example 1: PostgreSQL backup with pgBackRest
+### Example 1: PostgreSQL backup with S3 and verification
 
-**Prompt**: "Set up automated backups for my PostgreSQL 15 database on an EC2 instance. 80 GB of data, RPO target 1 hour."
+**User prompt:**
+```
+Set up automated PostgreSQL backups for my production database (250GB). I need daily full backups stored in S3, WAL archiving for point-in-time recovery, and automated verification that backups are restorable.
+```
 
-**Output**: The agent configures pgBackRest with S3 repository in a secondary region, sets up WAL archiving (achieving 5-minute RPO), daily differential backups, weekly full backups, and a cron-based verification job that restores to an RDS instance and runs integrity checks.
+**Agent output:**
 
-### Example 2: Restore runbook for accidental deletion
+```bash
+#!/bin/bash
+# scripts/backup-postgres.sh
+set -euo pipefail
 
-**Prompt**: "Someone deleted all rows from the users table 3 hours ago. Help me restore it."
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+S3_BUCKET="s3://myapp-backups/postgres"
+DB_HOST="${DB_HOST:?required}"
+DB_NAME="${DB_NAME:?required}"
 
-**Output**: The agent walks through point-in-time recovery: identifies the latest base backup before the incident, restores to a temporary instance, replays WAL to 5 minutes before the deletion timestamp, exports the users table, and provides the import command with `ON CONFLICT` handling to merge with any new users created since the incident.
+echo "[$(date)] Starting backup of ${DB_NAME}..."
+
+# Create base backup with checksums
+pg_basebackup \
+  -h "$DB_HOST" -U replication \
+  -D /tmp/backup_${TIMESTAMP} \
+  -Ft -z -P --checkpoint=fast --wal-method=stream
+
+# Upload to S3
+aws s3 cp /tmp/backup_${TIMESTAMP}/base.tar.gz \
+  "${S3_BUCKET}/base/${TIMESTAMP}/base.tar.gz" \
+  --storage-class STANDARD_IA
+
+# Upload WAL files
+aws s3 sync /tmp/backup_${TIMESTAMP}/pg_wal/ \
+  "${S3_BUCKET}/base/${TIMESTAMP}/pg_wal/"
+
+# Cleanup local
+rm -rf /tmp/backup_${TIMESTAMP}
+
+# Record backup metadata
+echo "{\"timestamp\":\"${TIMESTAMP}\",\"type\":\"full\",\"size\":\"$(aws s3 ls ${S3_BUCKET}/base/${TIMESTAMP}/ --summarize | tail -1)\"}" >> /var/log/backup-history.jsonl
+
+echo "[$(date)] Backup complete: ${TIMESTAMP}"
+```
+
+### Example 2: Disaster recovery runbook
+
+**User prompt:**
+```
+Create a disaster recovery runbook for our PostgreSQL database. Include steps for full restore, point-in-time recovery to a specific timestamp, and failover to a read replica.
+```
+
+**Agent produces** a detailed runbook with exact commands, estimated time per step, verification queries, and a communication template for notifying the team during an incident.
 
 ## Guidelines
 
-- Run restore drills monthly — automate them, don't rely on humans remembering
-- Monitor backup job success/failure with alerts, not just logs
-- Document backup credentials location and rotation schedule
-- Keep backup tools (pgBackRest, wal-g) version-pinned and updated separately from the database
-- Calculate and track actual RPO (time between last successful backup and now) as a metric
+- Always encrypt backups at rest (S3 SSE-KMS, or gpg before upload)
+- Test restores monthly — an untested backup is not a backup
+- Store backups in a different region than production
+- Use separate IAM credentials for backup operations with minimal permissions
+- Monitor backup job completion — alert immediately if a backup fails
+- Document the restore process so any team member can execute it under pressure
+- For databases over 500GB, prefer incremental backups (pgBackRest, Percona XtraBackup)
+- Keep backup credentials in a secrets manager, never in scripts
+- Calculate actual RTO by running restore drills — estimated RTO is usually optimistic
