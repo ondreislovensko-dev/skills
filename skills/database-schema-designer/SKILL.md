@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "PostgreSQL, MySQL, SQLite; examples default to PostgreSQL"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["database", "schema-design", "postgresql", "data-modeling"]

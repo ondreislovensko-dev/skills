@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Language and database agnostic; examples default to PostgreSQL and Node.js"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["saas", "multi-tenant", "architecture", "database-design"]
