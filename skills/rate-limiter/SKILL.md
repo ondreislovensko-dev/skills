@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Node.js 18+, Python 3.9+, or Go 1.21+. Redis 7+ for distributed mode."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["rate-limiting", "api-security", "middleware"]
