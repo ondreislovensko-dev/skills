@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Docker 20+. BuildKit recommended for advanced caching features."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: devops
   tags: ["docker", "optimization", "containers"]

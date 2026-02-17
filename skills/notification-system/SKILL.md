@@ -11,7 +11,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Node.js 18+, Python 3.9+. Requires a message queue (Redis/BullMQ, RabbitMQ, or SQS) for production use."
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["notifications", "messaging", "email"]
