@@ -10,7 +10,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Any backend framework (Node.js, Python, Go, etc.)"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["authentication", "authorization", "oauth", "rbac", "security"]

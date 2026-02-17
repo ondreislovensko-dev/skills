@@ -9,7 +9,7 @@ description: >-
 license: Apache-2.0
 compatibility: "Any language with JWT library support"
 metadata:
-  author: carlos
+  author: terminal-skills
   version: "1.0.0"
   category: development
   tags: ["jwt", "tokens", "authentication", "security"]
