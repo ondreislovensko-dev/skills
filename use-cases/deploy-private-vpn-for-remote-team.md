@@ -1,7 +1,9 @@
 ---
 title: Deploy a Private VPN for a Remote Team
 slug: deploy-private-vpn-for-remote-team
+description: "Set up OpenVPN for corporate network access and Xray VLESS+Reality as a censorship-resistant proxy on the same server, with automated client provisioning and monitoring."
 category: networking
+skills: [openvpn, xray]
 tags: [openvpn, xray, vpn, security, remote-work]
 ---
 
