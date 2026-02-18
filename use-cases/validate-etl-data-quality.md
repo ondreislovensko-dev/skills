@@ -11,70 +11,86 @@ tags: [data-quality, etl, pipelines, analytics, validation]
 
 ## The Problem
 
-Your morning dashboard shows revenue dropped 80% overnight. Panic. Three hours later, someone discovers a broken ETL job silently loaded null values into the amounts column. The data was never validated — it just flowed from source to warehouse to dashboard. By the time anyone noticed, stakeholders had already escalated and trust in the data team was shattered.
+Kenji's Monday morning starts with a Slack message from the VP of Sales: "Revenue dashboard is showing an 80% drop overnight. What happened?" Kenji leads the data team at a mid-size e-commerce analytics company. Three hours and four panicked stakeholders later, someone finds the root cause -- a broken ETL job silently loaded null values into the `amount_cents` column of the payments table.
+
+The data was never validated. It flowed straight from the payments provider's CSV export into the staging table, through a dbt transformation, and into the dashboard. No checks at any stage. By the time the VP noticed, the board had already seen the numbers. Trust in the data team -- the kind that takes months to build -- evaporated in a single morning.
+
+The worst part: this isn't the first time. Last quarter, a currency conversion bug doubled European revenue for two weeks before anyone caught it. The quarter before that, a timezone mismatch caused duplicate records that inflated customer counts by 12%. Every incident follows the same pattern: bad data flows in, nobody checks it, dashboards break, people scramble.
 
 ## The Solution
 
-Use the **data-validator** skill to run automated quality checks on your data at every stage of the pipeline. Combine with **sql-optimizer** to write efficient validation queries and **data-analysis** to profile datasets and detect anomalies. Catch problems at ingestion, not at the dashboard.
+Using the **data-validator**, **sql-optimizer**, and **data-analysis** skills, Kenji builds validation gates at every stage of the pipeline. Profile incoming data before it touches the warehouse. Define explicit rules that block bad loads. Write efficient SQL checks that run after every ingestion. The goal: catch problems at the source, not at the dashboard.
 
 ## Step-by-Step Walkthrough
 
-### 1. Profile the incoming data
+### Step 1: Profile the Incoming Data
+
+Kenji starts with the daily payments CSV -- the feed that caused Monday's outage. He asks the agent to examine it before it gets anywhere near the warehouse:
 
 ```text
 Profile this CSV export from our payments provider. We receive this daily and load it into our warehouse. Show me the data shape and any red flags.
 ```
 
-The agent scans the file and reports:
+The profile comes back with a clear picture of what's in the file:
 
-```text
-Dataset: payments_20260217.csv
-Rows: 34,219 | Columns: 11
+**Dataset:** `payments_20260217.csv` -- 34,219 rows, 11 columns
 
-| Column          | Type   | Nulls | Unique | Concern          |
-|-----------------|--------|-------|--------|------------------|
-| transaction_id  | string | 0%    | 34,219 | ✅ All unique    |
-| amount_cents    | int    | 0.4%  | 5,891  | ⚠️ 137 nulls     |
-| currency        | string | 0%    | 3      | ✅ USD, EUR, GBP |
-| customer_email  | string | 2.3%  | 18,442 | ⚠️ Above threshold|
-| processed_at    | date   | 0%    | 31,004 | ✅ All today      |
-```
+| Column | Type | Nulls | Unique Values | Status |
+|---|---|---|---|---|
+| `transaction_id` | string | 0% | 34,219 | Clean -- all unique |
+| `amount_cents` | int | 0.4% | 5,891 | **137 nulls** |
+| `currency` | string | 0% | 3 | Clean -- USD, EUR, GBP |
+| `customer_email` | string | 2.3% | 18,442 | **789 missing** |
+| `processed_at` | date | 0% | 31,004 | Clean -- all today |
 
-### 2. Define and run validation rules
+Two columns already look problematic. Those 137 null amounts are exactly the kind of thing that breaks a revenue dashboard -- aggregate functions skip nulls, so `SUM(amount_cents)` silently under-reports. And 2.3% missing emails is above the 1% threshold the marketing team depends on for attribution.
+
+### Step 2: Define and Run Validation Rules
+
+Kenji defines explicit pass/fail rules for the feed:
 
 ```text
 Validate this data with these rules: transaction_id must be unique, amount_cents cannot be null, customer_email null rate must be under 1%, and all dates must be today.
 ```
 
-```text
-## Validation Report
+The validation report is immediate and unambiguous:
 
-### ❌ Failed (2)
-1. amount_cents: 137 null values (0.4%) — blocks accurate revenue calc
-2. customer_email: 2.3% null (threshold: 1%) — 789 records missing email
+**Failed (2):**
+1. **`amount_cents` nulls** -- 137 null values (0.4%). Blocks accurate revenue calculation. This is what caused Monday's dashboard incident.
+2. **`customer_email` null rate** -- 2.3% null (threshold: 1%). 789 records missing email, breaking marketing attribution downstream.
 
-### ✅ Passed (2)
-- transaction_id uniqueness: PASS
-- processed_at date range: PASS (all 2026-02-17)
+**Passed (2):**
+- `transaction_id` uniqueness -- all 34,219 values unique
+- `processed_at` date range -- all records dated 2026-02-17
 
-Pipeline verdict: BLOCK — fix nulls in amount_cents before loading.
-```
+**Pipeline verdict: BLOCK.** Fix nulls in `amount_cents` before loading.
 
-### 3. Investigate the root cause
+This is the key shift -- instead of loading everything and hoping for the best, the pipeline now has a gate. Bad data doesn't get through.
+
+### Step 3: Investigate the Root Cause
+
+Blocking the load is only half the job. Kenji needs to understand why 137 records have null amounts:
 
 ```text
 Show me the 137 rows with null amount_cents. Is there a pattern?
 ```
 
-The agent finds all 137 records share `payment_method: bank_transfer` and `status: pending` — these are authorized but not yet settled transactions that the provider shouldn't have included.
+Every single one shares two traits: `payment_method: bank_transfer` and `status: pending`. These are authorized but not yet settled transactions. The payments provider shouldn't be including them in the daily export at all -- they're pre-settlement records that don't have a final amount yet.
 
-### 4. Build a validation query for the warehouse
+This is valuable information. It's not a data corruption issue; it's a provider-side filtering problem. Kenji can now go back to the provider with a specific ask: exclude records where `status = pending` from the daily export. In the meantime, the validation rule catches them automatically.
+
+### Step 4: Build a Warehouse Validation Query
+
+Kenji needs these checks to run automatically after every load, not just when someone remembers to profile a file:
 
 ```text
 Write a SQL validation query I can run after each load to catch these issues automatically.
 ```
 
+The query runs all checks in a single pass using conditional aggregation:
+
 ```sql
+-- Post-load validation: runs after each daily payments ingestion
 WITH checks AS (
   SELECT
     COUNT(*) AS total_rows,
@@ -86,27 +102,41 @@ WITH checks AS (
   WHERE load_date = CURRENT_DATE
 )
 SELECT *,
-  CASE WHEN null_amounts > 0 THEN 'FAIL' ELSE 'PASS' END AS amount_check,
-  CASE WHEN null_emails::float / total_rows > 0.01 THEN 'FAIL' ELSE 'PASS' END AS email_check,
-  CASE WHEN duplicate_txns > 0 THEN 'FAIL' ELSE 'PASS' END AS uniqueness_check
+  CASE WHEN null_amounts > 0
+    THEN 'FAIL' ELSE 'PASS' END AS amount_check,
+  CASE WHEN null_emails::float / total_rows > 0.01
+    THEN 'FAIL' ELSE 'PASS' END AS email_check,
+  CASE WHEN duplicate_txns > 0
+    THEN 'FAIL' ELSE 'PASS' END AS uniqueness_check
 FROM checks;
 ```
 
-### 5. Set up ongoing monitoring rules
+This runs in under 200ms on 50,000 rows. If any check returns `FAIL`, the pipeline halts and sends an alert to Slack before bad data propagates to production tables.
+
+### Step 5: Formalize a Data Contract
+
+The final step is turning these ad-hoc checks into a formal agreement:
 
 ```text
 Summarize a data contract for this payments feed that we can share with the provider and use for automated checks.
 ```
 
-The agent produces a data contract document specifying expected schema, null thresholds, freshness requirements, and volume bounds.
+The data contract specifies everything the pipeline expects:
+
+- **Schema:** 11 columns with exact types (`transaction_id: string`, `amount_cents: integer`, etc.)
+- **Null thresholds:** `amount_cents` at 0%, `customer_email` under 1%, all other fields under 0.5%
+- **Freshness:** file delivered by 06:00 UTC, all records dated current day
+- **Volume bounds:** 25,000-50,000 rows (flag if outside range -- too few means a partial export, too many means duplicates)
+- **Type constraints:** `amount_cents` must be integer (not float), `currency` must be one of USD/EUR/GBP
+
+Kenji shares this contract with the payments provider and wires it into the pipeline as automated checks. Any deviation triggers an alert before data moves past staging.
 
 ## Real-World Example
 
-Kenji, a data engineer at a mid-size e-commerce analytics company, loads data from 12 merchant APIs nightly. One merchant changed their API response format — order amounts switched from cents (integer) to dollars (float), silently inflating revenue by 100x.
+Three weeks after setting up validation, the system catches something Kenji would have missed entirely. One of the 12 merchant APIs his team ingests nightly changed their response format -- order amounts switched from cents (integer) to dollars (float), silently inflating revenue by 100x.
 
-1. Kenji asks the agent: "Profile today's merchant feeds and compare value distributions to last week"
-2. The agent flags merchant #7: average amount jumped from 4,500 to 450,000 — a 100x increase
-3. Kenji asks: "Validate the data types match our schema contract"
-4. The agent confirms: `amount` field changed from integer to float with decimal values
-5. Kenji adds a type-check rule to the pipeline that blocks loads when types drift
-6. Total time from detection to fix: 15 minutes instead of 3 days of wrong dashboards
+The profiling step flags it immediately: merchant #7's average amount jumped from 4,500 to 450,000 overnight. The type-check rule confirms it -- the `amount` field changed from integer to float with decimal values. Without validation, this would have shown a 100x revenue spike on every dashboard for days before anyone questioned why the numbers looked too good.
+
+Kenji adds a type-drift rule to the pipeline and notifies the merchant about their API change. Total time from detection to fix: 15 minutes. The previous approach -- waiting for someone to notice bad dashboards -- would have taken 3 days and another round of stakeholder trust erosion.
+
+The validation layer now catches 2-3 issues per week across the 12 feeds. Most are minor (a null spike here, a volume drop there), but each one is a potential dashboard incident that never happens. The Monday morning Slack panics have stopped.

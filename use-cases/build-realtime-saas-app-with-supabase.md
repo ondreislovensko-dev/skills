@@ -11,221 +11,234 @@ tags: [supabase, saas, realtime, authentication, postgres, baas]
 
 ## The Problem
 
-Marta is a solo developer building a project management tool for freelancers. She has a working React frontend but needs a backend — user authentication, a database with proper access control, real-time updates when team members change tasks, and file storage for attachments. She considered building a Node.js API with Express and PostgreSQL, but that means writing auth middleware, designing API routes, setting up WebSocket servers, managing file uploads, and deploying/maintaining everything. For a solo developer, that is 4-6 weeks of backend work before building any actual product features.
+Marta is a solo developer building a project management tool for freelancers. She has a working React frontend -- the UI is designed, the components are built, the routing works. What she does not have is a backend.
 
-She needs a backend that handles auth, database, real-time, and storage out of the box — so she can focus on the product, not the plumbing.
+She needs user authentication, a database with proper access control so users only see their own data, real-time updates when team members change tasks, and file storage for attachments. Building this with Node.js and Express means writing auth middleware, designing REST endpoints, setting up a WebSocket server for real-time, managing file uploads to S3, and deploying and maintaining all of it. For a solo developer, that is 4-6 weeks of backend work before building any actual product features.
+
+She needs a backend that handles auth, database, real-time, and storage out of the box -- so she can launch an MVP while competitors are still configuring middleware.
 
 ## The Solution
 
-Use **supabase** for the entire backend — Postgres database with Row-Level Security, built-in authentication, real-time subscriptions, and file storage. Use **auth-system-setup** for designing the auth flow (magic links + Google OAuth), and **database-schema-designer** for the multi-tenant data model.
+Use **supabase** for the entire backend -- Postgres database with Row-Level Security, built-in authentication, real-time subscriptions, and file storage. Use **auth-system-setup** for designing the auth flow (magic links + Google OAuth), and **database-schema-designer** for the multi-tenant data model.
 
 ## Step-by-Step Walkthrough
 
-### 1. Design the multi-tenant database schema
+### Step 1: Design the Multi-Tenant Database Schema
 
 ```text
 I'm building a project management SaaS for freelancers. I need a multi-tenant schema where each user can create workspaces, invite members, and manage projects with tasks. The schema should support: workspaces (owned by a user, members with roles), projects (belong to a workspace), tasks (belong to a project, assigned to a member, have status and priority), and comments (on tasks, real-time). Design the Supabase schema with proper Row-Level Security so users can only access their own workspaces and data. Use Postgres best practices.
 ```
 
-The agent designs the schema:
+Multi-tenancy in Supabase means Row-Level Security (RLS) does the heavy lifting. Every query automatically filters to data the current user has access to -- no middleware, no `WHERE user_id = ?` scattered across your codebase.
 
-```text
-Multi-tenant schema created:
+The schema uses five tables:
 
-Tables:
-  workspaces         → id, name, owner_id, created_at
-  workspace_members   → workspace_id, user_id, role (owner/admin/member)
-  projects           → id, workspace_id, name, description, status
-  tasks              → id, project_id, title, description, status, priority,
-                        assignee_id, due_date, position (for drag-drop ordering)
-  comments           → id, task_id, author_id, content, created_at
+```sql
+-- supabase/migrations/20260218_create_schema.sql
 
-Row-Level Security policies:
-  workspaces:
-    SELECT → user is a member of the workspace
-    INSERT → any authenticated user (they become owner)
-    UPDATE/DELETE → only workspace owner or admin
+CREATE TABLE workspaces (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  owner_id UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
 
-  tasks:
-    SELECT → user is a member of the task's workspace
-    INSERT → members with 'member' or higher role
-    UPDATE → assignee can update status; admins can update anything
-    DELETE → admins and owners only
+CREATE TABLE workspace_members (
+  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id),
+  role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'member')),
+  PRIMARY KEY (workspace_id, user_id)
+);
 
-  comments:
-    SELECT → workspace members
-    INSERT → workspace members
-    UPDATE/DELETE → comment author only
+CREATE TABLE projects (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'active'
+);
 
-Triggers:
-  → Auto-add creator as workspace owner on workspace INSERT
-  → Auto-update tasks.updated_at on any change
-  → Notify real-time channel on comment INSERT
+CREATE TABLE tasks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'todo' CHECK (status IN ('todo', 'in_progress', 'review', 'done')),
+  priority TEXT DEFAULT 'medium',
+  assignee_id UUID REFERENCES auth.users(id),
+  due_date DATE,
+  position INTEGER,          -- for drag-and-drop ordering
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 
-Migration file: supabase/migrations/20260218_create_schema.sql (247 lines)
+CREATE TABLE comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id UUID REFERENCES tasks(id) ON DELETE CASCADE,
+  author_id UUID REFERENCES auth.users(id),
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
 ```
 
-### 2. Set up authentication with magic links and Google OAuth
+RLS policies enforce access at the database level. A user can only see workspaces they belong to, and everything cascades from there:
+
+```sql
+-- Workspaces: only members can see them
+CREATE POLICY "workspace_member_select" ON workspaces FOR SELECT USING (
+  id IN (SELECT workspace_id FROM workspace_members WHERE user_id = auth.uid())
+);
+
+-- Tasks: only workspace members can view, assignee or admin can update
+CREATE POLICY "task_workspace_select" ON tasks FOR SELECT USING (
+  project_id IN (
+    SELECT p.id FROM projects p
+    JOIN workspace_members wm ON wm.workspace_id = p.workspace_id
+    WHERE wm.user_id = auth.uid()
+  )
+);
+
+-- Comments: workspace members can read and write, but only authors can edit/delete
+CREATE POLICY "comment_author_update" ON comments FOR UPDATE USING (
+  author_id = auth.uid()
+);
+```
+
+The migration file totals 247 lines covering 5 tables, 14 RLS policies, triggers for auto-adding the creator as workspace owner, and auto-updating `tasks.updated_at` on changes.
+
+### Step 2: Set Up Authentication with Magic Links and Google OAuth
 
 ```text
 Configure Supabase auth for my app. I want two sign-in methods: magic link (passwordless email) as the primary method, and Google OAuth as an alternative. After sign-up, auto-create a user profile with their name and avatar from the auth metadata. Set up the auth callback handler for my Next.js app. Show me the complete login page component with both methods.
 ```
 
-The agent implements auth:
+Passwordless magic links are the primary sign-in. No passwords to hash, no reset flows to build, and the conversion rate is higher because users do not abandon signup to think of a password.
 
-```text
-Authentication configured:
+The flow for both methods converges at the same callback:
 
-  Magic link flow:
-    1. User enters email → supabase.auth.signInWithOtp()
-    2. User clicks link in email → redirects to /auth/callback
-    3. Callback exchanges code for session
-    4. Redirect to /dashboard
+1. User enters email (magic link) or clicks "Sign in with Google"
+2. Supabase handles the auth exchange
+3. User lands at `/auth/callback` which exchanges the code for a session
+4. A database trigger fires on `auth.users` INSERT, creating a profile row:
 
-  Google OAuth flow:
-    1. User clicks "Sign in with Google"
-    2. supabase.auth.signInWithOAuth({ provider: 'google' })
-    3. Google consent screen → redirect to /auth/callback
-    4. Same callback handler as magic link
+```sql
+-- Auto-create profile on signup
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO profiles (id, email, full_name, avatar_url)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+    NEW.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-  Auto-profile creation:
-    Database trigger on auth.users INSERT:
-    → Creates profiles row with id, email, full_name, avatar_url
-    → Pulls name/avatar from Google metadata or email prefix
-
-  Files created:
-    app/auth/callback/route.ts     — OAuth callback handler
-    app/login/page.tsx             — Login page with both methods
-    lib/supabase-browser.ts        — Browser client
-    lib/supabase-server.ts         — Server client (App Router)
-    middleware.ts                   — Session refresh on every request
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 ```
 
-### 3. Build the real-time task board
+Google users get their name and avatar pulled from OAuth metadata. Magic link users get their email prefix as a display name. Either way, the profile exists before the user reaches the dashboard.
+
+The Next.js integration consists of four files: the callback route handler, the login page component, a browser Supabase client, a server Supabase client, and middleware that refreshes the session on every request.
+
+### Step 3: Build the Real-Time Task Board
 
 ```text
 Create a real-time Kanban task board component. It should: load tasks for a project grouped by status (todo, in_progress, review, done), support drag-and-drop between columns (update status and position), show real-time updates when another team member moves a task or adds a comment, and display an avatar of who's currently viewing the board using Supabase Presence. When a task moves, all connected users should see it move instantly.
 ```
 
-The agent builds the real-time board:
+The Kanban board subscribes to Postgres changes through Supabase real-time. When any user moves a task, every connected client sees it happen instantly:
 
-```text
-Real-time Kanban board implemented:
+```typescript
+// components/task-board.tsx — Real-time subscriptions
 
-  Components:
-    TaskBoard          → Main board, subscribes to real-time changes
-    TaskColumn         → Single column (todo/in_progress/review/done)
-    TaskCard           → Draggable task card with title, assignee, priority
-    OnlineAvatars      → Shows who's viewing via Presence
+const channel = supabase.channel(`project-${projectId}`);
 
-  Real-time subscriptions:
-    Channel: project-{id}
-    Events:
-      postgres_changes on tasks table (filtered by project_id)
-        → INSERT: new task appears in correct column
-        → UPDATE: task moves between columns smoothly
-        → DELETE: task fades out
+// Subscribe to task changes (INSERT, UPDATE, DELETE)
+channel.on('postgres_changes',
+  { event: '*', schema: 'public', table: 'tasks', filter: `project_id=eq.${projectId}` },
+  (payload) => {
+    if (payload.eventType === 'INSERT') addTaskToColumn(payload.new);
+    if (payload.eventType === 'UPDATE') moveTaskBetweenColumns(payload.old, payload.new);
+    if (payload.eventType === 'DELETE') removeTaskFromColumn(payload.old);
+  }
+);
 
-    Presence:
-      → Track { user_id, name, avatar } on subscribe
-      → Show colored avatars of online users in header
-      → "Dani is viewing" indicator
+// Track who's viewing the board via Presence
+channel.on('presence', { event: 'sync' }, () => {
+  setOnlineUsers(channel.presenceState());
+});
 
-  Drag-and-drop:
-    Using @dnd-kit/core for drag-drop
-    On drop: update task status + position via supabase.from('tasks').update()
-    RLS ensures only workspace members can move tasks
-    Optimistic UI: move card immediately, revert if update fails
-
-  Files:
-    components/task-board.tsx      — 186 lines
-    components/task-column.tsx     — 54 lines
-    components/task-card.tsx       — 72 lines
-    components/online-avatars.tsx  — 43 lines
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    await channel.track({ user_id: user.id, name: user.name, avatar: user.avatar });
+  }
+});
 ```
 
-### 4. Add file attachments with storage
+Drag-and-drop uses `@dnd-kit/core`. On drop, the UI moves the card immediately (optimistic update), then fires a Supabase update. RLS ensures only workspace members can move tasks. If the update fails -- maybe the user's permission was revoked -- the card snaps back.
+
+The presence feature shows colored avatars of everyone viewing the board in the header. "Dani is viewing" appears next to their avatar. This is purely ephemeral state managed by Supabase Presence -- no database writes.
+
+### Step 4: Add File Attachments with Storage
 
 ```text
 Add file attachment support to tasks. Users should be able to upload files (images, PDFs, documents) up to 10MB per file. Store files in a Supabase storage bucket organized by workspace/project/task. Show image previews inline in the task detail view. Only workspace members should be able to view and upload files. Add drag-and-drop upload to the task detail panel.
 ```
 
-The agent configures storage:
+Supabase Storage handles files the same way RLS handles data -- policies enforce access at the bucket level:
 
-```text
-File storage configured:
+```sql
+-- Storage policies for task-attachments bucket
 
-  Bucket: task-attachments (private)
+-- Only workspace members can view files
+CREATE POLICY "attachment_read" ON storage.objects FOR SELECT USING (
+  bucket_id = 'task-attachments' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT workspace_id FROM workspace_members WHERE user_id = auth.uid()
+  )
+);
 
-  Storage policies:
-    SELECT → workspace members (join through tasks → projects → workspace_members)
-    INSERT → workspace members, max 10MB, allowed types: image/*, application/pdf,
-             application/msword, text/*
-    DELETE → file uploader or workspace admin
-
-  Folder structure: {workspace_id}/{project_id}/{task_id}/{filename}
-
-  Components:
-    FileUploader       → Drag-and-drop zone, progress bar, validates size/type
-    AttachmentList     → Shows uploaded files with icons by type
-    ImagePreview       → Inline preview for images, lightbox on click
-
-  Upload flow:
-    1. User drops file on task detail panel
-    2. Client validates size (< 10MB) and type
-    3. Upload to supabase.storage with path workspace/project/task/filename
-    4. Insert attachment record in attachments table
-    5. Other users see new attachment via real-time subscription
+-- Only workspace members can upload, with size and type restrictions
+CREATE POLICY "attachment_upload" ON storage.objects FOR INSERT WITH CHECK (
+  bucket_id = 'task-attachments' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT workspace_id FROM workspace_members WHERE user_id = auth.uid()
+  )
+);
 ```
 
-### 5. Deploy and configure for production
+Files are organized as `{workspace_id}/{project_id}/{task_id}/{filename}`. The upload flow: user drops a file on the task detail panel, the client validates size (under 10MB) and type, uploads to Supabase Storage, inserts an attachment record, and other users see the new attachment via their existing real-time subscription.
+
+Image attachments render as inline previews in the task detail view. PDFs and documents show file-type icons. A lightbox opens on click for full-size viewing.
+
+### Step 5: Deploy and Configure for Production
 
 ```text
 Prepare this Supabase project for production. Set up: environment-specific configs (dev/staging/prod), database migrations workflow using Supabase CLI, proper CORS and redirect URLs, email templates for magic links, and rate limiting on edge functions. Also create a seed script that populates a demo workspace with sample data for new users.
 ```
 
-The agent configures production:
+Production configuration covers the things that are easy to forget:
 
-```text
-Production setup complete:
+- **Environments**: `.env.local` (local dev with `supabase start`), `.env.staging`, `.env.production`
+- **Migrations**: `supabase db diff` generates migrations from local changes, `supabase db push` applies them to the linked project. CI runs `supabase db push` on merge to main.
+- **CORS**: only the app domain and localhost in dev. No wildcards in production.
+- **Redirect URLs**: explicit whitelist for OAuth callbacks.
+- **Rate limiting**: 100 requests/minute per IP on edge functions.
+- **Email templates**: branded magic link emails that match the app's design.
 
-  Environments:
-    .env.local          → Local dev (supabase start)
-    .env.staging        → Staging project
-    .env.production     → Production project
+A seed script creates a "Getting Started" demo workspace with 3 sample projects, 12 tasks across all status columns, and 2 sample comments. It runs on `supabase db reset` and gives new users something to interact with immediately instead of staring at an empty board.
 
-  Migration workflow:
-    supabase db diff → generates migration from local changes
-    supabase db push → applies to linked project
-    CI: runs supabase db push on merge to main
-
-  Email templates:
-    Customized magic link email with app branding
-    Confirm signup email
-    Password reset email (fallback if added later)
-
-  Security:
-    CORS: only allow app domain + localhost in dev
-    Redirect URLs: explicit whitelist (no wildcards in prod)
-    Rate limiting: 100 req/min per IP on edge functions
-    RLS: verified all 14 policies with test queries
-
-  Seed script:
-    supabase/seed.sql creates:
-    → Demo workspace "Getting Started"
-    → 3 sample projects with 12 tasks across all statuses
-    → 2 sample comments
-    → Runs on supabase db reset
-```
+All 14 RLS policies are verified with test queries before deployment -- each one tested with an authorized user, an unauthorized user, and an unauthenticated request.
 
 ## Real-World Example
 
-A solo developer wants to build a project management SaaS for freelancers. Instead of spending 6 weeks building a Node.js backend with auth, database, WebSocket server, and file storage separately, she uses Supabase:
+Marta ships the entire backend in 2 days instead of the 6 weeks a custom Node.js API would have taken. Zero servers to maintain. The Supabase free tier handles her first 500 users, and the Pro plan at $25/month covers her to 10,000.
 
-1. She asks the agent to design a multi-tenant schema — it creates 5 tables with 14 RLS policies, ensuring users can only access their own workspace data
-2. Auth is configured with magic links and Google OAuth — users can sign in without passwords, profiles are auto-created from metadata
-3. A real-time Kanban board shows task changes instantly across connected clients — when one user moves a task, everyone sees it move. Presence shows who's online
-4. File attachments work with drag-and-drop upload, image previews, and storage policies that enforce workspace-level access
-5. Production deployment is automated with migrations in CI, environment configs, and branded email templates
+Magic links mean users sign in without passwords -- the conversion rate on signup is higher than she expected. Real-time subscriptions make the Kanban board feel alive: when one user moves a task, everyone sees it move. Presence shows who is currently looking at the board. File attachments with workspace-scoped storage policies mean she never had to write a single line of access control logic for uploads.
 
-Total backend development time: 2 days instead of 6 weeks. Zero servers to maintain. She launches an MVP and gets her first 10 paying users while a competitor is still configuring their Express middleware.
+She launches the MVP, gets her first 10 paying users within a month, and spends her time building product features instead of maintaining infrastructure. A competitor building a similar tool on a custom backend is still setting up their WebSocket server.

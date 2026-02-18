@@ -11,15 +11,17 @@ tags: [ffmpeg, sox, whisper, audiowaveform, yt-dlp, podcast, automation]
 
 ## The Problem
 
-Lena runs a weekly tech podcast with two hosts and occasional guests. She records raw audio via Zoom, spends hours manually editing — removing silence, normalizing volume, adding intro/outro music, generating transcripts, and creating waveform images for the website. She also pulls guest interview clips from YouTube. She wants to automate the entire post-production pipeline: drop in a raw recording and get back a production-ready episode with transcript, subtitles, waveform, and social media assets.
+Lena runs a weekly tech podcast with two hosts and occasional guests. Every episode follows the same post-production ritual: record on Zoom, spend 2-3 hours manually editing silence, normalizing volume, splicing in the intro and outro music, generating a transcript, creating waveform images for the website, and exporting to multiple formats. She also pulls guest interview clips from YouTube.
+
+The work is entirely mechanical. The same sox commands, the same ffmpeg flags, the same Whisper invocation, every single week. But one wrong flag and the audio clips or the loudness is off. She wants to drop in a raw recording and get back a production-ready episode with transcript, subtitles, waveform, and social media assets -- from a single command.
 
 ## The Solution
 
-Use the **ffmpeg-video-editing** skill along with sox, Whisper, and audiowaveform to build an end-to-end pipeline. A shell script orchestrates the tools, and a Python script handles transcription and chapter detection. One command produces a fully packaged episode.
+Use the **ffmpeg-video-editing** skill along with sox, Whisper, and audiowaveform to build an end-to-end pipeline. A shell script orchestrates the audio tools, a Python script handles transcription and chapter detection. One command produces a fully packaged episode.
 
 ## Step-by-Step Walkthrough
 
-### 1. Define the requirements
+### Step 1: Define the Requirements
 
 ```text
 I run a weekly podcast and want to automate post-production. Here's my current manual workflow that I want to turn into a single script:
@@ -35,27 +37,31 @@ I run a weekly podcast and want to automate post-production. Here's my current m
 Build a single shell script + Python script that does all of this.
 ```
 
-### 2. Set up the project structure
+### Step 2: Set Up the Project Structure
 
-```text
+The pipeline lives in a self-contained directory. Raw recordings go in, finished episodes come out:
+
+```
 podcast-pipeline/
-├── produce.sh              # Main orchestration script
-├── transcribe.py           # Whisper transcription + chapters
-├── assets/
-│   ├── intro.wav           # 15s intro jingle
-│   ├── outro.wav           # 10s outro jingle
-│   └── artwork.jpg         # Podcast artwork (3000x3000)
-└── output/                 # Generated per episode
+  produce.sh              # Main orchestration script
+  transcribe.py           # Whisper transcription + chapter detection
+  assets/
+    intro.wav             # 15s intro jingle
+    outro.wav             # 10s outro jingle
+    artwork.jpg           # Podcast artwork (3000x3000)
+  output/                 # Generated per episode
 ```
 
-Prerequisites:
+Prerequisites -- all open-source, no paid services:
 
 ```bash
 apt install -y sox libsox-fmt-all ffmpeg audiowaveform
 pip install faster-whisper
 ```
 
-### 3. Build the main pipeline script
+### Step 3: Build the Main Pipeline Script
+
+The shell script chains every processing step. Each stage reads from the temp workspace and writes back to it, so a failure at any point leaves previous work intact.
 
 ```bash
 #!/bin/bash
@@ -64,51 +70,37 @@ set -euo pipefail
 # --- Configuration ---
 RAW_FILE="$1"                                        # Input: WAV file or YouTube URL
 TITLE="${2:-Untitled Episode}"                        # Episode title for metadata
-EPISODE_NUM="${3:-000}"                               # Episode number for folder naming
-ASSETS_DIR="$(dirname "$0")/assets"                   # Intro/outro jingles + artwork
-OUTPUT_DIR="$(dirname "$0")/output/ep${EPISODE_NUM}"  # All outputs land here
-WORK_DIR=$(mktemp -d)                                 # Temp workspace, cleaned on exit
+EPISODE_NUM="${3:-000}"                               # Episode number
+ASSETS_DIR="$(dirname "$0")/assets"
+OUTPUT_DIR="$(dirname "$0")/output/ep${EPISODE_NUM}"
+WORK_DIR=$(mktemp -d)
 
 trap "rm -rf $WORK_DIR" EXIT
 mkdir -p "$OUTPUT_DIR"
 
-echo "🎙️ Podcast Production Pipeline"
-echo "   Input: $RAW_FILE"
-echo "   Title: $TITLE"
-echo ""
-
-# ============================
-# STEP 1: Download from YouTube (if URL provided instead of file)
-# ============================
-# Supports pasting a YouTube URL directly as the first argument.
-# yt-dlp extracts audio and converts to WAV automatically.
+# ---- STEP 1: Download from YouTube (if URL provided) ----
 if [[ "$RAW_FILE" == http* ]]; then
-    echo "📥 Downloading audio from URL..."
     yt-dlp -x --audio-format wav -o "$WORK_DIR/downloaded.%(ext)s" "$RAW_FILE"
     RAW_FILE="$WORK_DIR/downloaded.wav"
 fi
 
-# ============================
-# STEP 2: Audio Cleanup
-# ============================
-echo "🧹 Step 1: Audio cleanup..."
-
-# Convert to mono WAV at 44.1kHz for a consistent processing baseline
+# ---- STEP 2: Audio Cleanup ----
+# Convert to mono 44.1kHz for consistent processing
 sox "$RAW_FILE" -r 44100 -c 1 "$WORK_DIR/mono.wav"
 
-# Remove leading/trailing silence (threshold: 0.1% of max amplitude, min 0.3s)
+# Trim leading/trailing silence (threshold: 0.1% amplitude, min 0.3s)
 sox "$WORK_DIR/mono.wav" "$WORK_DIR/trimmed.wav" \
     silence 1 0.3 0.1% reverse silence 1 0.3 0.1% reverse
 
-# Capture a noise profile from the first 0.5s (assumed to be room tone / no speech)
+# Capture noise profile from first 0.5s (assumed room tone)
 sox "$WORK_DIR/trimmed.wav" -n noiseprof "$WORK_DIR/noise.prof" trim 0 0.5
 
-# Apply the full cleanup chain in one pass:
-#   noisered  — reduce background noise using the captured profile
-#   highpass  — remove low-frequency rumble below 80Hz
-#   compand   — compress dynamic range so quiet and loud parts are more even
+# Full cleanup chain in one pass:
+#   noisered  — reduce background noise using captured profile
+#   highpass  — remove rumble below 80Hz
+#   compand   — compress dynamic range (quiet/loud parts more even)
 #   equalizer — boost voice presence at 3kHz by 2dB
-#   norm      — normalize peak amplitude to -1dB
+#   norm      — normalize peak to -1dB
 sox "$WORK_DIR/trimmed.wav" "$WORK_DIR/clean.wav" \
     noisered "$WORK_DIR/noise.prof" 0.2 \
     highpass 80 \
@@ -116,48 +108,29 @@ sox "$WORK_DIR/trimmed.wav" "$WORK_DIR/clean.wav" \
     equalizer 3000 1.5q +2dB \
     norm -1
 
-echo "   ✅ Cleaned: $(soxi -d "$WORK_DIR/clean.wav")"
-
-# ============================
-# STEP 3: Loudness normalization to -16 LUFS (podcast standard)
-# ============================
-echo "📊 Step 2: Loudness normalization (-16 LUFS)..."
-
-# Measure current integrated loudness using ffmpeg's loudnorm filter
+# ---- STEP 3: Loudness Normalization (-16 LUFS) ----
 CURRENT_LUFS=$(ffmpeg -i "$WORK_DIR/clean.wav" -af loudnorm=print_format=json -f null - 2>&1 | \
     grep -A1 '"input_i"' | tail -1 | tr -d ' ",' | cut -d: -f2)
 
 TARGET_LUFS=-16
 GAIN=$(echo "$TARGET_LUFS - $CURRENT_LUFS" | bc)
-
-# Apply the calculated gain offset to hit -16 LUFS
 sox "$WORK_DIR/clean.wav" "$WORK_DIR/normalized.wav" gain ${GAIN}
-echo "   ✅ Applied ${GAIN}dB gain (${CURRENT_LUFS} → ${TARGET_LUFS} LUFS)"
 
-# ============================
-# STEP 4: Add Intro & Outro with Crossfade
-# ============================
-# Strategy: split intro/outro at the crossfade boundary, duck the music
-# to 20% volume in the overlap zone, then mix with the episode audio.
-echo "🎵 Step 3: Adding intro/outro..."
-
+# ---- STEP 4: Intro/Outro with Crossfade ----
 INTRO="$ASSETS_DIR/intro.wav"
 OUTRO="$ASSETS_DIR/outro.wav"
 EPISODE="$WORK_DIR/normalized.wav"
-CROSSFADE=2  # seconds of overlap between music and speech
+CROSSFADE=2  # seconds of overlap
 
-# --- Intro crossfade ---
-# Split intro into main part + tail (last 2s at 20% volume)
+# Split intro: main part + tail at 20% volume for ducking
 INTRO_DUR=$(soxi -D "$INTRO")
 INTRO_MAIN_DUR=$(echo "$INTRO_DUR - $CROSSFADE" | bc)
 sox "$INTRO" "$WORK_DIR/intro_main.wav" trim 0 $INTRO_MAIN_DUR
 sox "$INTRO" "$WORK_DIR/intro_tail.wav" trim $INTRO_MAIN_DUR vol 0.2
-# Mix ducked intro tail with the first 2s of the episode
 sox "$EPISODE" "$WORK_DIR/ep_head.wav" trim 0 $CROSSFADE
 sox -m "$WORK_DIR/intro_tail.wav" "$WORK_DIR/ep_head.wav" "$WORK_DIR/crossfade_in.wav"
 
-# --- Outro crossfade ---
-# Split episode body, fade out the tail, mix with ducked outro start
+# Split episode body, crossfade into outro
 sox "$EPISODE" "$WORK_DIR/ep_body.wav" trim $CROSSFADE
 EP_BODY_DUR=$(soxi -D "$WORK_DIR/ep_body.wav")
 EP_TRIM_DUR=$(echo "$EP_BODY_DUR - $CROSSFADE" | bc)
@@ -167,7 +140,7 @@ sox "$OUTRO" "$WORK_DIR/outro_ducked.wav" vol 0.2 fade t $CROSSFADE 0 0
 sox -m "$WORK_DIR/ep_tail.wav" "$WORK_DIR/outro_ducked.wav" "$WORK_DIR/crossfade_out.wav"
 sox "$OUTRO" "$WORK_DIR/outro_main.wav" trim $CROSSFADE
 
-# --- Concatenate: intro → crossfade → episode → crossfade → outro ---
+# Concatenate: intro -> crossfade -> episode -> crossfade -> outro
 sox "$WORK_DIR/intro_main.wav" \
     "$WORK_DIR/crossfade_in.wav" \
     "$WORK_DIR/ep_main.wav" \
@@ -175,42 +148,28 @@ sox "$WORK_DIR/intro_main.wav" \
     "$WORK_DIR/outro_main.wav" \
     "$WORK_DIR/final.wav"
 
-FINAL_DUR=$(soxi -d "$WORK_DIR/final.wav")
-echo "   ✅ Final duration: $FINAL_DUR"
-
-# ============================
-# STEP 5: Transcription & Chapters (via Python + Whisper)
-# ============================
-echo "📝 Step 4: Transcribing with Whisper..."
+# ---- STEP 5: Transcription (via Python + Whisper) ----
 python3 "$(dirname "$0")/transcribe.py" "$WORK_DIR/final.wav" "$OUTPUT_DIR" "$TITLE"
-echo "   ✅ Transcript and chapters generated"
 
-# ============================
-# STEP 6: Waveform Generation
-# ============================
-echo "🌊 Step 5: Generating waveforms..."
-
-# Website player waveform (1200x150, blue on white)
+# ---- STEP 6: Waveform Generation ----
+# Website player (1200x150, blue on white)
 audiowaveform -i "$WORK_DIR/final.wav" -o "$OUTPUT_DIR/waveform.png" \
     --width 1200 --height 150 \
     --background-color ffffff --waveform-color 3b82f6
 
-# Social media preview image (1200x630, light blue on dark)
+# Social media preview (1200x630, light blue on dark)
 audiowaveform -i "$WORK_DIR/final.wav" -o "$OUTPUT_DIR/social-preview.png" \
     --width 1200 --height 630 \
     --background-color 0f172a --waveform-color 38bdf8 --no-axis-labels
 
-# JSON peaks for interactive web audio player (20 peaks per second, 8-bit)
+# JSON peaks for interactive web player (20 peaks/sec, 8-bit)
 audiowaveform -i "$WORK_DIR/final.wav" -o "$OUTPUT_DIR/peaks.json" \
     --pixels-per-second 20 --bits 8
 
-# ============================
-# STEP 7: Export (MP3 + FLAC)
-# ============================
-echo "📦 Step 6: Exporting final formats..."
+# ---- STEP 7: Export MP3 + FLAC ----
 SAFE_TITLE=$(echo "$TITLE" | tr -cd '[:alnum:] ._-' | tr ' ' '_')
 
-# MP3 with ID3 metadata and embedded artwork (shows in podcast apps)
+# MP3 with ID3 metadata and embedded artwork
 ffmpeg -y -i "$WORK_DIR/final.wav" -i "$ASSETS_DIR/artwork.jpg" \
     -map 0:a -map 1:v \
     -codec:a libmp3lame -b:a 192k -codec:v copy \
@@ -221,33 +180,24 @@ ffmpeg -y -i "$WORK_DIR/final.wav" -i "$ASSETS_DIR/artwork.jpg" \
     -disposition:v attached_pic \
     "$OUTPUT_DIR/${SAFE_TITLE}.mp3" 2>/dev/null
 
-# FLAC for archival (lossless, no artwork needed)
+# FLAC for archival (lossless)
 ffmpeg -y -i "$WORK_DIR/final.wav" -codec:a flac \
     -metadata title="$TITLE" -metadata artist="My Podcast" \
     "$OUTPUT_DIR/${SAFE_TITLE}.flac" 2>/dev/null
 
-echo "🎉 Production complete!"
-echo "Output directory: $OUTPUT_DIR/"
+echo "Production complete: $OUTPUT_DIR/"
 ls -lh "$OUTPUT_DIR/"
 ```
 
-### 4. Build the transcription script
+### Step 4: Build the Transcription Script
+
+The Python script handles everything Whisper-related: transcription, subtitle generation in two formats, and automatic chapter detection based on silence gaps.
 
 ```python
 #!/usr/bin/env python3
-"""Transcribe audio with faster-whisper and generate chapters.
+"""Transcribe audio with faster-whisper and generate chapters."""
 
-Outputs:
-  - transcript.txt   Full plain-text transcript
-  - subtitles.srt    SRT subtitle file (for video editors)
-  - subtitles.vtt    WebVTT subtitle file (for web players)
-  - chapters.json    Auto-detected chapter markers
-  - chapters.txt     Human-readable chapter list
-  - segments.json    Timestamped segments (for interactive web player)
-"""
-
-import sys
-import json
+import sys, json
 from pathlib import Path
 from faster_whisper import WhisperModel
 
@@ -255,96 +205,69 @@ audio_path = sys.argv[1]
 output_dir = Path(sys.argv[2])
 title = sys.argv[3] if len(sys.argv) > 3 else "Episode"
 
-# Load the "small" model — good balance of speed and accuracy.
-# Use "large-v3" for production quality, "tiny" for quick drafts.
+# "small" model — good speed/accuracy balance. Use "large-v3" for production.
 model = WhisperModel("small", device="cpu", compute_type="int8")
 segments_iter, info = model.transcribe(audio_path, beam_size=5, word_timestamps=True)
 segments = list(segments_iter)
 
 print(f"   Language: {info.language} ({info.language_probability:.0%})")
 
-# --- Full transcript (plain text, one continuous block) ---
+# --- Full transcript ---
 transcript = " ".join(seg.text.strip() for seg in segments)
 (output_dir / "transcript.txt").write_text(transcript)
 
-# --- SRT subtitles (standard format for video editors and media players) ---
+# --- SRT + VTT subtitles ---
 def ts(seconds):
-    """Convert seconds to SRT timestamp format: HH:MM:SS,mmm"""
-    h = int(seconds // 3600)
-    m = int((seconds % 3600) // 60)
-    s = int(seconds % 60)
-    ms = int((seconds % 1) * 1000)
+    h, m = int(seconds // 3600), int((seconds % 3600) // 60)
+    s, ms = int(seconds % 60), int((seconds % 1) * 1000)
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
 
 with open(output_dir / "subtitles.srt", "w") as f:
     for i, seg in enumerate(segments, 1):
         f.write(f"{i}\n{ts(seg.start)} --> {ts(seg.end)}\n{seg.text.strip()}\n\n")
 
-# --- VTT subtitles (web-native format, used by <track> elements) ---
 with open(output_dir / "subtitles.vtt", "w") as f:
     f.write("WEBVTT\n\n")
     for seg in segments:
-        start = ts(seg.start).replace(",", ".")
-        end = ts(seg.end).replace(",", ".")
-        f.write(f"{start} --> {end}\n{seg.text.strip()}\n\n")
+        f.write(f"{ts(seg.start).replace(',','.')} --> {ts(seg.end).replace(',','.')}\n{seg.text.strip()}\n\n")
 
 # --- Chapter detection ---
-# Heuristic: look for long pauses (>3s) between segments as topic boundaries.
-# Only create a new chapter if the current one is at least 5 minutes long,
-# to avoid overly granular chapters from brief pauses.
-chapters = []
-chapter_start = 0
-chapter_texts = []
-MIN_CHAPTER_LENGTH = 300  # seconds (5 min minimum chapter)
+# Heuristic: long pauses (>3s) between segments = topic boundary.
+# Minimum 5 minutes per chapter to avoid overly granular splits.
+chapters, chapter_start, chapter_texts = [], 0, []
 
 for i, seg in enumerate(segments):
     chapter_texts.append(seg.text.strip())
     if i < len(segments) - 1:
-        gap = segments[i + 1].start - seg.end  # silence between segments
-        elapsed = seg.end - chapter_start       # current chapter duration
-        if gap > 3.0 and elapsed > MIN_CHAPTER_LENGTH:
-            # Use the first ~10 words as a chapter title summary
-            chapter_summary = " ".join(" ".join(chapter_texts).split()[:10]) + "..."
-            chapters.append({
-                "start": chapter_start,
-                "start_formatted": ts(chapter_start).replace(",", "."),
-                "title": chapter_summary,
-            })
+        gap = segments[i + 1].start - seg.end
+        elapsed = seg.end - chapter_start
+        if gap > 3.0 and elapsed > 300:
+            summary = " ".join(" ".join(chapter_texts).split()[:10]) + "..."
+            chapters.append({"start": chapter_start, "start_formatted": ts(chapter_start).replace(",", "."), "title": summary})
             chapter_start = segments[i + 1].start
             chapter_texts = []
 
-# Don't forget the last chapter
 if chapter_texts:
-    chapter_summary = " ".join(" ".join(chapter_texts).split()[:10]) + "..."
-    chapters.append({
-        "start": chapter_start,
-        "start_formatted": ts(chapter_start).replace(",", "."),
-        "title": chapter_summary,
-    })
+    summary = " ".join(" ".join(chapter_texts).split()[:10]) + "..."
+    chapters.append({"start": chapter_start, "start_formatted": ts(chapter_start).replace(",", "."), "title": summary})
 
-# Write structured chapters JSON (for programmatic use)
 with open(output_dir / "chapters.json", "w") as f:
     json.dump({"title": title, "chapters": chapters}, f, indent=2)
 
-# Write plain-text chapter list (for podcast apps / show notes)
 with open(output_dir / "chapters.txt", "w") as f:
     for ch in chapters:
         f.write(f"{ch['start_formatted']} {ch['title']}\n")
 
-# --- Segments JSON (for interactive web audio player with synced text) ---
+# --- Segments JSON (for interactive web player with synced text) ---
 with open(output_dir / "segments.json", "w") as f:
-    json.dump({
-        "language": info.language,
-        "segments": [
-            {"start": s.start, "end": s.end, "text": s.text.strip()}
-            for s in segments
-        ]
-    }, f, indent=2)
+    json.dump({"language": info.language, "segments": [
+        {"start": s.start, "end": s.end, "text": s.text.strip()} for s in segments
+    ]}, f, indent=2)
 
 print(f"   Segments: {len(segments)}, Chapters: {len(chapters)}")
 ```
 
-### 5. Run the pipeline
+### Step 5: Run the Pipeline
 
 ```bash
 chmod +x produce.sh
@@ -356,21 +279,24 @@ chmod +x produce.sh
 ./produce.sh "https://youtube.com/watch?v=VIDEO_ID" "Episode 43: Guest Interview" 043
 ```
 
-### 6. Review the output
+One command, full production. The output directory contains everything needed to publish:
 
-```text
-output/ep042/
-├── Episode_42_AI_in_Healthcare.mp3     # Final MP3 (192kbps, artwork, metadata)
-├── Episode_42_AI_in_Healthcare.flac    # Archival FLAC
-├── transcript.txt                       # Full text transcript
-├── subtitles.srt                        # SRT subtitles
-├── subtitles.vtt                        # VTT subtitles (for web)
-├── segments.json                        # Timestamped segments (for web player)
-├── chapters.json                        # Auto-detected chapters
-├── chapters.txt                         # Chapter markers (human-readable)
-├── waveform.png                         # Website player waveform (1200x150)
-├── social-preview.png                   # Social media image (1200x630)
-└── peaks.json                           # Web player peaks data
-```
+| File | Purpose |
+|---|---|
+| `Episode_42_AI_in_Healthcare.mp3` | Final MP3 (192kbps, embedded artwork + metadata) |
+| `Episode_42_AI_in_Healthcare.flac` | Archival lossless copy |
+| `transcript.txt` | Full text transcript |
+| `subtitles.srt` | SRT subtitles (video editors, media players) |
+| `subtitles.vtt` | WebVTT subtitles (web `<track>` elements) |
+| `segments.json` | Timestamped segments (interactive web player) |
+| `chapters.json` | Auto-detected chapter markers |
+| `chapters.txt` | Human-readable chapter list (show notes) |
+| `waveform.png` | Website player waveform (1200x150) |
+| `social-preview.png` | Social media image (1200x630) |
+| `peaks.json` | Web player peaks data |
 
-One command, full production. Drop in a raw WAV (or YouTube URL), get back everything you need to publish.
+## Real-World Example
+
+Lena runs the pipeline on a Friday night after recording Episode 42. The raw 67-minute Zoom WAV goes in. Three minutes later, the output directory has everything: a cleaned, normalized MP3 with intro/outro crossfades, a full transcript, SRT and VTT subtitles, auto-detected chapter markers, a waveform for the website, and a social media preview image.
+
+The following week, she pastes a YouTube URL for a guest interview. The pipeline downloads the audio, runs the same processing chain, and produces an identical package. What used to take 2-3 hours of manual editing now takes the time it takes to type one command and wait for Whisper to finish.

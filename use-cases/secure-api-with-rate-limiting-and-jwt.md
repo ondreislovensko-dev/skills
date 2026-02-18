@@ -11,7 +11,7 @@ tags: [api-security, jwt, rate-limiting, authentication, authorization]
 
 ## The Problem
 
-Marta is building a public-facing REST API for her team's SaaS product. Right now, anyone can hit any endpoint — there's no authentication, no authorization, and no throttling. Before launch, she needs JWT-based auth with role-based permissions, and rate limiting so a single client can't hammer the API and degrade service for everyone else.
+Marta is building a public-facing REST API for her team's SaaS product. Right now, anyone can hit any endpoint -- there's no authentication, no authorization, and no throttling. The API is fully functional, serving about 15 endpoints, but it's wide open. Before launch, she needs JWT-based auth with role-based permissions, and rate limiting so a single client can't hammer the API and degrade service for everyone else. She's seen what happens when an unprotected API meets the real world, and she'd rather not learn that lesson firsthand.
 
 ## The Solution
 
@@ -19,7 +19,9 @@ Use **auth-system-setup** to scaffold the authentication flow (registration, log
 
 ## Step-by-Step Walkthrough
 
-### 1. Scaffold the authentication system
+### Step 1: Scaffold the Authentication System
+
+Registration, login, email verification -- the foundation everything else builds on.
 
 ```text
 I have an Express.js API with about 15 endpoints. I need user registration
@@ -28,26 +30,19 @@ a clean middleware pattern I can apply to protected routes. Use PostgreSQL
 for the user store.
 ```
 
-```text
-Created auth/user.model.ts — User table schema (id, email, password_hash,
-  role, email_verified, created_at)
-Created auth/register.ts — POST /auth/register
-  - Validates email format and password strength (min 10 chars, mixed case, number)
-  - Hashes password with bcrypt (12 rounds)
-  - Stores user with role='viewer' by default
-  - Sends verification token (SHA-256, expires in 24h)
-Created auth/login.ts — POST /auth/login
-  - Verifies email + password
-  - Rejects unverified accounts with clear error message
-  - Returns JWT on success (details in next step)
-Created auth/verify-email.ts — GET /auth/verify?token=xxx
-  - Marks email_verified=true, invalidates token
-Created auth/middleware.ts — requireAuth middleware stub (JWT logic next)
+Five files establish the auth foundation:
 
-Database migration: migrations/001_create_users.sql
-```
+- **`auth/user.model.ts`** -- User table schema with `id`, `email`, `password_hash`, `role`, `email_verified`, and `created_at`
+- **`auth/register.ts`** -- `POST /auth/register` validates email format and password strength (minimum 10 characters, mixed case, at least one number), hashes with bcrypt at 12 rounds, assigns `role='viewer'` by default, and sends a verification token (SHA-256, expires in 24 hours)
+- **`auth/login.ts`** -- `POST /auth/login` verifies credentials and rejects unverified accounts with a clear error message. Returns a JWT on success.
+- **`auth/verify-email.ts`** -- `GET /auth/verify?token=xxx` marks the account verified and invalidates the token
+- **`migrations/001_create_users.sql`** -- Database migration for the user and verification tables
 
-### 2. Configure JWT token issuance and verification
+The middleware stub (`auth/middleware.ts`) is ready for JWT logic in the next step.
+
+### Step 2: Configure JWT Token Issuance and Verification
+
+Short-lived access tokens for API calls, long-lived refresh tokens for session continuity, and revocation support for security incidents.
 
 ```text
 Set up JWT handling. I need access tokens (short-lived, 15 minutes) and
@@ -55,69 +50,69 @@ refresh tokens (7 days, stored in DB so I can revoke them). Include the
 user's role in the access token claims. Roles are: viewer, editor, admin.
 ```
 
-```text
-Created auth/jwt.ts — Token service:
-  issueAccessToken(user):
-    Payload: { sub: user.id, role: user.role, iat, exp }
-    Expiry: 15 minutes
-    Algorithm: RS256 with 2048-bit key pair
-  issueRefreshToken(user):
-    Generates opaque token (crypto.randomBytes, 64 hex chars)
-    Stores hash in refresh_tokens table (user_id, token_hash, expires_at)
-    Expiry: 7 days
-  verifyAccessToken(token):
-    Validates signature, checks exp, returns decoded payload
-  rotateRefreshToken(oldToken):
-    Invalidates old token, issues new access + refresh pair
-    Detects reuse of revoked tokens → revokes entire family (security)
+The token service (`auth/jwt.ts`) implements four operations:
 
-Updated auth/login.ts — Returns { accessToken, refreshToken }
-Created auth/refresh.ts — POST /auth/refresh for token rotation
-Created auth/middleware.ts — requireAuth reads Bearer token from header,
-  calls verifyAccessToken, attaches user to req.user
-Created auth/authorize.ts — requireRole('admin') higher-order middleware
-  that checks req.user.role against allowed roles
+```typescript
+// Issue a 15-minute access token with role claim
+issueAccessToken(user): {
+  // Payload: { sub: user.id, role: user.role, iat, exp }
+  // Algorithm: RS256 with 2048-bit key pair
+}
 
-Key pair stored in: config/jwt-private.pem, config/jwt-public.pem
-  (Added to .gitignore — generate per environment)
+// Issue an opaque refresh token stored in the database
+issueRefreshToken(user): {
+  // crypto.randomBytes(64).toString('hex')
+  // Stored as hash in refresh_tokens table (user_id, token_hash, expires_at)
+  // Expiry: 7 days
+}
+
+// Validate signature and expiration
+verifyAccessToken(token): decoded payload or rejection
+
+// Rotate: invalidate old token, issue new pair
+// Detects reuse of revoked tokens -> revokes entire token family
+rotateRefreshToken(oldToken): { newAccessToken, newRefreshToken }
 ```
 
-### 3. Add role-based access control to endpoints
+The refresh token rotation with reuse detection is the key security feature. If an attacker steals a refresh token and the legitimate user also tries to use it, the reuse triggers and all tokens in that family get revoked. Both parties have to re-authenticate, but the attacker is locked out.
+
+The `requireAuth` middleware reads the Bearer token from the Authorization header, verifies it, and attaches the decoded user to `req.user`. The `requireRole('admin')` higher-order middleware checks `req.user.role` against the allowed roles.
+
+Key pair files (`jwt-private.pem`, `jwt-public.pem`) go in `config/` and are added to `.gitignore` -- generated per environment, never committed.
+
+### Step 3: Apply Role-Based Access Control to Endpoints
 
 ```text
 Apply the auth middleware to my routes. Here's the access pattern:
-  - GET /projects — any authenticated user
-  - POST /projects — editor or admin
-  - DELETE /projects/:id — admin only
-  - GET /analytics — admin only
-  - GET /public/status — no auth required
+  - GET /projects -- any authenticated user
+  - POST /projects -- editor or admin
+  - DELETE /projects/:id -- admin only
+  - GET /analytics -- admin only
+  - GET /public/status -- no auth required
 ```
 
-```text
-Updated routes/projects.ts:
-  GET  /projects       → requireAuth
-  POST /projects       → requireAuth, requireRole('editor', 'admin')
-  DELETE /projects/:id → requireAuth, requireRole('admin')
+The middleware chain makes permissions explicit and readable:
 
-Updated routes/analytics.ts:
-  GET /analytics → requireAuth, requireRole('admin')
+```typescript
+// Any authenticated user can list projects
+router.get('/projects', requireAuth, projectController.list);
 
-routes/public.ts:
-  GET /public/status → no middleware (open)
+// Only editors and admins can create
+router.post('/projects', requireAuth, requireRole('editor', 'admin'), projectController.create);
 
-Middleware chain example:
-  router.delete('/projects/:id',
-    requireAuth,
-    requireRole('admin'),
-    projectController.delete
-  )
+// Only admins can delete
+router.delete('/projects/:id', requireAuth, requireRole('admin'), projectController.delete);
 
-If token is missing → 401 { error: 'Authentication required' }
-If token is expired → 401 { error: 'Token expired' }
-If role is insufficient → 403 { error: 'Insufficient permissions' }
+// Analytics restricted to admins
+router.get('/analytics', requireAuth, requireRole('admin'), analyticsController.get);
+
+// Public endpoint -- no middleware
+router.get('/public/status', statusController.get);
 ```
 
-### 4. Implement rate limiting per user and per IP
+Error responses are clear and consistent: missing token returns `401 Authentication required`, expired token returns `401 Token expired`, insufficient role returns `403 Insufficient permissions`. Each response includes enough information for the client to handle it correctly without leaking internal details.
+
+### Step 4: Implement Rate Limiting Per User and Per IP
 
 ```text
 Add rate limiting. I want:
@@ -128,37 +123,26 @@ Add rate limiting. I want:
 Use Redis as the backing store.
 ```
 
-```text
-Created middleware/rate-limiter.ts — Three limiter configurations:
+Three limiter configurations in `middleware/rate-limiter.ts`, all backed by Redis with a sliding window algorithm (smoother than fixed windows):
 
-  globalLimiter:
-    Key: req.ip
-    Window: 60 seconds, max 100 requests
-    Store: Redis (ioredis, connection from env REDIS_URL)
-    Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
+**Global limiter** -- keyed on `req.ip`, 100 requests per 60-second window. Applied to all public routes. Response headers include `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` so clients can self-throttle.
 
-  authenticatedLimiter:
-    Key: req.user.id (applied after requireAuth)
-    Window: 60 seconds, max 300 requests
-    Skips if req.user.role === 'admin'
+**Authenticated limiter** -- keyed on `req.user.id` (applied after `requireAuth`), 300 requests per 60-second window. Skips the limit entirely when `req.user.role === 'admin'` -- admins running data exports shouldn't hit artificial ceilings.
 
-  loginLimiter:
-    Key: req.ip
-    Window: 900 seconds (15 min), max 5 attempts
-    On limit: 429 { error: 'Too many login attempts. Try again in N minutes.' }
-    Includes Retry-After header
+**Login limiter** -- keyed on `req.ip`, 5 attempts per 15-minute window. This is the brute-force protection. After 5 failed attempts, the response is `429 Too many login attempts. Try again in N minutes.` with a `Retry-After` header.
 
-Applied to routes:
-  app.use('/public', globalLimiter)
-  app.use('/auth/login', loginLimiter)
-  app.use('/projects', requireAuth, authenticatedLimiter)
-  app.use('/analytics', requireAuth, requireRole('admin'))  // no limiter
+Route application:
 
-Redis key pattern: rl:{type}:{key} with TTL matching the window
-Sliding window algorithm — smoother than fixed windows
+```typescript
+app.use('/public', globalLimiter);
+app.use('/auth/login', loginLimiter);
+app.use('/projects', requireAuth, authenticatedLimiter);
+app.use('/analytics', requireAuth, requireRole('admin'));  // no limiter
 ```
 
-### 5. Test the full security stack
+Redis key pattern: `rl:{type}:{key}` with TTL matching the window duration. If Redis goes down, the limiters fail open (allow requests) rather than locking out all users -- a deliberate design choice that prioritizes availability over strict enforcement during infrastructure issues.
+
+### Step 5: Test the Full Security Stack
 
 ```text
 Generate a test suite that verifies the auth flow end-to-end:
@@ -166,39 +150,22 @@ registration, login, token refresh, role enforcement, and rate
 limiting. Use Jest and supertest.
 ```
 
-```text
-Created tests/auth-security.test.ts — 18 test cases:
+The test suite (`tests/auth-security.test.ts`) covers 18 cases across four areas:
 
-  Registration (4 tests):
-    ✓ Registers user with valid credentials
-    ✓ Rejects duplicate email
-    ✓ Rejects weak password
-    ✓ Returns verification token
+**Registration** (4 tests): Successful registration with valid credentials, duplicate email rejection, weak password rejection, and verification token generation.
 
-  Login + JWT (5 tests):
-    ✓ Returns access + refresh tokens on valid login
-    ✓ Rejects unverified email
-    ✓ Rejects wrong password
-    ✓ Access token expires after 15 minutes (mocked clock)
-    ✓ Refresh token rotation issues new pair and invalidates old
+**Login and JWT** (5 tests): Valid login returns both tokens, unverified email gets rejected, wrong password gets rejected, access token expires after 15 minutes (mocked clock), and refresh token rotation issues a new pair while invalidating the old one.
 
-  Role-based access (4 tests):
-    ✓ Viewer can GET /projects
-    ✓ Viewer cannot POST /projects → 403
-    ✓ Editor can POST /projects
-    ✓ Only admin can DELETE /projects/:id
+**Role-based access** (4 tests): Viewer can `GET /projects`, viewer cannot `POST /projects` (returns 403), editor can `POST /projects`, and only admin can `DELETE /projects/:id`.
 
-  Rate limiting (5 tests):
-    ✓ Returns 429 after 100 unauthenticated requests
-    ✓ Returns 429 after 5 login attempts in 15 min
-    ✓ Authenticated user gets 300 req/min allowance
-    ✓ Admin bypasses authenticated rate limit
-    ✓ Rate limit headers present in responses
+**Rate limiting** (5 tests): Returns 429 after 100 unauthenticated requests, returns 429 after 5 login attempts in 15 minutes, authenticated user gets the 300 request per minute allowance, admin bypasses the authenticated rate limit, and rate limit headers are present in all responses.
 
-All tests use an in-memory Redis mock (ioredis-mock) for speed.
-Test database: separate PostgreSQL schema, reset between suites.
-```
+All tests use `ioredis-mock` for speed and a separate PostgreSQL schema that resets between suites. The full suite runs in under 8 seconds.
 
 ## Real-World Example
 
-Dani runs a small analytics platform with three tiers of API consumers. After a bot scraped his entire dataset through the unauthenticated endpoint, he used this approach to lock things down in an afternoon. Registration and JWT auth went in first, then he added a stricter rate limit tier for free-plan users (60 req/min) versus paid users (600 req/min) by reading the plan from the JWT claims. Login brute-force protection caught two credential-stuffing attempts in the first week.
+Dani runs a small analytics platform with three tiers of API consumers: a free plan, a paid plan, and enterprise. After a bot scraped his entire dataset through the unauthenticated endpoint -- downloading 18 months of data in a single afternoon -- he used this approach to lock things down.
+
+Registration and JWT auth went in first, gating every data endpoint behind authentication. Then he extended the rate limiter tiers beyond the basic three: free-plan users get 60 requests per minute, paid users get 600, and enterprise gets 3,000 -- all read from the JWT claims, so upgrading a customer's plan takes effect on their next token refresh without any code changes.
+
+The login brute-force protection caught two credential-stuffing attempts in the first week -- automated scripts cycling through leaked password databases. Both were blocked after 5 attempts. The whole security layer shipped in an afternoon, and Dani sleeps better knowing his API isn't a free buffet anymore.

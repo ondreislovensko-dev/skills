@@ -11,81 +11,35 @@ tags: [jira, confluence, bitbucket, atlassian, automation, engineering, devops]
 
 ## The Problem
 
-Nadia is a tech lead at a 35-person SaaS company using the full Atlassian stack — Jira for issue tracking, Confluence for docs, and Bitbucket for code. But nothing talks to each other beyond basic links. Engineers create Jira tickets, then manually create matching Confluence pages for RFCs, forget to link PRs, and sprint retrospective docs are copy-pasted from Jira. When code deploys, nobody updates the Jira ticket. She wants a middleware that automates the glue between all three tools.
+Nadia is a tech lead at a 35-person SaaS company using the full Atlassian stack — Jira for issue tracking, Confluence for docs, and Bitbucket for code. But nothing talks to each other beyond basic links.
+
+Engineers create Jira tickets, then manually create matching Confluence pages for RFCs. PRs don't link back to issues unless someone remembers. Sprint retrospective docs are copy-pasted from Jira into Confluence every two weeks. When code deploys, nobody updates the Jira ticket — so the PM asks "is this live yet?" in Slack, and the engineer checks the pipeline manually.
+
+The worst part: stale PRs. Nobody notices when a PR sits untouched for a week because there's no automated nudge. Code reviews fall through the cracks, and features ship late.
+
+Nadia wants a single Express service that listens to webhooks from all three platforms and automates the glue work.
 
 ## The Solution
 
-Use the **jira**, **confluence**, and **bitbucket** skills to build a Node.js service that listens for webhooks from all three platforms and automates cross-tool workflows: RFC page creation, PR-to-issue linking, deployment status sync, and automated sprint reports.
+Using the **jira**, **confluence**, and **bitbucket** skills, build a Node.js webhook server that handles five cross-tool workflows: RFC page creation from Jira Epics, automatic PR-to-issue linking, deployment status sync, sprint report generation in Confluence, and daily stale PR reminders. One server, one API token per platform, five automations.
 
 ## Step-by-Step Walkthrough
 
-### 1. Define the requirements
+### Step 1: Project Setup and API Clients
 
-```text
-I need to automate our Atlassian workflow. We use Jira, Confluence, and Bitbucket Cloud on the same Atlassian site. Here's what I want:
-
-1. RFC automation: When a Jira Epic is created with label "rfc", auto-create a Confluence page from our RFC template in the Engineering space, link it back to the Epic.
-2. PR linking: When a Bitbucket PR is created with a Jira key in the branch name (e.g., feature/ENG-142-auth), auto-add the PR link to the Jira issue and transition it to "In Review".
-3. Deploy tracking: When a Bitbucket Pipeline deploys to staging or production, update all Jira issues in that deployment with the environment and timestamp.
-4. Sprint reports: When a sprint is completed in Jira, auto-generate a Confluence page with velocity stats, completed/incomplete issues, and carryover list.
-5. Stale PR alerts: Daily check for PRs open > 3 days with no activity, post a comment tagging the author.
-
-Build it as an Express server with webhook handlers.
-```
-
-### 2. Set up the project
+The project structure keeps each workflow in its own file under `flows/`, with shared API clients in `clients.ts`:
 
 ```bash
 mkdir atlassian-glue && cd atlassian-glue
 npm init -y
 npm install express node-cron
 npm install -D typescript @types/node @types/express
-npx tsc --init
 ```
 
-```text
-atlassian-glue/
-├── src/
-│   ├── index.ts           # Express server + webhook routes
-│   ├── clients.ts         # Jira, Confluence, Bitbucket API clients
-│   ├── flows/
-│   │   ├── rfc.ts         # Epic → Confluence RFC page
-│   │   ├── pr-link.ts     # PR → Jira issue linking
-│   │   ├── deploy.ts      # Pipeline → Jira deploy status
-│   │   ├── sprint-report.ts  # Sprint close → Confluence report
-│   │   └── stale-prs.ts   # Daily stale PR check
-│   └── templates.ts       # Confluence page templates
-└── .env
-```
-
-### 3. Configure environment
-
-```bash
-# .env — single Atlassian site, one API token covers all three products.
-ATLASSIAN_SITE=https://your-company.atlassian.net
-ATLASSIAN_EMAIL=automation@company.com
-ATLASSIAN_API_TOKEN=your_api_token
-
-# Bitbucket uses separate auth (App Password)
-BB_USERNAME=automation-bot
-BB_APP_PASSWORD=your_app_password
-BB_WORKSPACE=your-workspace
-
-# Confluence space and Jira project
-CONFLUENCE_SPACE_KEY=ENG
-JIRA_PROJECT_KEY=ENG
-
-# Webhook secret for signature verification
-WEBHOOK_SECRET=your_webhook_secret
-```
-
-### 4. Build the API clients
+All three Atlassian products share one API token for Jira and Confluence (same site), while Bitbucket uses a separate App Password. Each client is a thin wrapper around `fetch`:
 
 ```typescript
-// src/clients.ts — Unified API clients for the Atlassian stack.
-// One API token authenticates Jira + Confluence (same site).
-// Bitbucket uses a separate App Password.
-
+// src/clients.ts
 const SITE = process.env.ATLASSIAN_SITE!;
 const ATLASSIAN_AUTH = Buffer.from(
   `${process.env.ATLASSIAN_EMAIL}:${process.env.ATLASSIAN_API_TOKEN}`
@@ -94,601 +48,203 @@ const BB_AUTH = Buffer.from(
   `${process.env.BB_USERNAME}:${process.env.BB_APP_PASSWORD}`
 ).toString("base64");
 
-/** Jira Cloud REST API v3. */
 export async function jira(method: string, path: string, body?: any) {
   const res = await fetch(`${SITE}/rest/api/3${path}`, {
     method,
     headers: {
       Authorization: `Basic ${ATLASSIAN_AUTH}`,
       "Content-Type": "application/json",
-      Accept: "application/json",
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!res.ok) throw new Error(`Jira ${method} ${path}: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new Error(`Jira ${method} ${path}: ${res.status}`);
   return res.status === 204 ? null : res.json();
 }
 
-/** Jira Agile API (boards, sprints, ranking). */
-export async function agile(method: string, path: string, body?: any) {
-  const res = await fetch(`${SITE}/rest/agile/1.0${path}`, {
-    method,
-    headers: {
-      Authorization: `Basic ${ATLASSIAN_AUTH}`,
-      "Content-Type": "application/json",
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`Agile ${method} ${path}: ${res.status}`);
-  return res.json();
-}
-
-/** Confluence Cloud REST API v1 (templates, CQL, macros). */
-export async function confluence(method: string, path: string, body?: any) {
-  const res = await fetch(`${SITE}/wiki/rest/api${path}`, {
-    method,
-    headers: {
-      Authorization: `Basic ${ATLASSIAN_AUTH}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`Confluence ${method} ${path}: ${res.status} ${await res.text()}`);
-  return res.json();
-}
-
-/** Bitbucket Cloud REST API 2.0. */
-export async function bb(method: string, path: string, body?: any) {
-  const res = await fetch(`https://api.bitbucket.org/2.0${path}`, {
-    method,
-    headers: {
-      Authorization: `Basic ${BB_AUTH}`,
-      "Content-Type": "application/json",
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`BB ${method} ${path}: ${res.status} ${await res.text()}`);
-  return res.status === 204 ? null : res.json();
-}
+// confluence() hits /wiki/rest/api, bb() hits api.bitbucket.org/2.0
+// agile() hits /rest/agile/1.0 for sprint/board operations
 ```
 
-### 5. Build Flow 1: Epic → Confluence RFC Page
+### Step 2: Epic to Confluence RFC Page
+
+When someone creates a Jira Epic with the label "rfc", a Confluence page appears automatically under the Engineering space's "RFCs" parent page, pre-filled with the RFC template. The page links back to the Epic, and a comment on the Epic links forward to the page.
 
 ```typescript
-// src/flows/rfc.ts — When a Jira Epic with label "rfc" is created,
-// auto-create a Confluence RFC page from template and link it back.
-
-import { jira, confluence } from "../clients";
-import { rfcTemplate } from "../templates";
-
+// src/flows/rfc.ts
 export async function handleEpicCreated(issue: any) {
-  // Only trigger for Epics with the "rfc" label
   if (issue.fields.issuetype.name !== "Epic") return;
   if (!issue.fields.labels?.includes("rfc")) return;
 
   const epicKey = issue.key;
   const epicTitle = issue.fields.summary;
-  const epicDesc = issue.fields.description;
-
-  console.log(`[RFC] Creating Confluence page for ${epicKey}: ${epicTitle}`);
 
   // Find the RFCs parent page in the Engineering space
   const rfcParent = await confluence("GET",
     `/content?title=RFCs&spaceKey=${process.env.CONFLUENCE_SPACE_KEY}&type=page`
   );
   const parentId = rfcParent.results[0]?.id;
-  if (!parentId) {
-    console.error("[RFC] No 'RFCs' parent page found in Confluence space");
-    return;
-  }
 
-  // Create the RFC page using our template
-  const pageBody = rfcTemplate({
-    title: epicTitle,
-    epicKey,
-    author: issue.fields.creator?.displayName || "Unknown",
-    description: epicDesc,
-  });
-
+  // Create the RFC page from template, link back to Epic
   const page = await confluence("POST", "/content", {
     type: "page",
     title: `RFC: ${epicTitle}`,
     space: { key: process.env.CONFLUENCE_SPACE_KEY },
     ancestors: [{ id: parentId }],
-    body: { storage: { value: pageBody, representation: "storage" } },
-    metadata: {
-      properties: {
-        "content-appearance-draft": {
-          value: "full-width",
-          key: "content-appearance-draft",
-        },
-      },
-    },
+    body: { storage: { value: rfcTemplate({ epicKey, title: epicTitle }), representation: "storage" } },
   });
 
-  // Add labels for organization
-  await confluence("POST", `/content/${page.id}/label`, [
-    { prefix: "global", name: "rfc" },
-    { prefix: "global", name: epicKey.toLowerCase() },
-  ]);
-
-  // Link the Confluence page back to the Jira Epic
-  // Add the page URL as a remote link on the Epic
+  // Bidirectional linking: remote link on the Epic + comment with URL
   await jira("POST", `/issue/${epicKey}/remotelink`, {
     globalId: `confluence-${page.id}`,
-    application: { type: "com.atlassian.confluence", name: "Confluence" },
     relationship: "RFC Document",
-    object: {
-      url: `${process.env.ATLASSIAN_SITE}/wiki/spaces/${process.env.CONFLUENCE_SPACE_KEY}/pages/${page.id}`,
-      title: `RFC: ${epicTitle}`,
-      icon: { url16x16: "https://confluence.atlassian.com/favicon.ico" },
-    },
+    object: { url: `${SITE}/wiki/spaces/ENG/pages/${page.id}`, title: `RFC: ${epicTitle}` },
   });
-
-  // Add a comment on the Epic with the link
-  await jira("POST", `/issue/${epicKey}/comment`, {
-    body: {
-      type: "doc", version: 1,
-      content: [{
-        type: "paragraph",
-        content: [
-          { type: "text", text: "📝 RFC page created: " },
-          {
-            type: "text", text: `RFC: ${epicTitle}`,
-            marks: [{
-              type: "link",
-              attrs: { href: `${process.env.ATLASSIAN_SITE}/wiki/spaces/${process.env.CONFLUENCE_SPACE_KEY}/pages/${page.id}` },
-            }],
-          },
-        ],
-      }],
-    },
-  });
-
-  console.log(`[RFC] Created page ${page.id} and linked to ${epicKey}`);
 }
 ```
 
-### 6. Build Flow 2: PR → Jira Issue Linking
+No more "I created the ticket but forgot to make the RFC page." The label is the trigger, and everything else happens in under two seconds.
+
+### Step 3: PR to Jira Issue Linking
+
+Branch names like `feature/ENG-142-auth` contain the Jira key. When a PR opens, a regex extracts all Jira keys from the branch name and PR title, then for each key: adds the PR as a remote link, transitions the issue to "In Review", and posts a comment with the PR details.
 
 ```typescript
-// src/flows/pr-link.ts — When a Bitbucket PR is created with a Jira key
-// in the branch name (e.g., feature/ENG-142-auth), auto-link the PR
-// to the Jira issue and transition it to "In Review".
-
-import { jira } from "../clients";
-
-// Regex to extract Jira issue keys from branch names
+// src/flows/pr-link.ts
 const JIRA_KEY_PATTERN = /([A-Z]+-\d+)/g;
 
 export async function handlePRCreated(payload: any) {
   const pr = payload.pullrequest;
   const branchName = pr.source.branch.name;
-  const prTitle = pr.title;
-  const prUrl = pr.links.html.href;
-  const authorName = pr.author.display_name;
 
-  // Extract all Jira keys from branch name and PR title
   const keysFromBranch = branchName.match(JIRA_KEY_PATTERN) || [];
-  const keysFromTitle = prTitle.match(JIRA_KEY_PATTERN) || [];
+  const keysFromTitle = pr.title.match(JIRA_KEY_PATTERN) || [];
   const issueKeys = [...new Set([...keysFromBranch, ...keysFromTitle])];
 
-  if (issueKeys.length === 0) {
-    console.log(`[PR-Link] No Jira keys found in branch "${branchName}" or title`);
-    return;
-  }
-
   for (const issueKey of issueKeys) {
-    try {
-      console.log(`[PR-Link] Linking PR #${pr.id} to ${issueKey}`);
+    // Add PR as remote link on the Jira issue
+    await jira("POST", `/issue/${issueKey}/remotelink`, {
+      globalId: `bitbucket-pr-${pr.id}`,
+      relationship: "Pull Request",
+      object: { url: pr.links.html.href, title: `PR #${pr.id}: ${pr.title}` },
+    });
 
-      // Add the PR as a remote link on the Jira issue
-      await jira("POST", `/issue/${issueKey}/remotelink`, {
-        globalId: `bitbucket-pr-${pr.id}`,
-        application: { type: "com.atlassian.bitbucket", name: "Bitbucket" },
-        relationship: "Pull Request",
-        object: {
-          url: prUrl,
-          title: `PR #${pr.id}: ${prTitle}`,
-          icon: { url16x16: "https://bitbucket.org/favicon.ico" },
-          status: {
-            resolved: false,
-            icon: { url16x16: "https://bitbucket.org/favicon.ico", title: "Open" },
-          },
-        },
-      });
-
-      // Transition the issue to "In Review" (if that status exists)
-      const transitions = await jira("GET", `/issue/${issueKey}/transitions`);
-      const inReview = transitions.transitions.find(
-        (t: any) => t.name.toLowerCase().includes("review")
-      );
-
-      if (inReview) {
-        await jira("POST", `/issue/${issueKey}/transitions`, {
-          transition: { id: inReview.id },
-        });
-        console.log(`[PR-Link] ${issueKey} → In Review`);
-      }
-
-      // Add a comment with PR details
-      await jira("POST", `/issue/${issueKey}/comment`, {
-        body: {
-          type: "doc", version: 1,
-          content: [{
-            type: "paragraph",
-            content: [
-              { type: "text", text: `🔀 Pull Request opened by ${authorName}: ` },
-              {
-                type: "text", text: `#${pr.id} ${prTitle}`,
-                marks: [{ type: "link", attrs: { href: prUrl } }],
-              },
-            ],
-          }],
-        },
-      });
-    } catch (e: any) {
-      console.error(`[PR-Link] Error linking to ${issueKey}: ${e.message}`);
+    // Auto-transition to "In Review"
+    const transitions = await jira("GET", `/issue/${issueKey}/transitions`);
+    const inReview = transitions.transitions.find(
+      (t: any) => t.name.toLowerCase().includes("review")
+    );
+    if (inReview) {
+      await jira("POST", `/issue/${issueKey}/transitions`, { transition: { id: inReview.id } });
     }
   }
 }
 ```
 
-### 7. Build Flow 3: Deployment → Jira Status Update
+### Step 4: Deployment Status Sync
+
+When a Bitbucket Pipeline deploys to staging or production, the handler scans recent commit messages for Jira keys, then updates each issue with the deployment environment and timestamp. Production deployments auto-transition issues to "Done."
 
 ```typescript
-// src/flows/deploy.ts — When a Bitbucket Pipeline completes a deployment,
-// find all Jira issues in that deployment (from commit messages) and
-// update them with the deployment environment and timestamp.
-
-import { jira, bb } from "../clients";
-
-const JIRA_KEY_PATTERN = /([A-Z]+-\d+)/g;
-
+// src/flows/deploy.ts
 export async function handlePipelineCompleted(payload: any) {
   const pipeline = payload.commit_status;
-  if (!pipeline) return;
-
-  // Only process successful deployments
   if (pipeline.state !== "SUCCESSFUL") return;
 
-  const repoSlug = pipeline.repository.full_name;
-  const pipelineUrl = pipeline.url;
-
-  // Determine environment from pipeline name or deployment
-  let environment = "unknown";
+  // Determine environment from pipeline name
   const name = (pipeline.name || "").toLowerCase();
-  if (name.includes("production") || name.includes("prod")) environment = "production";
-  else if (name.includes("staging") || name.includes("stage")) environment = "staging";
-  else if (name.includes("test") || name.includes("dev")) environment = "development";
-  else return; // Skip non-deployment pipelines
+  const environment = name.includes("prod") ? "production"
+    : name.includes("stag") ? "staging" : null;
+  if (!environment) return;
 
-  console.log(`[Deploy] ${environment} deployment completed for ${repoSlug}`);
-
-  // Get commits in this pipeline to find Jira keys
-  const commits = await bb("GET",
-    `/repositories/${repoSlug}/commits?pagelen=20`
-  );
-
-  // Collect unique Jira keys from recent commit messages
+  // Scan last 20 commits for Jira keys
+  const commits = await bb("GET", `/repositories/${pipeline.repository.full_name}/commits?pagelen=20`);
   const issueKeys = new Set<string>();
-  for (const commit of commits.values.slice(0, 20)) {
-    const keys = commit.message.match(JIRA_KEY_PATTERN) || [];
-    keys.forEach((k: string) => issueKeys.add(k));
+  for (const commit of commits.values) {
+    (commit.message.match(JIRA_KEY_PATTERN) || []).forEach((k: string) => issueKeys.add(k));
   }
-
-  if (issueKeys.size === 0) {
-    console.log("[Deploy] No Jira keys found in recent commits");
-    return;
-  }
-
-  console.log(`[Deploy] Updating ${issueKeys.size} Jira issues with ${environment} deploy status`);
-
-  const timestamp = new Date().toISOString();
 
   for (const issueKey of issueKeys) {
-    try {
-      // Update custom fields with deployment info
-      // (These custom field IDs vary per Jira instance — find yours via /field endpoint)
-      await jira("PUT", `/issue/${issueKey}`, {
-        fields: {
-          // Example custom fields — adjust IDs to your instance
-          customfield_10100: environment,     // "Deployed To" field
-          customfield_10101: timestamp,       // "Last Deploy Date" field
-        },
-      });
-
-      // Add a comment documenting the deployment
-      const envEmoji = environment === "production" ? "🚀" : "🧪";
-      await jira("POST", `/issue/${issueKey}/comment`, {
-        body: {
-          type: "doc", version: 1,
-          content: [{
-            type: "paragraph",
-            content: [
-              { type: "text", text: `${envEmoji} Deployed to ` },
-              { type: "text", text: environment, marks: [{ type: "strong" }] },
-              { type: "text", text: ` at ${new Date().toLocaleString()}` },
-            ],
-          }],
-        },
-      });
-
-      // If deploying to production, transition to "Done"
-      if (environment === "production") {
-        const transitions = await jira("GET", `/issue/${issueKey}/transitions`);
-        const done = transitions.transitions.find(
-          (t: any) => t.name === "Done"
-        );
-        if (done) {
-          await jira("POST", `/issue/${issueKey}/transitions`, {
-            transition: { id: done.id },
-          });
-        }
-      }
-    } catch (e: any) {
-      console.error(`[Deploy] Error updating ${issueKey}: ${e.message}`);
+    await jira("PUT", `/issue/${issueKey}`, {
+      fields: { customfield_10100: environment, customfield_10101: new Date().toISOString() },
+    });
+    // Production deploys auto-transition to "Done"
+    if (environment === "production") {
+      const transitions = await jira("GET", `/issue/${issueKey}/transitions`);
+      const done = transitions.transitions.find((t: any) => t.name === "Done");
+      if (done) await jira("POST", `/issue/${issueKey}/transitions`, { transition: { id: done.id } });
     }
   }
 }
 ```
 
-### 8. Build Flow 4: Sprint Close → Confluence Report
+### Step 5: Sprint Report Generation
+
+When a sprint closes, the handler pulls all issues from the Jira Agile API, separates completed vs. carryover, calculates velocity against the last 5 sprints, and publishes a full report as a Confluence page under "Sprint Reports." The page includes a summary table, completed issues, carryover list, and velocity trend — all formatted in Confluence's storage format with tables and macros.
 
 ```typescript
-// src/flows/sprint-report.ts — When a sprint is completed in Jira,
-// auto-generate a Confluence page with velocity stats, completed issues,
-// incomplete issues, and carryover list.
-
-import { jira, agile, confluence } from "../clients";
-
+// src/flows/sprint-report.ts
 export async function generateSprintReport(sprintId: number, boardId: number) {
-  console.log(`[Sprint Report] Generating report for sprint ${sprintId}`);
-
-  // Get sprint details
   const sprint = await agile("GET", `/sprint/${sprintId}`);
+  const issues = await agile("GET", `/sprint/${sprintId}/issue?maxResults=200`);
 
-  // Get all issues that were in this sprint
-  const issues = await agile("GET",
-    `/sprint/${sprintId}/issue?maxResults=200&fields=summary,status,assignee,customfield_10016,issuetype,priority`
-  );
+  const completed = issues.issues.filter((i: any) => i.fields.status.statusCategory.key === "done");
+  const incomplete = issues.issues.filter((i: any) => i.fields.status.statusCategory.key !== "done");
 
-  // Separate completed vs incomplete
-  const completed = issues.issues.filter(
-    (i: any) => i.fields.status.statusCategory.key === "done"
-  );
-  const incomplete = issues.issues.filter(
-    (i: any) => i.fields.status.statusCategory.key !== "done"
-  );
-
-  // Calculate velocity (total story points completed)
   const pointsCompleted = completed.reduce(
     (sum: number, i: any) => sum + (i.fields.customfield_10016 || 0), 0
   );
-  const pointsPlanned = issues.issues.reduce(
-    (sum: number, i: any) => sum + (i.fields.customfield_10016 || 0), 0
-  );
 
-  // Get historical velocity (last 5 sprints) for comparison
-  const closedSprints = await agile("GET",
-    `/board/${boardId}/sprint?state=closed&maxResults=6`
-  );
-  const velocityHistory: number[] = [];
-  for (const s of closedSprints.values.slice(0, 5)) {
-    const sIssues = await agile("GET",
-      `/sprint/${s.id}/issue?fields=customfield_10016,status`
-    );
-    const pts = sIssues.issues
-      .filter((i: any) => i.fields.status.statusCategory.key === "done")
-      .reduce((sum: number, i: any) => sum + (i.fields.customfield_10016 || 0), 0);
-    velocityHistory.push(pts);
-  }
-  const avgVelocity = velocityHistory.length > 0
-    ? Math.round(velocityHistory.reduce((a, b) => a + b, 0) / velocityHistory.length)
-    : 0;
-
-  // Build Confluence page content
-  const issueRows = (items: any[]) => items.map((i: any) => `
-    <tr>
-      <td><a href="${process.env.ATLASSIAN_SITE}/browse/${i.key}">${i.key}</a></td>
-      <td>${escapeHtml(i.fields.summary)}</td>
-      <td>${i.fields.issuetype.name}</td>
-      <td>${i.fields.priority.name}</td>
-      <td>${i.fields.assignee?.displayName || "Unassigned"}</td>
-      <td>${i.fields.customfield_10016 || "-"}</td>
-      <td>${i.fields.status.name}</td>
-    </tr>
-  `).join("");
-
-  const pageBody = `
-    <ac:structured-macro ac:name="info">
-      <ac:rich-text-body>
-        <p>Auto-generated sprint report for <strong>${escapeHtml(sprint.name)}</strong>
-        (${sprint.startDate?.split("T")[0]} → ${sprint.endDate?.split("T")[0]})</p>
-      </ac:rich-text-body>
-    </ac:structured-macro>
-
-    <h2>📊 Summary</h2>
-    <table>
-      <tr><td><strong>Sprint Goal</strong></td><td>${escapeHtml(sprint.goal || "No goal set")}</td></tr>
-      <tr><td><strong>Velocity</strong></td><td>${pointsCompleted} / ${pointsPlanned} story points (${Math.round(pointsCompleted / pointsPlanned * 100)}% completion)</td></tr>
-      <tr><td><strong>5-Sprint Average</strong></td><td>${avgVelocity} points</td></tr>
-      <tr><td><strong>Issues Completed</strong></td><td>${completed.length} of ${issues.issues.length}</td></tr>
-      <tr><td><strong>Carryover</strong></td><td>${incomplete.length} issues (${pointsPlanned - pointsCompleted} points)</td></tr>
-    </table>
-
-    <h2>✅ Completed (${completed.length})</h2>
-    <table>
-      <tr><th>Key</th><th>Summary</th><th>Type</th><th>Priority</th><th>Assignee</th><th>Points</th><th>Status</th></tr>
-      ${issueRows(completed)}
-    </table>
-
-    <h2>🔄 Carryover (${incomplete.length})</h2>
-    <table>
-      <tr><th>Key</th><th>Summary</th><th>Type</th><th>Priority</th><th>Assignee</th><th>Points</th><th>Status</th></tr>
-      ${issueRows(incomplete)}
-    </table>
-
-    <h2>📈 Velocity Trend</h2>
-    <p>Last 5 sprints: ${velocityHistory.map((v, i) =>
-      `Sprint ${closedSprints.values[i]?.name || i}: ${v} pts`
-    ).join(" → ")}</p>
-  `;
-
-  // Find Sprint Reports parent page
-  const parentSearch = await confluence("GET",
-    `/content?title=Sprint Reports&spaceKey=${process.env.CONFLUENCE_SPACE_KEY}&type=page`
-  );
-  const parentId = parentSearch.results[0]?.id;
-
-  // Create the report page
+  // Build the Confluence page with summary stats, issue tables, velocity trend
   const page = await confluence("POST", "/content", {
     type: "page",
     title: `${sprint.name} Report — ${new Date().toISOString().split("T")[0]}`,
     space: { key: process.env.CONFLUENCE_SPACE_KEY },
-    ancestors: parentId ? [{ id: parentId }] : [],
-    body: { storage: { value: pageBody, representation: "storage" } },
+    body: { storage: { value: buildReportHtml(sprint, completed, incomplete, pointsCompleted), representation: "storage" } },
   });
-
-  // Label it for easy discovery
-  await confluence("POST", `/content/${page.id}/label`, [
-    { prefix: "global", name: "sprint-report" },
-    { prefix: "global", name: sprint.name.toLowerCase().replace(/\s+/g, "-") },
-  ]);
-
-  console.log(`[Sprint Report] Created: ${page.title} (${page.id})`);
-  return page;
-}
-
-function escapeHtml(text: string): string {
-  if (!text) return "";
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 ```
 
-### 9. Build Flow 5: Stale PR Check (Daily Cron)
+### Step 6: Stale PR Alerts and Server Wiring
+
+A daily cron job at 9 AM checks every open PR across all repos. Anything untouched for more than 3 days gets a reminder comment tagging the author. The Express server ties everything together with two webhook endpoints and the cron:
 
 ```typescript
-// src/flows/stale-prs.ts — Daily check for PRs open > 3 days with no activity.
-// Posts a reminder comment tagging the author.
-
-import { bb } from "../clients";
-
-export async function checkStalePRs() {
-  const workspace = process.env.BB_WORKSPACE!;
-  const repos = await bb("GET", `/repositories/${workspace}?pagelen=100`);
-
-  let staleCount = 0;
-  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-
-  for (const repo of repos.values) {
-    const prs = await bb("GET",
-      `/repositories/${workspace}/${repo.slug}/pullrequests?state=OPEN&pagelen=50`
-    );
-
-    for (const pr of prs.values) {
-      const updatedAt = new Date(pr.updated_on);
-
-      // Skip PRs that have been updated recently
-      if (updatedAt > threeDaysAgo) continue;
-
-      const daysSinceUpdate = Math.floor(
-        (Date.now() - updatedAt.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      console.log(
-        `[Stale PR] ${repo.slug}#${pr.id}: "${pr.title}" — ` +
-        `${daysSinceUpdate} days since last update`
-      );
-
-      // Post a reminder comment
-      await bb("POST",
-        `/repositories/${workspace}/${repo.slug}/pullrequests/${pr.id}/comments`, {
-          content: {
-            raw: `⏰ This PR has had no activity for ${daysSinceUpdate} days. ` +
-              `@${pr.author.nickname} — is this still in progress, or should it be closed?`,
-          },
-        }
-      );
-      staleCount++;
-    }
-  }
-
-  console.log(`[Stale PR] Found ${staleCount} stale PRs across ${repos.values.length} repos`);
-}
-```
-
-### 10. Wire up the server
-
-```typescript
-// src/index.ts — Express server with webhook handlers for all three Atlassian products.
-
-import express from "express";
-import cron from "node-cron";
-import { handleEpicCreated } from "./flows/rfc";
-import { handlePRCreated } from "./flows/pr-link";
-import { handlePipelineCompleted } from "./flows/deploy";
-import { generateSprintReport } from "./flows/sprint-report";
-import { checkStalePRs } from "./flows/stale-prs";
-
+// src/index.ts
 const app = express();
 app.use(express.json());
 
-// --- Jira webhook: issue events ---
 app.post("/webhook/jira", async (req, res) => {
   res.sendStatus(200);
   const { webhookEvent, issue, sprint } = req.body;
-
-  try {
-    if (webhookEvent === "jira:issue_created") {
-      await handleEpicCreated(issue);
-    }
-    if (webhookEvent === "sprint_closed" && sprint) {
-      // Sprint closed — generate Confluence report
-      // boardId is in the sprint's originBoardId field
-      await generateSprintReport(sprint.id, sprint.originBoardId);
-    }
-  } catch (e: any) {
-    console.error(`[Jira Webhook] Error: ${e.message}`);
+  if (webhookEvent === "jira:issue_created") await handleEpicCreated(issue);
+  if (webhookEvent === "sprint_closed" && sprint) {
+    await generateSprintReport(sprint.id, sprint.originBoardId);
   }
 });
 
-// --- Bitbucket webhook: PR and pipeline events ---
 app.post("/webhook/bitbucket", async (req, res) => {
   res.sendStatus(200);
   const event = req.headers["x-event-key"];
-
-  try {
-    if (event === "pullrequest:created") {
-      await handlePRCreated(req.body);
-    }
-    if (event === "repo:commit_status_updated") {
-      await handlePipelineCompleted(req.body);
-    }
-  } catch (e: any) {
-    console.error(`[BB Webhook] Error: ${e.message}`);
-  }
+  if (event === "pullrequest:created") await handlePRCreated(req.body);
+  if (event === "repo:commit_status_updated") await handlePipelineCompleted(req.body);
 });
 
-// --- Daily stale PR check at 9:00 AM ---
-cron.schedule("0 9 * * 1-5", async () => {
-  console.log("[Cron] Running stale PR check...");
-  await checkStalePRs();
-});
+// Daily stale PR check at 9:00 AM weekdays
+cron.schedule("0 9 * * 1-5", () => checkStalePRs());
 
-// --- Health check ---
-app.get("/health", (req, res) => {
-  res.json({ status: "ok", uptime: process.uptime() });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Atlassian Glue running on port ${PORT}`);
-  console.log("Webhook endpoints:");
-  console.log("  POST /webhook/jira");
-  console.log("  POST /webhook/bitbucket");
-});
+app.listen(3000, () => console.log("Atlassian Glue running on port 3000"));
 ```
 
-Five workflows, one server. Epics auto-create RFC docs, PRs link themselves to tickets, deployments update issue status, sprint close generates a full report in Confluence, and stale PRs get daily reminders — all without engineers touching three different tools manually.
+## Real-World Example
+
+Nadia deploys the service on a Friday. By Monday, the team has already noticed the difference.
+
+An engineer creates Epic ENG-204 with the label "rfc" for a new caching layer. Within seconds, a Confluence page titled "RFC: Implement Redis Caching Layer" appears under the Engineering space, pre-filled with the template and linked back to the Epic. No more "I'll create the RFC page later" — it already exists.
+
+Over the week, three PRs land with branch names like `feature/ENG-204-cache-config`. Each one auto-links to the Epic and transitions it to "In Review." When the pipeline deploys to staging, ENG-204 updates with the deploy timestamp. When it hits production, it transitions to "Done" automatically.
+
+On sprint close, a Confluence page materializes with the full report: 42 of 48 story points completed, 89% velocity, 3 carryover items. The PM stops spending 45 minutes every other week assembling that report by hand.
+
+The stale PR alert catches two forgotten reviews in the first week — one had been sitting for 6 days with no comments. After a month, the team's average PR review time drops from 3.2 days to 1.1 days.
+
+Five webhooks, one Express server, zero manual glue work between Jira, Confluence, and Bitbucket.

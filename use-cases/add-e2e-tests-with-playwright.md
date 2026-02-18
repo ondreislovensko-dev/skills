@@ -17,46 +17,54 @@ The team tried Cypress a year ago but abandoned it — tests were slow, flaky, a
 
 ## The Solution
 
-Use **playwright-testing** to set up a robust e2e test suite with auto-waiting locators that resist UI changes, **test-generator** to scaffold initial tests for critical flows, and **cicd-pipeline** to run tests on every PR so broken code never reaches main.
+Using the **playwright-testing**, **test-generator**, and **cicd-pipeline** skills, the agent sets up a robust e2e test suite with auto-waiting locators that resist UI changes, scaffolds tests for critical flows, and wires everything into CI so broken code never reaches main.
 
 ## Step-by-Step Walkthrough
 
-### 1. Set up Playwright with the right configuration
+### Step 1: Set Up Playwright with the Right Configuration
 
 ```text
 Set up Playwright for our Next.js analytics dashboard. We need to test on Chromium, Firefox, and WebKit (our users report Safari bugs often). Configure it to: auto-start our dev server (npm run dev on port 3000), capture traces and screenshots only on failure (save CI storage), retry failed tests twice in CI, run tests in parallel locally but sequentially in CI (our CI runner is small). We use TypeScript.
 ```
 
-The agent generates the configuration:
+The configuration lands in `playwright.config.ts` with the settings that matter most for a small team:
 
-```text
-Playwright configured:
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
 
-  playwright.config.ts:
-    Test directory: ./tests/e2e
-    Browsers: Chromium, Firefox, WebKit
-    Parallel: yes locally, 1 worker in CI
-    Retries: 2 in CI, 0 locally
-    Traces: on-first-retry (captures timeline, DOM, network)
-    Screenshots: only-on-failure
-    Video: on-first-retry
-    Web server: npm run dev, port 3000, reuse if running
-
-  Project structure:
-    tests/
-      e2e/
-        auth.setup.ts          — Login once, save session
-        pages/                 — Page object models
-        flows/                 — User flow tests
-        visual/                — Screenshot comparison tests
-      .auth/                   — Saved auth state (gitignored)
-
-  Dependencies installed:
-    @playwright/test, @axe-core/playwright
-    Browsers: chromium, firefox, webkit downloaded
+export default defineConfig({
+  testDir: './tests/e2e',
+  fullyParallel: true,
+  workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 2 : 0,
+  use: {
+    trace: 'on-first-retry',       // Captures timeline, DOM, network — only when needed
+    screenshot: 'only-on-failure',
+    video: 'on-first-retry',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
+  webServer: {
+    command: 'npm run dev',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+  },
+});
 ```
 
-### 2. Write tests for the 5 most critical user flows
+The project structure separates concerns cleanly:
+
+- `tests/e2e/auth.setup.ts` — logs in once, saves the session so every other test reuses it
+- `tests/e2e/pages/` — page object models (locators live here, not in tests)
+- `tests/e2e/flows/` — user flow tests
+- `tests/e2e/visual/` — screenshot comparison tests
+- `tests/.auth/` — saved auth state, gitignored
+
+### Step 2: Write Tests for the 5 Most Critical User Flows
 
 ```text
 Write e2e tests for our most critical flows. Our app is a B2B analytics dashboard. The critical flows are:
@@ -70,53 +78,46 @@ Write e2e tests for our most critical flows. Our app is a B2B analytics dashboar
 Use page objects for each page. Use role-based locators (getByRole, getByLabel) not CSS selectors.
 ```
 
-The agent writes the test suite:
+Every page gets a page object that encapsulates its locators. This is what killed the Cypress setup last time — tests broke because selectors were scattered everywhere. Here, the dashboard page object keeps everything in one place:
 
-```text
-5 critical flow tests created:
+```typescript
+// tests/e2e/pages/dashboard.page.ts
+import { type Page, type Locator } from '@playwright/test';
 
-  tests/e2e/pages/
-    login.page.ts        — email, password, submit, error locators
-    dashboard.page.ts    — KPI cards, date picker, navigation
-    report.page.ts       — metric selector, chart, generate button
-    data-table.page.ts   — filters, table rows, export button
-    settings.page.ts     — team tab, invite form, pending list
+export class DashboardPage {
+  readonly kpiCards: Locator;
+  readonly dateRangePicker: Locator;
+  readonly newReportButton: Locator;
 
-  tests/e2e/flows/
-    01-login.spec.ts
-      ✓ successful login redirects to dashboard
-      ✓ invalid credentials show error message
-      ✓ empty fields show validation errors
+  constructor(private page: Page) {
+    this.kpiCards = page.getByRole('region', { name: /kpi/i });
+    this.dateRangePicker = page.getByLabel('Date range');
+    this.newReportButton = page.getByRole('button', { name: 'New Report' });
+  }
 
-    02-dashboard.spec.ts
-      ✓ KPI cards show numbers (not loading state)
-      ✓ date range picker updates all cards
-      ✓ clicking KPI card navigates to detail view
-
-    03-create-report.spec.ts
-      ✓ create report with revenue + users metrics
-      ✓ chart renders with correct date range
-      ✓ report appears in sidebar after save
-
-    04-filter-export.spec.ts
-      ✓ country filter updates table data
-      ✓ date range filter shows correct rows
-      ✓ CSV export triggers download with filtered data
-
-    05-team-invite.spec.ts
-      ✓ invite team member with viewer role
-      ✓ pending invite shows in list
-      ✓ duplicate email shows error
-
-  Total: 15 tests across 3 browsers = 45 test runs
-  Estimated runtime: ~90 seconds (parallel)
-
-  Auth setup:
-    auth.setup.ts logs in once, saves storageState
-    All flow tests reuse saved session (no repeated logins)
+  async verifyKPIsLoaded() {
+    // Verify cards show numbers, not loading spinners
+    for (const card of await this.kpiCards.all()) {
+      await expect(card.getByRole('status')).not.toBeVisible();
+      await expect(card.locator('[data-testid="kpi-value"]')).toHaveText(/\d/);
+    }
+  }
+}
 ```
 
-### 3. Add API mocking for edge cases you can not test with real data
+The test files cover 15 assertions across the 5 flows:
+
+| Flow | Tests | What breaks without them |
+|---|---|---|
+| Login | Successful redirect, invalid credentials, validation errors | The Safari login button bug from last sprint |
+| Dashboard | KPI cards loaded, date picker updates, card navigation | Users staring at infinite spinners |
+| Create report | Metric selection, chart rendering, save to sidebar | Reports silently failing to generate |
+| Filter + export | Country filter, date range, CSV download | The broken filter from the API change |
+| Team invite | Send invite, pending list, duplicate email error | Invites disappearing into the void |
+
+Auth setup runs once and saves `storageState` — no repeated logins across 15 tests. Total runtime across 3 browsers: about 90 seconds in parallel.
+
+### Step 3: Add API Mocking for Edge Cases
 
 ```text
 Add tests for error states and edge cases using API mocking. Test these scenarios:
@@ -130,117 +131,88 @@ Add tests for error states and edge cases using API mocking. Test these scenario
 Use Playwright's route mocking, don't hit real APIs for these tests.
 ```
 
-The agent creates mocked tests:
+These are the scenarios no one ever tests manually — and exactly the ones users hit. Playwright's route interception makes them trivial:
 
-```text
-Edge case tests with API mocking:
+```typescript
+// tests/e2e/flows/edge-cases.spec.ts
+test('API error shows retry button that actually works', async ({ page }) => {
+  let callCount = 0;
+  await page.route('/api/dashboard', (route) => {
+    callCount++;
+    if (callCount === 1) return route.fulfill({ status: 500 });
+    return route.continue(); // Second call succeeds
+  });
 
-  tests/e2e/flows/edge-cases.spec.ts
-
-    ✓ API error → shows error state with retry button
-      Mocks: /api/dashboard → 500
-      Verifies: error message visible, retry button works, data loads after retry
-
-    ✓ Empty data → shows empty state
-      Mocks: /api/dashboard → 200, { data: [] }
-      Verifies: "No data for this period" message, suggests changing date range
-
-    ✓ Slow report generation → shows progress
-      Mocks: /api/reports/generate → 3s delay → 200
-      Verifies: progress indicator appears, chart renders after response
-
-    ✓ Export failure → shows error toast
-      Mocks: /api/export → starts response, then aborts
-      Verifies: error toast appears with "Export failed", retry option shown
-
-    ✓ Expired session → redirects to login
-      Mocks: /api/dashboard → 401
-      Verifies: redirect to /login, "Session expired" message shown
-
-  These tests run without a backend — pure UI behavior testing.
-  Runtime: ~15 seconds (all API responses are mocked, no network wait).
+  await page.goto('/dashboard');
+  await expect(page.getByText('Something went wrong')).toBeVisible();
+  await page.getByRole('button', { name: 'Retry' }).click();
+  await expect(page.getByText('Something went wrong')).not.toBeVisible();
+});
 ```
 
-### 4. Add visual regression tests for key pages
+Five edge-case tests, all running without a backend. The session-expiry test mocks a 401 response and verifies the redirect to `/login` with a "Session expired" message. The slow-report test adds a 3-second delay and confirms the progress indicator appears. These run in about 15 seconds total since there is no network wait.
+
+### Step 4: Add Visual Regression Tests
 
 ```text
 Add visual regression tests that catch unexpected CSS changes. Take screenshots of: the login page, the dashboard with KPI cards, a generated report with chart, and the settings page. Mock API responses to ensure consistent data for screenshots. Configure a 1% pixel diff threshold so minor anti-aliasing differences don't cause failures.
 ```
 
-The agent sets up visual testing:
+Visual tests mock every API call to produce deterministic screenshots — same data, same timestamps, every run. The `maxDiffPixelRatio: 0.01` threshold ignores anti-aliasing noise while catching real layout shifts.
 
-```text
-Visual regression tests configured:
+Four pages get baseline screenshots committed to git:
 
-  tests/e2e/visual/screenshots.spec.ts
+- **login.png** — no auth needed, simplest baseline
+- **dashboard.png** — 4 KPI cards with mocked data
+- **report-chart.png** — line chart with mocked series data
+- **settings-team.png** — team member list with mocked profiles
 
-    Pages captured:
-      login.png          — Login page (no auth needed)
-      dashboard.png      — Dashboard with 4 KPI cards (mocked data)
-      report-chart.png   — Report with line chart (mocked data)
-      settings-team.png  — Settings > Team tab (mocked members)
+Snapshots live in `tests/e2e/visual/screenshots.spec.ts-snapshots/` and show up in PR diffs. When a screenshot changes intentionally, one command updates the baselines:
 
-    Configuration:
-      maxDiffPixelRatio: 0.01 (1% threshold)
-      Mocked API data for deterministic screenshots
-      Frozen date/time to prevent timestamp drift
-
-    Snapshot storage:
-      tests/e2e/visual/screenshots.spec.ts-snapshots/
-      → Committed to git, reviewed in PRs
-
-    Update command:
-      npx playwright test tests/e2e/visual --update-snapshots
+```bash
+npx playwright test tests/e2e/visual --update-snapshots
 ```
 
-### 5. Integrate into CI so every PR is tested
+### Step 5: Integrate into CI
 
 ```text
 Create a GitHub Actions workflow that runs the full Playwright suite on every PR to main. Cache the Playwright browsers between runs to speed up CI. Upload the HTML report as an artifact on failure so developers can debug. Add a PR comment that summarizes test results (passed/failed/skipped). The workflow should block merge if any test fails.
 ```
 
-The agent creates the CI pipeline:
+The workflow caches Playwright browsers between runs (saves about 45 seconds per build) and posts a summary comment on every PR:
 
-```text
-CI workflow created: .github/workflows/e2e.yml
-
-  Trigger: pull_request to main
-
-  Steps:
-    1. Checkout + setup Node 20
-    2. npm ci (cached)
-    3. Install Playwright browsers (cached — saves ~45s)
-    4. Run all tests: npx playwright test
-    5. Upload HTML report artifact (always, for debugging)
-    6. Post PR comment with results summary
-
-  PR comment example:
-    🎭 Playwright Results: 45/45 passed
-    ✅ Chromium: 15 passed
-    ✅ Firefox: 15 passed
-    ✅ WebKit: 15 passed
-    ⏱️ Duration: 2m 14s
-
-  On failure:
-    🎭 Playwright Results: 43/45 passed, 2 failed
-    ❌ Firefox: filter-export.spec.ts › CSV export (trace attached)
-    ❌ WebKit: login.spec.ts › redirect after login (screenshot attached)
-    📎 Download full report: [artifact link]
-
-  Branch protection:
-    → Require "E2E Tests" check to pass before merge
-    → Blocks merge on any test failure
-
-  Total CI time: ~3 minutes (parallel tests, cached browsers)
+```yaml
+# .github/workflows/e2e.yml
+name: E2E Tests
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install --with-deps
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
 ```
+
+On failure, the PR comment links directly to the trace file for the failing test — no guesswork about what happened. Branch protection requires the "E2E Tests" check to pass before merge.
+
+Total CI time: about 3 minutes. That is 3 minutes to test 15 flows across 3 browsers, 5 edge cases, and 4 visual regression checks.
 
 ## Real-World Example
 
-A frontend team at a B2B startup ships 3-4 PRs daily with no e2e tests. Every release, their QA engineer spends 4 hours manually clicking through flows, and bugs still slip through — a broken Safari login, missing form validation, a filter that stopped working after an API change.
+Dani's team enables the workflow on a Monday. By Wednesday, the CI catches a PR that breaks the CSV export on Firefox — a `Blob` constructor difference that only manifests in Gecko. Thursday, the visual regression test flags a dashboard layout shift caused by a padding change in a shared component. Neither bug would have survived manual QA either, but both would have shipped on a busy week when "we'll test it later" becomes "we'll fix it in production."
 
-1. They ask the agent to set up Playwright — it configures multi-browser testing with auth state reuse and page objects
-2. 15 tests cover the 5 most critical flows, running across Chrome, Firefox, and Safari in 90 seconds
-3. API mocking catches edge cases that are impossible to test manually — error states, timeouts, expired sessions
-4. Visual regression tests catch a CSS change that would have broken the dashboard layout on mobile
-5. CI runs the full suite on every PR — the team catches 3 bugs in the first week that would have reached production
-6. QA time drops from 4 hours per release to 30 minutes of exploratory testing. The QA engineer focuses on finding new bugs instead of re-checking old flows
+QA time drops from 4 hours per release to 30 minutes of exploratory testing. The QA engineer stops re-checking the same 5 flows and starts finding new bugs — the kind that automated tests cannot catch, like confusing UX flows and misleading copy. Three weeks in, the team has caught 8 regressions before production, and the Thursday release ritual stops feeling like a gamble.

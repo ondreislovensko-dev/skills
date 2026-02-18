@@ -11,21 +11,23 @@ tags: [documentation, onboarding, legacy-code, architecture, developer-experienc
 
 ## The Problem
 
-A new engineer joins the team and asks "where are the docs?" The answer is a sheepish grin and "the code is the documentation." The codebase has 140,000 lines across 400 files, zero docstrings, no architecture diagram, and the original authors left two years ago. Onboarding takes 6 weeks instead of 1 because every question requires archaeology — reading git blame, decoding cryptic variable names, and reverse-engineering data flows through trial and error. The team knows documentation would save hundreds of hours, but nobody has time to write it because they're too busy onboarding people who can't find documentation.
+A new engineer joins the team and asks "where are the docs?" The answer is a sheepish grin and "the code is the documentation." The codebase has 140,000 lines across 400 files, zero docstrings, no architecture diagram, and the original authors left two years ago. Onboarding takes 6 weeks instead of 1 because every question requires archaeology -- reading git blame, decoding cryptic variable names, and reverse-engineering data flows through trial and error.
+
+The team knows documentation would save hundreds of hours, but nobody has time to write it because they're too busy onboarding people who can't find documentation. It's the classic chicken-and-egg problem, except it costs real money: 6 weeks of reduced productivity per new hire, senior engineers pulled into constant knowledge-transfer sessions, and bugs that exist solely because nobody understood what the code was supposed to do.
 
 ## The Solution
 
-Point the AI agent at your codebase and let it analyze the code structure, extract function contracts, trace data flows, and produce documentation at every level — from inline docstrings to architecture overviews to onboarding guides. It reads the code the way an experienced engineer would, but documents it immediately instead of keeping the knowledge in their head.
+Point the agent at your codebase and let it analyze the code structure, extract function contracts, trace data flows, and produce documentation at every level -- from inline docstrings to architecture overviews to onboarding guides. It reads the code the way an experienced engineer would, but documents it immediately instead of keeping the knowledge in their head.
 
 ## Step-by-Step Walkthrough
 
-### 1. Map the architecture first
+### Step 1: Map the Architecture First
 
 ```text
 Analyze the codebase in src/ and generate an architecture overview. Show me the module dependency graph, entry points, external service dependencies, key data flows, and environment variables. I want a new engineer to understand the system in 10 minutes.
 ```
 
-The agent scans the directory structure, traces imports, and produces:
+The scan traces every import, catalogs every external call, and maps the whole system:
 
 ```markdown
 # System Architecture
@@ -35,45 +37,47 @@ E-commerce order processing platform. 3 main domains: catalog, orders, payments.
 Monolithic Node.js/Express app with PostgreSQL, Redis, and Stripe integration.
 
 ## Module Dependency Graph
-  src/
-  ├── api/              → HTTP layer (Express routes)
-  │   ├── catalog.ts    → depends on: services/catalog, middleware/auth
-  │   ├── orders.ts     → depends on: services/orders, services/payments, middleware/auth
-  │   └── webhooks.ts   → depends on: services/payments (Stripe webhook handler)
-  ├── services/         → Business logic
-  │   ├── catalog.ts    → depends on: repositories/products, repositories/categories
-  │   ├── orders.ts     → depends on: repositories/orders, services/payments, services/inventory
-  │   ├── payments.ts   → depends on: external/stripe, repositories/transactions
-  │   └── inventory.ts  → depends on: repositories/products, cache/redis
-  ├── repositories/     → Database access (Knex.js query builders)
-  ├── middleware/        → Auth (JWT), rate limiting, error handling
-  ├── jobs/             → Bull queue workers (order fulfillment, email sends)
-  └── utils/            → Shared helpers (formatting, validation, logging)
+src/
+├── api/              -> HTTP layer (Express routes)
+│   ├── catalog.ts    -> depends on: services/catalog, middleware/auth
+│   ├── orders.ts     -> depends on: services/orders, services/payments, middleware/auth
+│   └── webhooks.ts   -> depends on: services/payments (Stripe webhook handler)
+├── services/         -> Business logic
+│   ├── catalog.ts    -> depends on: repositories/products, repositories/categories
+│   ├── orders.ts     -> depends on: repositories/orders, services/payments, services/inventory
+│   ├── payments.ts   -> depends on: external/stripe, repositories/transactions
+│   └── inventory.ts  -> depends on: repositories/products, cache/redis
+├── repositories/     -> Database access (Knex.js query builders)
+├── middleware/        -> Auth (JWT), rate limiting, error handling
+├── jobs/             -> Bull queue workers (order fulfillment, email sends)
+└── utils/            -> Shared helpers (formatting, validation, logging)
 
 ## Key Data Flows
-  Order Placement:
-    POST /api/orders → orders.service.create() → payments.service.charge()
-    → stripe.charges.create() → transactions.repo.insert()
-    → inventory.service.decrement() → orders.repo.updateStatus('paid')
-    → jobs.enqueue('send-confirmation-email')
+Order Placement:
+  POST /api/orders -> orders.service.create() -> payments.service.charge()
+  -> stripe.charges.create() -> transactions.repo.insert()
+  -> inventory.service.decrement() -> orders.repo.updateStatus('paid')
+  -> jobs.enqueue('send-confirmation-email')
 
 ## External Dependencies
-  PostgreSQL (main data store), Redis (inventory cache + job queue),
-  Stripe (payments), SendGrid (transactional emails)
+PostgreSQL (main data store), Redis (inventory cache + job queue),
+Stripe (payments), SendGrid (transactional emails)
 
 ## Environment Variables (12 found)
-  DATABASE_URL, REDIS_URL, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
-  SENDGRID_API_KEY, JWT_SECRET, PORT, NODE_ENV, LOG_LEVEL,
-  RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX, SENTRY_DSN
+DATABASE_URL, REDIS_URL, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
+SENDGRID_API_KEY, JWT_SECRET, PORT, NODE_ENV, LOG_LEVEL,
+RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX, SENTRY_DSN
 ```
 
-### 2. Add docstrings to the most critical modules
+A new engineer can now see the entire system in one page: three domains, four external services, one clear data flow for the most important operation. The 12 environment variables are no longer a scavenger hunt through .env.example files and Slack messages.
+
+### Step 2: Add Docstrings to the Most Critical Modules
 
 ```text
 Add comprehensive JSDoc documentation to every exported function in src/services/orders.ts and src/services/payments.ts. Include parameter types, return types, thrown errors, side effects, and example usage.
 ```
 
-The agent reads each function, analyzes its behavior, and generates:
+The agent reads each function, traces its dependencies, and produces documentation that captures not just the interface but the behavior:
 
 ```typescript
 /**
@@ -85,11 +89,11 @@ The agent reads each function, analyzes its behavior, and generates:
  *
  * @param userId - Authenticated user ID (e.g., "usr_k82mf9")
  * @param items - Array of {productId, quantity} objects. Minimum 1 item.
- * @param shippingAddress - Full shipping address with country code for tax calculation.
+ * @param shippingAddress - Full address with country code for tax calculation.
  * @param paymentMethodId - Stripe payment method ID (e.g., "pm_1N2x3Y...")
- * @returns The created order object with status "paid" and Stripe charge ID.
+ * @returns The created order with status "paid" and Stripe charge ID.
  *
- * @throws {ValidationError} If any product is out of stock or quantity exceeds available inventory.
+ * @throws {ValidationError} If any product is out of stock or quantity exceeds inventory.
  * @throws {PaymentError} If Stripe charge fails (card declined, insufficient funds).
  *   The order is rolled back — no inventory deduction occurs.
  * @throws {DatabaseError} If the transaction fails to commit.
@@ -111,56 +115,44 @@ The agent reads each function, analyzes its behavior, and generates:
  */
 ```
 
-### 3. Document the tricky parts — the business logic nobody understands
+The `@sideEffects` section is the most valuable part. Without it, a developer calling `createOrder` might not realize it charges a credit card, sends an email, and modifies inventory -- all in one function call. That kind of hidden coupling is where bugs live.
+
+### Step 3: Document the Tricky Parts -- the Business Logic Nobody Understands
 
 ```text
 Find the 10 most complex functions in the codebase (highest cyclomatic complexity) and add inline comments explaining the business logic. Focus on WHY, not WHAT.
 ```
 
-```text
-Top 10 Complex Functions (by cyclomatic complexity):
+Complexity analysis reveals the functions that need documentation most urgently:
 
-1. services/orders.ts:calculateShipping() — complexity: 23
-   Added 14 inline comments explaining:
-   - Weight-based tier breakpoints and why they exist (carrier contract terms)
-   - The free shipping threshold logic (marketing rule: orders > $75)
-   - International shipping surcharge calculation
-   - The edge case handler for oversized items (flagged: likely bug —
-     oversized surcharge applied twice when item is also fragile)
+| Rank | Function | Complexity | Comments Added |
+|---|---|---|---|
+| 1 | `services/orders.ts:calculateShipping()` | 23 | 14 comments |
+| 2 | `services/payments.ts:handleStripeWebhook()` | 19 | 11 comments |
+| 3-10 | (8 more functions) | 11-17 | 6-9 comments each |
 
-2. services/payments.ts:handleStripeWebhook() — complexity: 19
-   Added 11 inline comments explaining:
-   - Why certain event types are ignored (historical: caused duplicate processing)
-   - The idempotency check using webhook event ID
-   - The 3-retry logic for database writes after webhook (Stripe re-sends if no 200)
-   ...
+The `calculateShipping` documentation explains the weight-based tier breakpoints (carrier contract terms), the free shipping threshold (marketing rule: orders over $75), the international surcharge calculation, and an edge case handler for oversized items.
 
-[...8 more functions with comments added]
+This is where documentation pays for itself in bug discoveries. The analysis flagged three issues hiding in the complex code:
 
-⚠ Bugs discovered during documentation:
-  1. calculateShipping(): oversized + fragile items charged surcharge twice
-  2. handleRefund(): partial refunds don't update inventory (items not restocked)
-  3. applyDiscount(): percentage discounts calculated before tax, flat discounts after —
-     inconsistent and likely unintentional
-```
+1. **`calculateShipping()`**: oversized + fragile items get charged the surcharge twice
+2. **`handleRefund()`**: partial refunds don't update inventory (items never get restocked)
+3. **`applyDiscount()`**: percentage discounts calculated before tax, flat discounts after -- inconsistent and likely unintentional
 
-### 4. Generate the onboarding guide
+Three bugs, found for free, because documenting code forces you to understand it.
+
+### Step 4: Generate the Onboarding Guide
 
 ```text
 Based on everything we've documented, generate a GETTING_STARTED.md for new engineers. Cover: local setup, architecture overview, key files to read first, how to run and test, common tasks, and who to ask about each domain.
 ```
 
-The agent produces a comprehensive onboarding guide referencing the architecture doc, linking to the most important documented files, explaining the local development setup, and listing the 5 files a new engineer should read in order.
+The onboarding guide references the architecture doc, links to the most important documented files, explains the local development setup with copy-pasteable commands, and lists the 5 files a new engineer should read in order. It transforms a 6-week archaeological expedition into a guided tour.
 
 ## Real-World Example
 
-A senior engineer at a 20-person fintech startup is tasked with onboarding 4 new hires in Q1. The payment processing codebase has 140K lines of TypeScript, no documentation, and the two engineers who built it left 18 months ago. Previous onboarding took 6 weeks per engineer.
+A senior engineer at a 20-person fintech startup was tasked with onboarding 4 new hires in Q1. The payment processing codebase had 140K lines of TypeScript, no documentation, and the two engineers who built it left 18 months ago. Previous onboarding had been taking 6 weeks per engineer.
 
-1. The engineer feeds the entire `src/` directory to the agent for architecture mapping — completed in 8 minutes
-2. Docstrings are generated for the 3 most critical service modules (orders, payments, compliance) — 45 minutes of review and minor edits
-3. The agent identifies and documents the 10 most complex functions, discovering 3 bugs in the process
-4. An onboarding guide is generated and reviewed — 20 minutes of customization
-5. New hires use the documentation to become productive in 8 days instead of 6 weeks
-6. The 3 discovered bugs are fixed before they reach production
+Architecture mapping completed in 8 minutes and revealed the system's structure for the first time as a single readable document. Docstrings were generated for the 3 most critical service modules -- orders, payments, compliance -- and reviewed in 45 minutes of light editing. The complexity analysis documented the 10 hardest functions and uncovered 3 bugs that had been silently affecting production.
 
-Total documentation effort: one full day instead of the estimated 3 weeks of manual documentation.
+The 4 new hires used the documentation to become productive in 8 days instead of 6 weeks. The 3 discovered bugs were fixed before they reached customers. Total documentation effort: one full day instead of the estimated 3 weeks of manual work. The documentation kept paying dividends -- the next quarter's hires onboarded even faster because the docs were already there.

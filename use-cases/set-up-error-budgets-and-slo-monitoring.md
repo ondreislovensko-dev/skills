@@ -11,15 +11,19 @@ tags: [sre, slo, error-budget, reliability, monitoring, observability]
 
 ## The Problem
 
-The engineering team ships features every sprint, but nobody knows if the platform is "reliable enough." When incidents happen, there is a heated debate: "Should we freeze releases?" vs "We need to ship this feature." The SRE team says uptime is 99.9%, product says customers are complaining, and neither side has data to resolve the argument. There are no formal SLOs, no error budgets, and reliability decisions are made by gut feeling.
+The engineering team ships features every sprint, but nobody knows if the platform is "reliable enough." When incidents happen, the same argument erupts: "Should we freeze releases?" versus "We need to ship this feature by Thursday." The SRE team says uptime is 99.9%. Product says customers are complaining about intermittent errors. Neither side has data to settle it.
+
+There are no formal SLOs. No error budgets. Reliability decisions are made by gut feeling and whoever argues loudest in the sprint planning meeting. The team needs a system that answers one question with data: should we ship features this week, or fix reliability?
 
 ## The Solution
 
-Use `data-analysis` to define SLIs from existing metrics and calculate baseline reliability, `report-generator` to build SLO dashboards and error budget burn-down reports, and `cicd-pipeline` to gate deployments when error budgets are exhausted.
+Using the **data-analysis**, **report-generator**, and **cicd-pipeline** skills, this walkthrough defines SLIs from existing Prometheus and Datadog metrics, calculates SLO targets based on 90 days of historical data, builds Grafana dashboards with error budget burn-down charts, and gates deployments automatically when budgets run low.
 
 ## Step-by-Step Walkthrough
 
-### 1. Define SLIs from existing metrics
+### Step 1: Define SLIs That Reflect User Experience
+
+Most teams monitor server metrics -- CPU, memory, disk. But customers do not care about CPU usage. They care about whether the page loads, whether checkout works, and whether search results appear quickly. SLIs need to measure what users experience:
 
 ```text
 We run 6 production services behind an API gateway. We have Prometheus metrics
@@ -32,9 +36,25 @@ Prometheus or Datadog metric, and write the PromQL/Datadog query to calculate
 it. Focus on what customers actually experience, not internal metrics.
 ```
 
-The agent defines 14 SLIs across 6 services. For the API gateway: availability (successful requests / total requests, PromQL: `sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m]))`), and latency (p99 under 500ms). For checkout: success rate from Datadog business metrics. Each SLI has a precise query and a justification for why it matters to users.
+Fourteen SLIs come out across 6 services. The most important ones:
 
-### 2. Set SLO targets based on historical data
+**API Gateway availability** -- the percentage of requests that do not return a 5xx error:
+
+```promql
+sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+```
+
+This is what users feel directly. Every 5xx is a user seeing an error page.
+
+**API Gateway latency** -- p99 response time under 500ms. Users do not notice 200ms versus 300ms, but they absolutely notice when a page takes 2 seconds.
+
+**Checkout success rate** -- from Datadog business metrics, the percentage of checkout attempts that complete successfully. This ties directly to revenue.
+
+Each SLI has a precise query and a justification for why it matters to users, not just to the operations team.
+
+### Step 2: Set SLO Targets from Historical Data
+
+SLO targets pulled from thin air are either too aggressive (constant alerts, team ignores them) or too lenient (meaningless). Historical data sets the right level:
 
 ```text
 Pull the last 90 days of data for each SLI and calculate the baseline
@@ -44,9 +64,21 @@ recommended SLO, the implied error budget in minutes per month, and what
 would have triggered an error budget alert in the last 90 days.
 ```
 
-The agent analyzes historical data and recommends SLOs: API availability at 99.95% (allowing 21.6 minutes downtime/month), checkout success at 99.5% (allowing ~50 failed checkouts/month on current volume), search latency p99 under 800ms. It shows that the current API availability is 99.97% — tight but achievable. Two incidents last quarter would have burned 73% of the monthly budget.
+The analysis produces concrete targets:
 
-### 3. Build error budget dashboards
+| SLI | Current (90-day) | Recommended SLO | Error Budget |
+|-----|-------------------|----------------|--------------|
+| API availability | 99.97% | 99.95% | 21.6 minutes downtime/month |
+| API latency p99 | 420ms | 500ms | ~22 minutes of slow responses/month |
+| Checkout success | 99.72% | 99.5% | ~50 failed checkouts/month at current volume |
+
+The API availability target of 99.95% gives the team 21.6 minutes of downtime per month as their error budget. The current 99.97% performance means there is headroom -- but not much. Two incidents last quarter would have burned 73% of the monthly budget. A third would have exhausted it.
+
+This is exactly the kind of data that settles the "ship vs. fix" debate. If the budget is 80% full, the answer is obvious: fix reliability this sprint.
+
+### Step 3: Build Error Budget Dashboards
+
+The SLO targets need to be visible to every team, not buried in a spreadsheet:
 
 ```text
 Create Grafana dashboard JSON for each service showing:
@@ -59,9 +91,18 @@ Create Grafana dashboard JSON for each service showing:
 Use traffic-light colors: green (>50% budget), yellow (20-50%), red (<20%).
 ```
 
-The agent generates complete Grafana dashboard JSON with 6 panels per service. The burn rate panel uses a multi-window approach (1h and 6h) to detect both fast and slow budget burns. Alert rules fire when the 1-hour burn rate exceeds 14.4x (budget would exhaust in 5 hours) or 6-hour burn rate exceeds 6x (budget would exhaust in 2 days).
+The Grafana dashboards use 6 panels per service. The most critical panel is the burn rate chart, which uses a multi-window approach:
 
-### 4. Gate deployments on error budget
+- **1-hour burn rate exceeds 14.4x:** the budget would exhaust in 5 hours. This triggers an immediate page.
+- **6-hour burn rate exceeds 6x:** the budget would exhaust in 2 days. This triggers a warning alert.
+
+The multi-window approach catches both fast incidents (service goes down hard) and slow burns (elevated error rate from a bad deploy that is not quite bad enough to trigger traditional alerting).
+
+Traffic-light colors make the dashboard readable at a glance: green means more than 50% of budget remains, yellow means 20-50%, and red means less than 20% -- time to stop shipping features and fix reliability.
+
+### Step 4: Gate Deployments on Error Budget
+
+The dashboard tells humans what to do. The deployment gate enforces it automatically:
 
 ```text
 Add a deployment gate to our GitHub Actions pipeline. Before deploying to
@@ -72,9 +113,15 @@ but log every override. If budget is between 20-50%, add a warning comment
 to the PR but allow deployment.
 ```
 
-The agent generates a GitHub Actions job that queries Prometheus for the current error budget, blocks deploys when budget is under 20%, warns between 20-50%, and logs all override decisions to a Slack channel. The override requires approval from someone with the SRE role.
+The GitHub Actions job queries Prometheus before every production deploy:
 
-### 5. Create the weekly reliability report
+- **Budget > 50%:** Deploy proceeds normally. Ship with confidence.
+- **Budget 20-50%:** PR gets a warning comment: "Error budget at 35%. Deploy with caution." Deployment proceeds but the team is aware.
+- **Budget < 20%:** Deployment is blocked. Slack message explains: "Production deploy blocked -- API availability error budget at 12%. Focus on reliability before shipping new features." A `deploy-override` label on the PR bypasses the gate, but every override is logged to a Slack channel and requires SRE approval.
+
+### Step 5: Automate the Weekly Reliability Report
+
+The final piece turns all this data into a sprint planning input:
 
 ```text
 Generate a weekly report template that automatically pulls data and shows:
@@ -87,14 +134,12 @@ Generate a weekly report template that automatically pulls data and shows:
 Format as markdown suitable for posting in Slack.
 ```
 
-The agent creates a report generator script that queries Prometheus and Datadog, produces a markdown report with sparkline-style trend indicators, and posts to Slack every Monday at 9am. The recommendation engine uses simple logic: budget > 50% = "ship features," 20-50% = "balance both," < 20% = "reliability sprint."
+The report generator queries Prometheus and Datadog every Monday at 9 AM and posts to Slack. The recommendation engine is simple: budget above 50% means "ship features," 20-50% means "balance both," and below 20% means "reliability sprint." The report includes sparkline-style trend indicators so the team can see whether reliability is improving or degrading week over week.
 
 ## Real-World Example
 
-An SRE lead at a 50-person B2B SaaS company is tired of the "ship vs. fix" debate happening every sprint planning. Engineering wants to ship features, customers report intermittent errors, and there is no data to settle the argument.
+In the first month, the deployment gate blocks 2 production deploys when the error budget drops below 20%. Both times, the team investigates and finds a regression from a recent release that had been slowly burning the budget -- not enough to trigger traditional alerting, but enough to exhaust the monthly budget in a week. The regressions get fixed before they reach more customers.
 
-1. She defines 14 SLIs across 6 services using existing Prometheus and Datadog metrics
-2. Historical analysis shows API availability at 99.97% — room for a 99.95% SLO with a meaningful error budget
-3. Grafana dashboards give every team real-time visibility into their error budget
-4. In the first month, 2 deployments are automatically blocked when budget drops below 20% — both times the team finds and fixes a regression before it reaches more customers
-5. The weekly reliability report becomes a standard part of sprint planning — feature vs. reliability decisions are now data-driven, and the "should we freeze releases" debate disappears
+The weekly reliability report becomes a fixture in sprint planning. Instead of the "ship vs. fix" argument, the team looks at the error budget number and makes a data-driven decision. When the budget is healthy, product gets their features. When it is low, engineering focuses on reliability. The heated debate disappears because both sides are looking at the same data.
+
+Three months in, the SRE lead tracks the results: the mean time between customer-facing incidents doubles. The number of "should we freeze releases" emergency meetings drops to zero. And product velocity actually increases -- the team ships more features per quarter because they spend less time fighting fires and debating reliability in meetings.

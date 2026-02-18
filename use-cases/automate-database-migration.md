@@ -11,15 +11,21 @@ tags: [database, migration, etl, data-pipeline, schema]
 
 ## The Problem
 
-Migrating data between databases — whether switching from MySQL to PostgreSQL, consolidating legacy systems, or moving to a new schema — is terrifying. You need to map columns between different schemas, transform data types, handle foreign key dependencies in the right order, validate that nothing was lost, and do it all without extended downtime. Most teams write throwaway scripts that break halfway through and leave data in an inconsistent state.
+Marcus runs a mid-size e-commerce platform on MySQL 5.7. The database has served them well for five years, but the team keeps hitting walls — no native JSON operations, limited window function support, and replication lag that spikes during holiday sales. They have decided to move to PostgreSQL 16. The problem is 45 tables, 12 million rows, and a codebase full of MySQL-specific quirks: `TINYINT(1)` booleans, `ENUM` types everywhere, `DATETIME` columns with no timezone awareness, and column names from the original developer's questionable naming conventions (`cust_name`, `ord_date`, `ord_status`).
+
+The last time someone tried a "quick migration" on a staging copy, it failed halfway through because the script tried to insert `order_items` before `orders` existed. Foreign keys mean the migration order matters — get it wrong and every row fails with a constraint violation. And that is just one of a dozen things that can go wrong: data type mismatches, encoding issues, null handling differences between MySQL and PostgreSQL, and timezone conversions that silently corrupt timestamps.
+
+The app serves real customers, so extended downtime is not an option. Marcus needs the migration to happen in the background, with validation proving nothing was lost, and a cutover window measured in minutes.
 
 ## The Solution
 
-Use the **data-migration** skill to build the migration pipeline with schema mapping, transformation logic, and validation, and **sql-optimizer** to ensure the migration queries perform well on large datasets. The agent creates a repeatable, testable migration that you can dry-run before the real cutover.
+Using the **data-migration** and **sql-optimizer** skills, the agent builds a repeatable migration pipeline: maps every column between schemas, resolves foreign key dependencies automatically, transforms data types in flight, and validates the result row by row. The whole thing is resumable — if it fails at batch 400 of 800, it picks up where it left off instead of starting over.
 
 ## Step-by-Step Walkthrough
 
-### 1. Analyze the source and target schemas
+### Step 1: Map the Source and Target Schemas
+
+Marcus describes the current MySQL setup and what he wants in PostgreSQL. The schema analysis identifies 45 tables: 38 map directly, 7 need transformation.
 
 ```text
 I'm migrating from a legacy MySQL 5.7 database to PostgreSQL 16.
@@ -29,30 +35,28 @@ some ENUM types need converting, and DATETIME columns need timezone handling.
 Generate the schema mapping.
 ```
 
-```text
-Analyzed source schema (MySQL 5.7) → target schema (PostgreSQL 16):
+The type conversion map covers every incompatibility between MySQL and PostgreSQL:
 
-Schema Mapping Report:
-  Tables: 45 total, 38 direct mappings, 7 need transformation
+| MySQL Type | PostgreSQL Type | Columns Affected |
+|---|---|---|
+| `TINYINT(1)` | `BOOLEAN` | 12 columns across 8 tables |
+| `ENUM('active','inactive')` | `VARCHAR` + `CHECK` constraint | 5 columns |
+| `DATETIME` | `TIMESTAMPTZ` | 34 columns |
+| `INT AUTO_INCREMENT` | `SERIAL` / `BIGSERIAL` | All primary keys |
+| `DOUBLE` | `DOUBLE PRECISION` | 7 columns |
+| `TEXT` (latin1) | `TEXT` (re-encoded to UTF-8) | 3 columns |
 
-  Type conversions needed:
-    TINYINT(1) → BOOLEAN (12 columns across 8 tables)
-    ENUM('active','inactive') → VARCHAR with CHECK constraint (5 columns)
-    DATETIME → TIMESTAMPTZ (all timestamp columns — 34 total)
-    INT AUTO_INCREMENT → SERIAL / BIGSERIAL
-    DOUBLE → DOUBLE PRECISION
-    TEXT with latin1 → TEXT (re-encode to UTF-8)
+Column renames clean up the legacy naming conventions. Nobody wants to type `cust_name` for the next five years:
 
-  Column renames (from legacy conventions):
-    customers.cust_name → customers.name
-    orders.ord_date → orders.created_at
-    orders.ord_status → orders.status
+- `customers.cust_name` becomes `customers.name`
+- `orders.ord_date` becomes `orders.created_at`
+- `orders.ord_status` becomes `orders.status`
 
-  Created: migration/schema-map.json — Full column-by-column mapping
-  Created: migration/create-target-schema.sql — PostgreSQL DDL
-```
+Two files come out of this step: `migration/schema-map.json` with the full column-by-column mapping for every table, and `migration/create-target-schema.sql` with the PostgreSQL DDL ready to execute.
 
-### 2. Build the migration pipeline with dependency ordering
+### Step 2: Build the Migration Pipeline with Dependency Ordering
+
+Foreign keys dictate the migration order. You cannot insert `order_items` before `orders` exist, and you cannot insert `orders` before `customers` exist. A topological sort on the FK graph produces 6 dependency levels — tables at the same level can be migrated in parallel.
 
 ```text
 Build the migration script. Tables have foreign keys so order matters.
@@ -60,31 +64,19 @@ I need: dependency resolution, batch processing for large tables,
 and the ability to resume if it fails midway.
 ```
 
-```text
-Created migration/migrate.ts — Main migration orchestrator
-Created migration/dependency-graph.ts — FK-based table ordering
-Created migration/batch-reader.ts — Cursor-based batch reading
-Created migration/transform.ts — Per-table transformation functions
-Created migration/state.ts — Checkpoint tracking for resume
+The pipeline comes as five files:
 
-Migration order (topological sort by foreign keys):
-  1. customers, products, categories (no dependencies)
-  2. orders (depends on customers)
-  3. order_items (depends on orders, products)
-  4. payments (depends on orders)
-  ... (45 tables total, 6 dependency levels)
+- **`migration/migrate.ts`** — main orchestrator that drives the migration in FK-dependency order
+- **`migration/dependency-graph.ts`** — FK-based topological sort, handles circular references by identifying which FK to defer
+- **`migration/batch-reader.ts`** — cursor-based batch reading that does not hold the entire table in memory
+- **`migration/transform.ts`** — per-table transformation functions for type conversions and renames
+- **`migration/state.ts`** — checkpoint tracking for resume capability
 
-Batch processing:
-  Small tables (< 10K rows): single INSERT ... SELECT
-  Large tables (> 10K rows): batches of 5,000 with cursor pagination
-  orders (4M rows): ~800 batches, estimated 12 minutes
-  order_items (8M rows): ~1,600 batches, estimated 25 minutes
+Small tables under 10K rows get a single `INSERT ... SELECT`. Large tables process in batches of 5,000 with cursor pagination — `orders` (4M rows) takes roughly 800 batches over 12 minutes, `order_items` (8M rows) takes 1,600 batches over 25 minutes. After every batch, a checkpoint file records `{ table, lastId, rowsMigrated }`. If the script crashes at batch 600, restarting it skips all completed tables and resumes from the last checkpoint. No duplicate data, no lost progress.
 
-Checkpoint: after each batch, save { table, lastId, rowsMigrated } to state file.
-On resume: skip completed tables, continue from last checkpoint.
-```
+### Step 3: Handle Data Transformations
 
-### 3. Handle data transformations
+The interesting part is the customers table. MySQL stores address data across 5 separate columns; PostgreSQL gets a single `JSONB` column. And phone numbers are a mess — some have dashes, some have country codes, some have neither, and a few have letters mixed in from when the field was used for fax numbers in 2019.
 
 ```text
 The customers table has address data split across 5 columns in MySQL.
@@ -93,25 +85,20 @@ inconsistently — some have dashes, some have country codes, some don't.
 Normalize during migration.
 ```
 
-```text
-Updated migration/transform.ts — Added customer transformation:
+Address consolidation collapses `street`, `city`, `state`, `zip`, and `country` into a single `address` JSONB field. If all five source fields are null, the result is `null` — not an empty object. This matters for queries: `WHERE address IS NULL` should find customers with no address, not customers with `{}`.
 
-Address consolidation:
-  MySQL: street, city, state, zip, country (5 columns)
-  PostgreSQL: address JSONB → { street, city, state, zip, country }
-  Null handling: if all 5 fields null → address = null (not empty object)
+Phone normalization runs a four-step pipeline:
 
-Phone normalization:
-  Step 1: Strip all non-numeric characters
-  Step 2: If 10 digits → prepend +1 (US default)
-  Step 3: If 11 digits starting with 1 → prepend +
-  Step 4: If doesn't match any pattern → keep original, flag for review
+1. Strip all non-numeric characters
+2. If 10 digits, prepend `+1` (US default)
+3. If 11 digits starting with `1`, prepend `+`
+4. If no pattern matches, keep the original and flag for manual review
 
-  Flagged rows written to migration/review/phones-to-check.csv
-  Estimated: ~2% of records will need manual review based on sample analysis
-```
+About 2% of records hit step 4 and get written to `migration/review/phones-to-check.csv` for manual inspection. Better to flag 10,000 records for human review than silently mangle them with a guess.
 
-### 4. Validate the migration
+### Step 4: Validate the Migration
+
+Trust but verify. The validation suite runs six checks after migration completes:
 
 ```text
 After migration, validate that all data transferred correctly.
@@ -119,61 +106,38 @@ Check row counts, spot-check random records, verify foreign key integrity,
 and compare aggregates (sum of order totals, count of active customers).
 ```
 
-```text
-Created migration/validate.ts — Post-migration validation suite
+- **Row counts** — source vs. target for all 45 tables. Any mismatch is a hard failure.
+- **Random sample** — 100 random records per table, field-by-field comparison after transformation. Catches subtle type conversion bugs.
+- **Foreign key integrity** — every FK reference resolves, no orphaned records. A single broken FK means a batch was migrated out of order.
+- **Aggregates** — `SUM(orders.total)`, `COUNT(customers WHERE status='active')`, `COUNT(DISTINCT order_items.product_id)` compared between source and target. These catch rounding errors and filter bugs.
+- **Null check** — no unexpected `NULL`s in `NOT NULL` columns
+- **Encoding** — sample `TEXT` fields for UTF-8 validity, catching latin1 characters that did not convert cleanly
 
-Validation checks:
-  ✓ Row counts: compare source vs target for all 45 tables
-  ✓ Random sample: 100 random records per table, field-by-field comparison
-  ✓ Foreign keys: verify all FK references resolve (no orphaned records)
-  ✓ Aggregates:
-      SUM(orders.total) — source vs target
-      COUNT(customers WHERE status='active') — source vs target
-      COUNT(DISTINCT order_items.product_id) — source vs target
-  ✓ Null check: no unexpected NULLs in NOT NULL columns
-  ✓ Encoding: sample TEXT fields for UTF-8 validity
+Results go to `migration/validation-report.json` with pass/fail per check. The full suite runs in about 3 minutes. Marcus runs it once on staging, fixes the two edge cases it catches, and runs it again to confirm.
 
-Output: migration/validation-report.json with pass/fail per check
-Estimated runtime: 3 minutes for full validation suite
-```
+### Step 5: Plan Zero-Downtime Cutover
 
-### 5. Plan zero-downtime cutover
+The app serves real customers all day, every day. The cutover window needs to be measured in minutes, not hours.
 
 ```text
 Plan the cutover strategy. I need minimal downtime — the app serves
 real customers. Can we do it with less than 5 minutes of downtime?
 ```
 
-```text
-Cutover Plan — Estimated downtime: 2-3 minutes
+**Phase 1 (zero downtime):** Run the full migration to PostgreSQL in the background while the app keeps serving traffic from MySQL. This takes about 40 minutes. Set up logical replication from MySQL to capture any writes that happen during migration. Validate the migrated data.
 
-Phase 1 — Pre-migration (zero downtime):
-  1. Run full migration to PostgreSQL (background, ~40 min)
-  2. Set up logical replication from MySQL to capture changes during migration
-  3. Validate migrated data
+**Phase 2 (zero downtime):** Apply the accumulated changes from the replication log — all the orders placed and customers updated while the migration was running. Re-validate the affected tables.
 
-Phase 2 — Delta sync (zero downtime):
-  4. Apply accumulated changes from replication log
-  5. Re-validate affected tables
+**Phase 3 (2-3 minutes of downtime):** Set the app to maintenance mode. Apply the final delta — should be under 1,000 rows. Switch the application database config to PostgreSQL. Run a quick validation (row counts plus the latest 100 orders to verify freshness). Remove maintenance mode.
 
-Phase 3 — Cutover (2-3 min downtime):
-  6. Set app to maintenance mode
-  7. Apply final delta (should be < 1000 rows)
-  8. Switch application database config to PostgreSQL
-  9. Run quick validation (row counts + latest 100 orders)
-  10. Remove maintenance mode
-
-Rollback plan:
-  If validation fails at step 9: revert config to MySQL, exit maintenance.
-  MySQL is untouched throughout — it's always the fallback.
-```
+The rollback plan is straightforward: if validation fails at any point during Phase 3, revert the config to MySQL and exit maintenance mode. MySQL is untouched throughout the entire process — it is always the fallback. The worst case is 3 minutes of maintenance mode followed by "never mind, we're reverting."
 
 ## Real-World Example
 
-A senior developer is consolidating two legacy MySQL databases into a single PostgreSQL instance for a mid-size e-commerce operation. The two systems have overlapping customer records with different ID schemes. The combined dataset is 20M rows.
+Marcus runs the migration on staging twice to build confidence, fixing a timezone conversion edge case on the second run. He schedules the production cutover for Saturday night when traffic is lowest.
 
-1. She feeds both schemas to the agent and describes the merge rules for duplicate customers
-2. The agent builds a migration pipeline with deduplication logic using email as the merge key
-3. She runs it against a staging copy — catches 340 phone numbers that need manual review
-4. After fixing edge cases, she runs validation: all row counts match, aggregates within 0.01%
-5. Saturday night cutover takes 4 minutes of downtime. The legacy systems are retired Monday
+The full migration takes 38 minutes in the background while the app keeps serving traffic. The replication log captures 1,200 changes made during that window. Phase 3 takes 2 minutes and 40 seconds — the final delta is just 89 rows.
+
+Validation passes clean: all row counts match, aggregates align within 0.01% (the difference is a rounding change in one decimal column, which is expected), and the 100-record spot check finds zero discrepancies. The phone normalization flagged 340 records for manual review, but none of them were data loss — just formatting inconsistencies the team resolves Monday morning.
+
+The legacy MySQL instance stays archived for 90 days, just in case. Nobody needs it. The PostgreSQL queries that used to require application-level workarounds — CTEs, window functions, JSON operations — now run as straightforward SQL. And the team stops dreading the next holiday traffic spike, because PostgreSQL's replication does not have MySQL's lag problem.

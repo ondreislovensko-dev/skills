@@ -13,100 +13,129 @@ tags: [regression-testing, refactoring, testing, code-quality, automation]
 
 Refactoring is essential but terrifying. You restructure a billing module to be more maintainable, and three weeks later a customer reports they were charged the wrong amount. The existing test suite — if it exists — covers happy paths but misses the edge case your refactoring subtly broke. Manual QA is slow and unreliable for catching behavioral regressions. So teams either avoid refactoring (accumulating tech debt) or refactor and pray (accumulating production incidents).
 
+The real danger isn't the things that break loudly — a missing function throws an error, someone notices in CI, it gets fixed. It's the silent changes: a refund calculation that's off by $0.25 on discounted orders, an inventory count that drifts by one unit on bundle cancellations. These bugs can run for weeks before anyone notices, and by then the blast radius is enormous. The refactoring looked clean, the tests passed, and nobody knew anything was wrong until the accounting team found the discrepancy.
+
 ## The Solution
 
-An AI agent uses `regression-tester` to analyze your refactoring diff, identify every behavior contract in the changed code, and generate targeted tests that verify equivalence between the old and new implementations. Combined with `test-generator` for coverage gaps and `code-reviewer` for structural issues, you get a comprehensive safety net before merging.
+Using the **regression-tester**, **test-generator**, and **code-reviewer** skills, the agent analyzes the refactoring diff, identifies every behavior contract in the changed code, and generates targeted tests that verify equivalence between the old and new implementations. It runs those tests against both versions — old code first to establish the baseline, new code second to catch divergence — and pinpoints exactly where behavior changed.
 
 ## Step-by-Step Walkthrough
 
-### 1. Start the regression check
+### Step 1: Start the Regression Check
 
-After completing your refactoring, ask for verification:
-
-```text
-I refactored the order processing module — split OrderService into OrderService, PricingService, and InventoryService. Check for regressions against main.
-```
-
-### 2. The agent analyzes the refactoring scope
+After completing the refactoring, hand it over for verification:
 
 ```text
-Analyzing diff: main...HEAD (12 files changed, +624 -389)
-
-Refactoring map:
-  src/services/OrderService.ts (389 lines) → split into:
-    src/services/OrderService.ts    (142 lines) — orchestration
-    src/services/PricingService.ts  (156 lines) — price calculation
-    src/services/InventoryService.ts (128 lines) — stock management
-
-Public API surface:
-  OrderService: 6 methods — createOrder, updateOrder, cancelOrder,
-                             getOrder, listOrders, processRefund
-  Signatures: All preserved ✓
-  Return types: All preserved ✓
-
-Existing test coverage:
-  tests/OrderService.test.ts — 12 tests, 67% coverage
-  Missing coverage: cancelOrder edge cases, refund calculations,
-                    inventory rollback on failed orders
-
-Generating regression tests...
+I refactored the order processing module — split OrderService into
+OrderService, PricingService, and InventoryService. The public API
+hasn't changed — all the same methods exist with the same signatures.
+Check for regressions against main.
 ```
 
-### 3. Review the regression test results
+### Step 2: Map the Refactoring Scope
+
+Before generating any tests, the agent needs to understand what changed and what should stay the same — not just which files were modified, but which behaviors could have been affected. The diff analysis (12 files changed, +624 -389) produces a clear picture of what moved where:
+
+| Before | After | Lines |
+|---|---|---|
+| `src/services/OrderService.ts` (389 lines) | `src/services/OrderService.ts` (142 lines) — orchestration | -247 |
+| | `src/services/PricingService.ts` (156 lines) — price calculation | +156 |
+| | `src/services/InventoryService.ts` (128 lines) — stock management | +128 |
+
+The public API surface check is the first good sign:
+
+| Method | Signature Preserved | Return Type Preserved |
+|---|---|---|
+| `createOrder` | Yes | Yes |
+| `updateOrder` | Yes | Yes |
+| `cancelOrder` | Yes | Yes |
+| `getOrder` | Yes | Yes |
+| `listOrders` | Yes | Yes |
+| `processRefund` | Yes | Yes |
+
+All 6 public methods have preserved signatures and return types. Nothing changed from the caller's perspective. The refactoring split internal implementation without touching the external contract.
+
+But the existing test coverage tells a different story: 12 tests at 67% coverage, all focused on the 3 most common flows. `cancelOrder` edge cases, refund calculations, and inventory rollback on failed orders have zero coverage. Those are exactly the behaviors most likely to break during a split — the logic that depends on interactions between pricing and inventory, which now live in separate files with separate method boundaries.
+
+The agent identifies 31 distinct behavior contracts from the code's branching logic, loop structures, and conditional returns. Each one becomes a regression test.
+
+### Step 3: Run Regression Tests Against Both Versions
+
+31 regression tests get generated across 3 test files. This is where it gets interesting — the tests run against both versions to establish what "correct" looks like:
+
+**Against the old code (main): 31/31 passed.**
+**Against the new code (HEAD): 29/31 passed.**
+
+Two regressions surface. Neither would have been caught by the existing 12 tests. Neither throws an error — both produce a valid result that happens to be wrong. Without running the same logic against both code versions, these bugs would have shipped silently.
+
+**Regression 1: Partial refund calculation on discounted orders**
+
+The test "calculates 50% refund for order with percentage discount" catches a subtle math difference:
+
+- **Old behavior:** `refund = (item_total * 0.5) - (discount * 0.5)` = **$21.25**
+- **New behavior:** `refund = (item_total - discount) * 0.5` = **$21.00**
+
+The problem is in `PricingService.ts:78`:
+
+```typescript
+// Old code — discount applied after the split
+const refundPerItem = lineTotal * refundPercent;
+const discountPerItem = discount * refundPercent;
+return refundPerItem - discountPerItem; // $21.25
+
+// New code — discount applied before the split (wrong)
+const discountedTotal = lineTotal - discount;
+return discountedTotal * refundPercent; // $21.00
+```
+
+Mathematically, `(a * r) - (b * r)` is not the same as `(a - b) * r` when applied to individual line items with rounding. The bug isn't obvious from reading the code — both versions look reasonable. In production, every customer with a percentage discount who requests a partial refund would receive $0.25 less. Across thousands of refunds, that adds up to real money — and more importantly, it's the kind of discrepancy that triggers a financial audit.
+
+**Regression 2: Inventory not restored for bundled items on cancellation**
+
+The test "restores stock for all items in a bundle when order is canceled" exposes missing logic:
+
+- **Old behavior:** Iterates `bundle.items` and restores each individual item to stock
+- **New behavior:** Restores only the bundle SKU, not the individual component items
+
+The bundle expansion logic didn't make it into `InventoryService.ts:45`. During the split, the method that handled bundle components stayed in `OrderService` where it no longer gets called during the cancellation flow. In production, canceling orders with bundles would permanently reduce available stock for each component item — a phantom inventory leak.
+
+This is the kind of bug that takes weeks to surface. Nobody notices until a popular item mysteriously shows "out of stock" despite warehouse shelves being full. Customer support investigates, warehouse confirms stock is available, and engineering has to trace through order history to find the leak. By that time, dozens of cancellations have each silently removed items from the available count.
+
+### Step 4: Fix and Re-Verify
 
 ```text
-Generated 31 regression tests across 3 test files.
-
-Running against OLD code (main):  31/31 passed ✓
-Running against NEW code (HEAD):  29/31 passed ✗
-
-❌ REGRESSION #1: processRefund — partial refund calculation
-   Test: "calculates 50% refund for order with percentage discount"
-   Old behavior: refund = (item_total × 0.5) - (discount × 0.5) = $21.25
-   New behavior: refund = (item_total - discount) × 0.5 = $21.00
-   Location: PricingService.ts:78 — discount applied before split, not after
-   Impact: Customers with percentage discounts get $0.25 less per refund
-
-❌ REGRESSION #2: cancelOrder — inventory not restored for bundled items
-   Test: "restores stock for all items in a bundle when order is canceled"
-   Old behavior: Iterates bundle.items and restores each
-   New behavior: Restores only the bundle SKU, not individual items
-   Location: InventoryService.ts:45 — bundle expansion logic not migrated
-   Impact: Canceling orders with bundles permanently reduces available stock
-
-✓ 29/31 behaviors preserved correctly.
+I fixed both issues — corrected the refund discount order of operations
+in PricingService and moved the bundle expansion logic into
+InventoryService. Run the regression tests again.
 ```
 
-### 4. Fix and re-verify
+All 31 regression tests pass against the updated code. Both specific fixes verified:
 
-```text
-I fixed both issues. Run the regression tests again.
-```
+- Partial refund with percentage discount: **$21.25** (matches old behavior)
+- Bundle cancellation restores **3 individual items** (matches old behavior)
+- All 29 other behaviors preserved
 
-```text
-Running 31 regression tests against fixed code...
+The agent also generates additional edge case coverage while it has context on the code:
 
-31/31 passed ✓
+**PricingService (+8 tests):**
+- Discount stacking (percentage on top of flat discount)
+- Zero-amount orders (free items, 100% discount)
+- Currency rounding at penny boundaries ($X.995 rounds correctly)
+- Negative amount guards (discounts can't exceed item total)
 
-Verification:
-  ✓ Partial refund with percentage discount: $21.25 (matches old behavior)
-  ✓ Bundle cancellation restores 3 individual items (matches old behavior)
-  ✓ All other behaviors preserved
+**InventoryService (+5 tests):**
+- Negative stock guard (cancellation can't push stock below zero)
+- Concurrent update handling (two cancellations for the same bundle)
+- Partial bundle restoration (only some items in bundle are restorable)
 
-Additional coverage generated:
-  +8 edge case tests for PricingService (discount stacking, zero-amount, currency rounding)
-  +5 edge case tests for InventoryService (negative stock guard, concurrent updates)
-
-Total test coverage for refactored modules: 94% (up from 67%)
-Safe to merge.
-```
+Total test coverage for the refactored modules: **94%** (up from 67%). The refactored code is now better tested than the original ever was — and crucially, the tests verify behavior, not implementation. If someone refactors again in six months, these same tests will catch regressions in the new structure. Safe to merge.
 
 ## Real-World Example
 
-Tomás, a senior developer at a 25-person e-commerce startup, needs to refactor the payment processing module. The original code was written by a developer who left, handles 14 payment scenarios, and has grown to 800 lines with deeply nested conditionals. It has 8 tests covering the 3 most common flows.
+Tomas, a senior developer at a 25-person e-commerce startup, needs to refactor the payment processing module. The code has become a liability — written by a developer who left a year ago, it handles 14 payment scenarios across credit cards, PayPal, and subscriptions, and has grown to 800 lines with deeply nested conditionals that nobody fully understands. Adding a new payment method means touching 6 different branches and hoping nothing breaks. It has 8 tests covering the 3 most common flows — new customer credit card payment, refund, and subscription renewal. The other 11 scenarios are untested.
 
-1. Tomás refactors the module into three focused services: PaymentGateway, InvoiceGenerator, and SubscriptionManager. The code is cleaner and each service is under 200 lines
-2. He asks the AI agent to run regression testing. The agent analyzes the diff, identifies 14 distinct payment scenarios from the old code's branching logic, and generates 38 regression tests
-3. The agent runs all 38 tests against the old code — all pass. Against the new code — 35 pass, 3 fail. One regression involves subscription trial-to-paid conversion skipping the proration step, which would have overcharged ~200 trial users on their first bill
-4. Tomás fixes the three regressions in 20 minutes. The agent re-verifies: all 38 tests pass on both implementations
-5. The refactored code ships with 94% test coverage (up from 31%). Three months later, when a new developer modifies the pricing logic, the regression tests catch two issues before they leave the PR
+He splits it into three focused services: PaymentGateway, InvoiceGenerator, and SubscriptionManager. Each service is under 200 lines and actually readable. The agent analyzes the diff, identifies all 14 payment scenarios from the old code's branching logic, and generates 38 regression tests.
+
+Against the old code — all 38 pass. Against the new code — 35 pass, 3 fail. One regression is particularly nasty: subscription trial-to-paid conversion skips the proration step, which would have overcharged roughly 200 trial users on their first bill. The overcharge is small enough per user ($3-8) that most wouldn't notice, but large enough in aggregate to trigger a dispute with the payment processor.
+
+Tomas fixes the three regressions in 20 minutes. The agent re-verifies: all 38 tests pass on both implementations. The refactored code ships with 94% test coverage (up from 31%). Three months later, when a new developer modifies the pricing logic, the regression tests catch two issues before they leave the PR. The safety net pays for itself almost immediately — the team starts refactoring with confidence instead of dread.

@@ -11,45 +11,47 @@ tags: [openvpn, xray, vpn, security, remote-work]
 
 ## The Problem
 
-A 25-person distributed startup needs secure access to internal services — staging servers, databases, admin panels — that should never be exposed to the public internet. The team currently relies on IP allowlists and SSH tunnels, which break constantly as people move between locations. Five team members also work from countries with heavy internet censorship where standard VPN protocols get detected and blocked within hours. The team needs a corporate VPN with split tunneling on the same server as an undetectable proxy for restricted regions.
+A 25-person distributed startup needs secure access to internal services — staging servers, databases, admin panels — that should never be exposed to the public internet. The team currently relies on IP allowlists and SSH tunnels, which break constantly as people move between home, coffee shops, and coworking spaces. Every location change means updating firewall rules and re-establishing tunnels.
+
+Five team members also work from countries with heavy internet censorship where standard VPN protocols get detected and blocked within hours. WireGuard lasts a day, OpenVPN over TCP maybe two, and commercial VPN services get flagged instantly. The team needs a corporate VPN with split tunneling on the same server as an undetectable proxy for restricted regions.
 
 ## The Solution
 
-Use `openvpn` to set up a corporate VPN with split tunneling, per-user certificates, and TOTP-based MFA. Use `xray` to configure VLESS with Reality protocol for censorship-resistant access that looks like normal HTTPS traffic. Both services coexist on one server — OpenVPN on UDP 1194 and Xray on TCP 443.
+Using the **openvpn** skill to set up a corporate VPN with split tunneling, per-user certificates, and TOTP-based MFA, alongside the **xray** skill to configure VLESS with Reality protocol for censorship-resistant access that looks like normal HTTPS traffic. Both services coexist on one server — OpenVPN on UDP 1194 and Xray on TCP 443.
 
 ## Step-by-Step Walkthrough
 
-### Step 1: Prepare the server
+### Step 1: Prepare the Server
+
+Start with a clean Ubuntu 22.04 server (2 CPU, 4GB RAM, public IP):
 
 ```text
-I have an Ubuntu 22.04 server (2 CPU, 4GB RAM, public IP). Install OpenVPN
-with EasyRSA, Google Authenticator for MFA, and Xray for the Reality proxy.
-Configure the firewall and enable IP forwarding.
+I have an Ubuntu 22.04 server (2 CPU, 4GB RAM, public IP). Install OpenVPN with EasyRSA, Google Authenticator for MFA, and Xray for the Reality proxy. Configure the firewall and enable IP forwarding.
 ```
+
+The base installation covers all packages, Xray via the official installer, firewall rules for all three services, and IP forwarding:
 
 ```bash
 apt update && apt upgrade -y
 apt install -y openvpn easy-rsa libpam-google-authenticator mailutils ufw
 
-# Install Xray via official installer
+# Xray via official installer
 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
 
 # Firewall: SSH + OpenVPN + Xray
 ufw allow 22/tcp && ufw allow 1194/udp && ufw allow 443/tcp && ufw enable
 
-# Enable IP forwarding for VPN routing
+# IP forwarding for VPN routing
 echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf && sysctl -p
 ```
 
-### Step 2: Build PKI and configure OpenVPN with split tunneling
+### Step 2: Build PKI and Configure OpenVPN
+
+The PKI uses elliptic curve crypto (secp384r1) instead of RSA for smaller keys and faster handshakes:
 
 ```text
-Create a CA with elliptic curve crypto, generate server certs, and configure
-OpenVPN with split tunneling — only internal traffic (10.0.0.0/8) goes through
-the VPN, internet stays direct. Enable MFA via PAM with Google Authenticator.
+Create a CA with elliptic curve crypto, generate server certs, and configure OpenVPN with split tunneling — only internal traffic (10.0.0.0/8) goes through the VPN, internet stays direct. Enable MFA via PAM with Google Authenticator.
 ```
-
-The agent initializes EasyRSA, builds the CA and server credentials, then writes a server config with split tunneling and PAM-based TOTP.
 
 ```bash
 make-cadir ~/openvpn-ca && cd ~/openvpn-ca
@@ -66,7 +68,7 @@ EOF
 cp pki/ca.crt pki/issued/server.crt pki/private/server.key pki/dh.pem ta.key /etc/openvpn/server/
 ```
 
-Key lines from `/etc/openvpn/server/server.conf`:
+The split tunneling configuration is the important part. Only internal network traffic routes through the VPN — everything else (web browsing, video calls, streaming) stays on the user's local connection. This means the VPN doesn't slow down daily internet use, and the server doesn't become a bandwidth bottleneck for 25 people:
 
 ```ini
 port 1194
@@ -92,8 +94,9 @@ max-clients 50
 crl-verify crl.pem
 ```
 
+NAT and service startup:
+
 ```bash
-# NAT for VPN client traffic
 IFACE=$(ip route get 1.1.1.1 | awk '{print $5; exit}')
 iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o "$IFACE" -j MASQUERADE
 apt install -y iptables-persistent && netfilter-persistent save
@@ -102,15 +105,13 @@ mkdir -p /var/log/openvpn
 systemctl enable --now openvpn-server@server
 ```
 
-### Step 3: Automate user provisioning and revocation
+### Step 3: Automate User Provisioning and Revocation
+
+Manual certificate generation for 25 people is a recipe for mistakes. One script handles the full onboarding: generate a client certificate, set up TOTP, build a self-contained `.ovpn` file, and email it to the new team member:
 
 ```text
-Write a provisioning script: given a username and email, generate a client
-certificate, set up TOTP, create a self-contained .ovpn file, and email it.
-Write a revocation script for instant access termination.
+Write a provisioning script: given a username and email, generate a client certificate, set up TOTP, create a self-contained .ovpn file, and email it. Write a revocation script for instant access termination.
 ```
-
-The agent creates `provision-user.sh` and `revoke-user.sh` for the full employee lifecycle.
 
 ```bash
 #!/bin/bash
@@ -128,7 +129,7 @@ mkdir -p /etc/openvpn/totp
 google-authenticator -t -d -f -r 3 -R 30 -w 3 -s "/etc/openvpn/totp/$USER" --no-confirm
 TOTP_SECRET=$(head -1 /etc/openvpn/totp/$USER)
 
-# Build .ovpn with embedded certs (self-contained, no extra files needed)
+# Build self-contained .ovpn (no extra files needed)
 mkdir -p ~/client-configs
 cat > ~/client-configs/"$USER".ovpn <<OVPN
 client
@@ -153,7 +154,6 @@ $(cat "$CA_DIR/ta.key")
 </tls-auth>
 OVPN
 
-# Email config with setup instructions
 mail -s "VPN Access" -A ~/client-configs/"$USER".ovpn "$EMAIL" <<MAIL
 Your .ovpn file is attached. Install OpenVPN Connect, import it, and set up
 Google Authenticator with secret: $TOTP_SECRET
@@ -161,6 +161,8 @@ When connecting: username=$USER, password=your TOTP code.
 MAIL
 echo "Provisioned $USER ($EMAIL)"
 ```
+
+Revocation is equally fast — one command kills access instantly:
 
 ```bash
 #!/bin/bash
@@ -173,21 +175,23 @@ systemctl restart openvpn-server@server
 echo "Revoked access for $USER"
 ```
 
-### Step 4: Configure Xray VLESS with Reality protocol
+No manual certificate management, no forgetting to revoke when someone leaves. The entire employee VPN lifecycle is two commands.
+
+### Step 4: Configure Xray VLESS with Reality Protocol
+
+For the five team members in restricted countries, standard VPN protocols won't survive. Reality protocol makes traffic indistinguishable from a normal HTTPS connection to microsoft.com — DPI systems see what looks like legitimate TLS 1.3 traffic and let it through:
 
 ```text
-Set up Xray with VLESS + Reality for 5 users. Reality impersonates a real
-website (microsoft.com) to defeat DPI — no domain or TLS cert needed.
-Enable per-user traffic stats via the Xray stats API.
+Set up Xray with VLESS + Reality for 5 users. Reality impersonates a real website (microsoft.com) to defeat DPI — no domain or TLS cert needed. Enable per-user traffic stats via the Xray stats API.
 ```
 
 ```bash
-# Generate credentials
-xray uuid    # Run 5 times — save as UUID_1 through UUID_5
+# Generate credentials — one UUID per user, one x25519 keypair for the server
+xray uuid    # Run 5 times for 5 users
 xray x25519  # Save the private and public key pair
 ```
 
-The Xray config at `/usr/local/etc/xray/config.json`:
+The Xray configuration at `/usr/local/etc/xray/config.json`:
 
 ```json
 {
@@ -238,16 +242,16 @@ The Xray config at `/usr/local/etc/xray/config.json`:
 }
 ```
 
-### Step 5: Add subscription server and monitoring
+### Step 5: Add Subscription Server and Monitoring
+
+Mobile clients like v2rayNG and Hiddify support subscription links that auto-configure the connection. A lightweight subscription server makes onboarding trivial — share a link and the client configures itself:
 
 ```text
-Create a subscription server for v2rayNG/Hiddify compatibility, monitoring
-scripts for both services, and a weekly Xray auto-update cron job.
+Create a subscription server for v2rayNG/Hiddify compatibility, monitoring scripts for both services, and a weekly Xray auto-update cron job.
 ```
 
-Subscription server (`sub-server.js`):
-
 ```javascript
+// sub-server.js — subscription endpoint for mobile clients
 const http = require("http");
 const SERVER_IP = "YOUR_SERVER_IP";
 const PBK = "YOUR_PUBLIC_KEY";
@@ -276,7 +280,7 @@ http.createServer((req, res) => {
 }).listen(8080, "127.0.0.1");
 ```
 
-Monitoring scripts:
+Monitoring scripts for both services:
 
 ```bash
 #!/bin/bash
@@ -300,32 +304,31 @@ for user in alice bob carol dave eve; do
 done
 ```
 
+Weekly auto-update keeps Xray current with the latest protocol improvements:
+
 ```bash
-# Weekly Xray auto-update — add to crontab
+# Add to crontab — updates every Sunday at 3 AM
 0 3 * * 0 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install && systemctl restart xray
 ```
 
-Start and verify:
+### Step 6: Test End-to-End
 
 ```bash
-systemctl enable --now xray
-systemctl status xray openvpn-server@server
-```
-
-### Step 6: Test end-to-end
-
-```bash
-# OpenVPN — verify split tunneling
+# OpenVPN — verify split tunneling works
 openvpn --config alice.ovpn
 ping 10.0.0.1        # Reaches internal network through VPN
 curl ifconfig.me     # Shows client's own IP (internet stays direct)
 
-# Xray — import subscription in v2rayNG, then test
+# Xray — import subscription in v2rayNG, then verify
 curl -x socks5://127.0.0.1:1080 https://ifconfig.me  # Shows server IP
 ```
 
+If `ping 10.0.0.1` succeeds and `curl ifconfig.me` shows the client's own IP (not the server's), split tunneling is working correctly. Internal traffic routes through the VPN, everything else stays direct.
+
 ## Real-World Example
 
-Leo provisions the dual-stack server on a Friday afternoon. By Monday, all 25 employees have `.ovpn` files and Google Authenticator configured via the provisioning script. Split tunneling means developers access internal staging servers through the VPN while video calls and web browsing use their local connection. When an intern's contract ends, one `revoke-user.sh` command kills access in seconds.
+Leo provisions the dual-stack server on a Friday afternoon. By Monday, all 25 employees have `.ovpn` files and Google Authenticator configured via the provisioning script. Split tunneling means developers access internal staging servers through the VPN while video calls and web browsing use their local connection — no bandwidth bottleneck, no latency on Zoom calls.
 
-The five team members in restricted countries import subscription links into v2rayNG. Reality protocol makes their traffic indistinguishable from normal HTTPS visits to microsoft.com, so DPI systems let it through. Over three months, the proxy stays unblocked while other VPN solutions get detected within days. The weekly auto-update keeps Xray current, and monitoring scripts give Leo visibility into usage across both services.
+When an intern's contract ends on their last day, one `revoke-user.sh` command kills access in seconds. No waiting for IT tickets, no "can someone remove their access?" messages in Slack a week later.
+
+The five team members in restricted countries import subscription links into v2rayNG. Reality protocol makes their traffic indistinguishable from normal HTTPS visits to microsoft.com, so DPI systems let it through. Over three months, the proxy stays unblocked while other VPN solutions in the same countries get detected and blocked within days. The weekly auto-update keeps Xray current, and monitoring scripts give Leo visibility into usage across both services.

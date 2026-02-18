@@ -21,11 +21,11 @@ Install the skill:
 
 ## Step-by-Step Walkthrough
 
-### 1. Tell the agent what to test
+### 1. Define what to test
 
 > Test the CRUD operations on our /api/products endpoint. The base URL is http://localhost:3000 and auth uses a Bearer token from the LOGIN_TOKEN env var.
 
-### 2. The agent builds and sends requests
+### 2. Build and send requests
 
 It constructs requests for each operation (Create, Read, Update, Delete), chains them so the created resource ID is used in subsequent requests, and includes proper headers and auth.
 

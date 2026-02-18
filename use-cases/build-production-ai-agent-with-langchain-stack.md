@@ -21,84 +21,240 @@ Dani needs an agent that can reason through multi-step questions, knows when to 
 
 ## The Solution
 
-Build a stateful RAG agent with LangGraph for multi-step reasoning, LangChain for retrieval and tool integration, and LangSmith for tracing, evaluation, and monitoring.
+Using the **langchain**, **langgraph**, and **langsmith** skills, the workflow builds a stateful RAG agent with LangGraph for multi-step reasoning, LangChain for retrieval and tool integration, and LangSmith for tracing, evaluation, and monitoring — turning a flaky chatbot into a production system that blocks its own deployment when quality drops.
 
-### Prompt for Your AI Agent
+## Step-by-Step Walkthrough
 
-```text
-I need to build a production support agent for our SaaS documentation. Here's the setup:
+### Step 1: Build the Document Pipeline
 
-**Documentation:**
-- 1,200 pages across API docs, changelogs, troubleshooting guides, KB articles
-- Docs are in a /docs folder as markdown files
-- Docs update weekly (new features, deprecations, version changes)
+Before any agent logic, 1,200 markdown files need to become searchable vectors. The pipeline loads docs from the `/docs` folder, splits them with overlap so context isn't lost at chunk boundaries, and stores them in Chroma with metadata filters for doc type, version, and last-updated date:
 
-**Requirements:**
-1. Multi-step reasoning: agent should break complex questions into sub-queries
-2. Source attribution: every answer must cite which doc pages it used
-3. Confidence scoring: agent should flag low-confidence answers for human review
-4. Evaluation pipeline: automated quality checks before deployment
-5. Full observability: trace every query, monitor latency, track accuracy
-
-**Architecture:**
-- Use LangGraph for the agent workflow with these nodes:
-  - `classify`: Determine if the question needs simple retrieval, multi-step reasoning, or human escalation
-  - `retrieve`: Search vector store with the query (or sub-queries)
-  - `generate`: Produce answer with citations from retrieved docs
-  - `evaluate`: Self-check the answer quality and confidence
-  - `escalate`: Route low-confidence answers to human support
-
-- Use LangChain for:
-  - Document loading (markdown files from /docs)
-  - Text splitting with RecursiveCharacterTextSplitter (chunk_size=800, overlap=200)
-  - Embeddings with OpenAI text-embedding-3-small
-  - Chroma vector store with metadata filters (doc_type, version, last_updated)
-  - Structured output for confidence scores and citations
-
-- Use LangSmith for:
-  - Automatic tracing of all agent runs
-  - Evaluation dataset from 200 real support tickets with expected answers
-  - Custom evaluators: correctness, citation accuracy, helpfulness
-  - CI/CD integration: block deployment if accuracy drops below 90%
-  - Production monitoring: alert on latency > 10s or error rate > 2%
-
-**State Schema:**
 ```python
+from langchain_community.document_loaders import DirectoryLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+
+# Load all markdown docs with metadata
+loader = DirectoryLoader("./docs", glob="**/*.md", show_progress=True)
+docs = loader.load()
+
+# Split with overlap — chunk_size=800 keeps context tight,
+# overlap=200 ensures no answer falls between cracks
+splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=200)
+chunks = splitter.split_documents(docs)
+
+# Tag each chunk with filterable metadata
+for chunk in chunks:
+    chunk.metadata["doc_type"] = classify_doc(chunk.metadata["source"])
+    chunk.metadata["last_updated"] = get_file_mtime(chunk.metadata["source"])
+
+# Embed and store — text-embedding-3-small balances cost and quality
+vectorstore = Chroma.from_documents(
+    chunks,
+    OpenAIEmbeddings(model="text-embedding-3-small"),
+    collection_name="support_docs",
+    persist_directory="./chroma_db"
+)
+print(f"Indexed {len(chunks)} chunks from {len(docs)} documents")
+```
+
+The metadata matters more than it looks. When a user asks about "v3 webhooks," the retriever can filter to `doc_type=api` and `version=v3` before doing similarity search — no more pulling deprecated v2 docs into the context window.
+
+### Step 2: Create the LangGraph Agent with Conditional Routing
+
+This is where the architecture diverges from basic RAG. Instead of a linear retrieve-then-generate pipeline, the agent is a state machine with five nodes. Each node reads and writes to shared state, and conditional edges decide what happens next:
+
+```python
+from langgraph.graph import StateGraph, END
+from typing import TypedDict, Annotated
+from langgraph.graph.message import add_messages
+
 class SupportState(TypedDict):
     messages: Annotated[list, add_messages]
-    question_type: str  # "simple", "multi_step", "escalate"
+    question_type: str        # "simple", "multi_step", "escalate"
     sub_queries: list[str]
-    retrieved_docs: list[Document]
+    retrieved_docs: list
     answer: str
     citations: list[str]
     confidence: float
     needs_human: bool
+
+graph = StateGraph(SupportState)
+
+# Add nodes — each is a function that takes state and returns partial state
+graph.add_node("classify", classify_question)
+graph.add_node("decompose", decompose_into_sub_queries)
+graph.add_node("retrieve", retrieve_documents)
+graph.add_node("generate", generate_answer)
+graph.add_node("evaluate", evaluate_confidence)
+graph.add_node("escalate", route_to_human)
+
+# Conditional routing — this is the key difference from basic RAG
+graph.add_conditional_edges("classify", lambda s: s["question_type"], {
+    "simple": "retrieve",        # Direct questions go straight to retrieval
+    "multi_step": "decompose",   # Complex questions get broken into sub-queries
+    "escalate": "escalate",      # Ambiguous questions go to a human
+})
+
+graph.add_edge("decompose", "retrieve")  # Sub-queries feed into retrieval
+graph.add_edge("retrieve", "generate")
+graph.add_conditional_edges("evaluate", lambda s: s["needs_human"], {
+    True: "escalate",   # Low confidence → human review
+    False: END,         # High confidence → return answer
+})
+
+graph.set_entry_point("classify")
+agent = graph.compile(checkpointer=SqliteSaver("./checkpoints.db"))
 ```
 
-Start with the LangGraph agent, then add the evaluation pipeline, then set up monitoring.
-```text
+The `classify` node is the traffic cop. A question like "What's the API rate limit?" routes straight to retrieval. "How do I migrate from v2 webhooks to v3 and update my auth?" gets decomposed into two sub-queries that each retrieve their own context. "I'm having a weird issue with my account" — too vague, escalate to a human immediately rather than guessing.
 
-### What Your Agent Will Do
+### Step 3: Add Confidence Scoring and Self-Evaluation
 
-1. **Read the skill files** for `langchain`, `langgraph`, and `langsmith` to understand the full stack
-2. **Set up the project** — install dependencies, configure environment variables, initialize vector store
-3. **Build the document pipeline** — load markdown docs, split into chunks, embed with metadata, store in Chroma
-4. **Create the LangGraph agent** with classify → retrieve → generate → evaluate → escalate nodes
-5. **Add conditional routing** — simple questions go straight to generate, complex ones get sub-query decomposition, unclear ones escalate
-6. **Implement persistence** — SQLite checkpointing so conversations maintain state across messages
-7. **Wire up LangSmith tracing** — automatic for all LangChain calls, manual `@traceable` for custom logic
-8. **Build the evaluation dataset** — 200 question/answer pairs from real support tickets
-9. **Create evaluators** — correctness (does the answer match?), citation accuracy (are sources real?), confidence calibration (does the confidence score correlate with actual quality?)
-10. **Set up CI/CD quality gate** — pytest runs evaluation suite, fails the build if accuracy < 90%
-11. **Configure production monitoring** — dashboards for latency, token usage, error rate, confidence distribution
+The generate node doesn't just produce an answer — it scores its own confidence using structured output. This is what makes the difference between a chatbot that guesses and one that knows when it's guessing:
 
-### Expected Outcome
+```python
+from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
 
-- **Agent accuracy**: 91% correct answers (up from 65% with basic RAG)
-- **Multi-step handling**: Complex questions decomposed into 2-4 sub-queries, each retrieving relevant context
-- **Confidence calibration**: 94% correlation between confidence score and actual correctness
-- **Escalation rate**: 12% of questions routed to humans (down from 35% needing correction)
-- **Observability**: Every query traceable in LangSmith with full node-by-node breakdown
-- **Deployment safety**: Automated eval blocks bad deployments; last 3 regressions caught before production
-- **Latency**: p50 = 2.1s, p95 = 5.8s (acceptable for support use case)
-- **Monthly cost**: $1,800 in API calls serving 12,000 queries — $0.15/query vs $4.20/ticket for human support
+class SupportAnswer(BaseModel):
+    answer: str = Field(description="The answer to the user's question")
+    citations: list[str] = Field(description="Source doc paths used")
+    confidence: float = Field(description="0.0-1.0 confidence score")
+    reasoning: str = Field(description="Why this confidence level")
+
+llm = ChatOpenAI(model="gpt-4o").with_structured_output(SupportAnswer)
+
+def generate_answer(state: SupportState) -> dict:
+    context = "\n\n".join(doc.page_content for doc in state["retrieved_docs"])
+    result = llm.invoke([
+        {"role": "system", "content": f"""Answer the support question using ONLY the provided context.
+Cite specific doc paths. If the context doesn't contain the answer, set confidence below 0.5.
+
+Context:
+{context}"""},
+        {"role": "user", "content": state["messages"][-1].content}
+    ])
+    return {
+        "answer": result.answer,
+        "citations": result.citations,
+        "confidence": result.confidence,
+        "needs_human": result.confidence < 0.7
+    }
+```
+
+The 0.7 threshold isn't arbitrary — it comes from calibrating against the evaluation dataset in the next step. Answers below 0.7 confidence are right only 40% of the time. Above 0.7, accuracy jumps to 94%.
+
+### Step 4: Wire Up LangSmith Tracing and Evaluation
+
+Every query that flows through the agent automatically gets traced in LangSmith — node-by-node, with inputs, outputs, latency, and token usage. But tracing alone doesn't prevent regressions. The evaluation pipeline does.
+
+First, build a dataset from 200 real support tickets where the team already knows the right answer:
+
+```python
+from langsmith import Client
+
+ls_client = Client()
+
+# Create evaluation dataset from real support tickets
+dataset = ls_client.create_dataset("support-eval-v1")
+for ticket in labeled_tickets:
+    ls_client.create_example(
+        inputs={"question": ticket["question"]},
+        outputs={"expected_answer": ticket["answer"],
+                 "expected_sources": ticket["source_docs"]},
+        dataset_id=dataset.id,
+    )
+```
+
+Then define custom evaluators that check what matters — not just "is the answer similar" but "are the citations real documents that exist":
+
+```python
+from langsmith.evaluation import evaluate
+
+def citation_accuracy(run, example):
+    """Check that cited sources actually exist and are relevant."""
+    cited = run.outputs.get("citations", [])
+    expected = example.outputs["expected_sources"]
+    if not cited:
+        return {"key": "citation_accuracy", "score": 0.0}
+    valid = sum(1 for c in cited if any(e in c for e in expected))
+    return {"key": "citation_accuracy", "score": valid / len(cited)}
+
+results = evaluate(
+    agent.invoke,
+    data="support-eval-v1",
+    evaluators=[correctness_evaluator, citation_accuracy, helpfulness_evaluator],
+    experiment_prefix="agent-v2.3",
+)
+print(f"Accuracy: {results.aggregate['correctness']:.1%}")
+print(f"Citation accuracy: {results.aggregate['citation_accuracy']:.1%}")
+```
+
+### Step 5: Set Up the CI/CD Quality Gate
+
+Evaluation runs locally during development, but the real safety net is the CI pipeline. Every pull request that touches agent code triggers a full evaluation run. If accuracy drops below 90%, the build fails:
+
+```yaml
+# .github/workflows/agent-eval.yml
+name: Agent Evaluation
+on:
+  pull_request:
+    paths: ["src/agent/**", "src/prompts/**", "docs/**"]
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run evaluation suite
+        env:
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python -m pytest tests/test_evaluation.py \
+            --tb=short \
+            -x  # Stop on first failure
+      - name: Check accuracy threshold
+        run: python scripts/check_eval_results.py --min-accuracy 0.90
+```
+
+The `check_eval_results.py` script pulls the latest evaluation run from LangSmith and fails if any metric drops below threshold. Three regressions have been caught this way before reaching production — a prompt tweak that tanked citation accuracy, a chunk size change that broke multi-step retrieval, and a model swap that hallucinated more.
+
+### Step 6: Production Monitoring and Alerting
+
+Once deployed, LangSmith monitors every query in production. Dashboards track latency percentiles, token usage, confidence distribution, and error rates. Alerts fire when things drift:
+
+```python
+from langsmith import traceable
+
+@traceable(name="support_agent_query")
+def handle_support_query(question: str, user_id: str) -> dict:
+    """Production entry point — automatically traced in LangSmith."""
+    config = {"configurable": {"thread_id": user_id}}
+    result = agent.invoke({"messages": [("user", question)]}, config)
+
+    # Log to monitoring
+    track_metrics({
+        "confidence": result["confidence"],
+        "question_type": result["question_type"],
+        "latency_ms": result.get("_latency_ms"),
+        "escalated": result["needs_human"],
+    })
+    return result
+```
+
+The monitoring dashboard shows patterns that evaluations miss. Confidence scores trending downward across a week usually means docs have changed and embeddings are stale — time to re-index. A spike in escalation rate after a deploy means the classify node is being too conservative. These signals are visible in LangSmith within hours, not days.
+
+## Real-World Example
+
+Two months after launching the LangGraph agent, Dani's support metrics tell the story. Accuracy sits at 91%, up from 65% with the basic RAG chatbot. The 35% human-correction rate dropped to 12% — and those 12% are genuine edge cases that get flagged automatically by the confidence scoring, not silent failures that erode trust.
+
+The multi-step handling is the biggest win. Questions like "How do I migrate from v2 webhooks to v3 and also update my OAuth scopes?" used to get a partial answer or a hallucination. Now they decompose into sub-queries, each pulling the right docs, and the final answer cites both the webhook migration guide and the OAuth changelog.
+
+Monthly cost went from $2,400 in API calls with negative ROI to $1,800 serving 12,000 queries at $0.15 each — compared to $4.20 per ticket when a human handles it. The CI quality gate has blocked 3 bad deployments that would have degraded accuracy. And when something does go wrong, the team opens the LangSmith trace, sees exactly which node failed and why, and fixes it in the same afternoon. No more "the bot gave a bad answer last Tuesday and we have no idea why."

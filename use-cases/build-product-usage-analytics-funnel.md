@@ -11,111 +11,141 @@ tags: [analytics, funnel, product, retention, user-behavior]
 
 ## The Problem
 
-A 15-person B2B SaaS startup has 2,000 registered users but only 300 active weekly. The product team does not know where users drop off — is it during onboarding, after the first project creation, or somewhere else? They have basic page-view analytics but no funnel tracking. The founder keeps asking "why aren't users sticking?" and nobody has data to answer. Setting up proper funnel analytics has been on the backlog for months, but the team has no dedicated data analyst and the developers are focused on shipping features.
+Tomas runs a 15-person B2B SaaS startup with 2,000 registered users. Only 300 are active weekly. That is an 85% drop-off between signup and regular usage, and the founder keeps asking "why aren't users sticking?" Nobody has data to answer.
+
+The product team has basic page-view analytics -- they know users visit the dashboard -- but they have no idea where users drop off. Is it during onboarding? After creating the first project? When they try to invite teammates and nobody responds? The team debates this in every product meeting, and every person has a different theory based on the last user they talked to.
+
+Setting up proper funnel analytics has been on the backlog for months, but there is no dedicated data analyst and the developers are focused on shipping features. Every week the gap between signups and active users widens, and the team is making product decisions on gut feeling. They shipped three onboarding improvements last quarter based on hunches -- none of them moved the weekly active number.
 
 ## The Solution
 
-Use the **analytics-tracking** skill to instrument key user events, the **data-analysis** skill to query and segment funnel data, and the **data-analysis** skill to produce funnel charts and retention curves the team can act on.
+Use the **analytics-tracking** skill to instrument key user events, and the **data-analysis** skill to query, segment, and visualize funnel data the team can act on. The workflow goes from zero instrumentation to actionable funnel insights in under a week: define stages, add tracking code, collect data, analyze drop-offs, and produce visualizations that drive product decisions.
 
 ## Step-by-Step Walkthrough
 
-### 1. Define the critical funnel stages
+### Step 1: Define the Critical Funnel Stages
 
-Tell the agent about your product:
+The first step is defining what "activation" actually means. Most teams track too few stages (signup and monthly active) or too many (every click). The sweet spot is 5-8 stages that represent genuine progression toward becoming a retained user.
 
 ```text
 We're a project management SaaS. Define a user activation funnel with these stages: signup → email verified → first project created → first team member invited → first task completed → returned within 7 days. Also suggest any stages I might be missing.
 ```
 
-### 2. The agent designs the funnel
+The activation funnel needs seven stages, not six. Profile setup completion is a commonly overlooked drop-off point -- users who bail on "tell us about your team" forms never reach the product:
 
-```text
-Recommended Activation Funnel:
-1. Signup completed
-2. Email verified
-3. Profile setup completed (suggested addition — often a drop-off point)
-4. First project created
-5. First team member invited
-6. First task completed
-7. Returned within 7 days (retention signal)
+1. **Signup completed** -- account created
+2. **Email verified** -- clicked confirmation link
+3. **Profile setup completed** -- filled in team name and role
+4. **First project created** -- created (not just viewed) a project
+5. **First team member invited** -- sent at least one invite
+6. **First task completed** -- marked a task as done
+7. **Returned within 7 days** -- came back after initial session
 
-Suggested additional tracking:
-- Time between stages (identify where users stall)
-- Feature discovery events (which features do retained users try first?)
-```
+Two additional tracking dimensions make the funnel actionable rather than just informational:
 
-### 3. Instrument the tracking events
+- **Time between stages**: A 4-minute median for email verification is healthy. An 18-minute median for first project creation means users are lost. Without timing data, both stages look like similar drop-offs.
+- **Feature discovery events**: Which features do retained users try first? If retained users all discover the template gallery before creating a project, that is a strong signal to surface templates earlier in onboarding.
+
+### Step 2: Instrument the Tracking Events
 
 ```text
 Generate the tracking code for these funnel events. We use a Node.js backend with Express and a React frontend. Use a provider-agnostic approach so we can send events to any analytics backend.
 ```
 
-The agent generates event-tracking functions for both frontend and backend, with consistent naming and properties.
+The tracking layer is provider-agnostic -- a thin wrapper that can send to Mixpanel, Amplitude, PostHog, or a custom backend without changing any call sites:
 
-### 4. Analyze the funnel data
+```typescript
+// lib/analytics.ts — provider-agnostic event tracking
 
-Once data is flowing (or using historical data if available):
+type FunnelEvent =
+  | { name: 'signup_completed'; properties: { source: string; referrer: string } }
+  | { name: 'email_verified'; properties: { delay_seconds: number } }
+  | { name: 'profile_setup_completed'; properties: { team_size: string; role: string } }
+  | { name: 'first_project_created'; properties: { template_used: boolean; template_name?: string } }
+  | { name: 'first_member_invited'; properties: { invite_method: 'email' | 'link' | 'slack' } }
+  | { name: 'first_task_completed'; properties: { time_to_complete_hours: number } }
+  | { name: 'user_returned'; properties: { days_since_signup: number; session_count: number } };
+
+export function track(event: FunnelEvent): void {
+  analyticsProvider.track(event.name, {
+    ...event.properties,
+    timestamp: new Date().toISOString(),
+    userId: getCurrentUserId(),
+  });
+}
+```
+
+The typed union ensures every call site provides the right properties for each event. No more passing `{ event: "signup" }` from one file and `{ type: "user_signup" }` from another -- the TypeScript compiler catches mismatches at build time.
+
+Backend events (signup, email verification) fire from Express middleware. Frontend events (project creation, task completion) fire from React components. Both use the same event names and property shapes, so when querying funnel data later, there is no mismatch between what the frontend and backend report.
+
+One subtle but important detail: each event captures timing information. `delay_seconds` on email verification tracks how long users take to open the confirmation email. `time_to_complete_hours` on the first task tracks the gap between project creation and meaningful engagement. These timing properties turn the funnel from a "what" tool into a "where do users stall" diagnostic.
+
+### Step 3: Analyze the Funnel Data
+
+After two weeks of data collection, the numbers tell a clear story. Out of 1,847 signups in the last 90 days, only 72 made it all the way to "returned within 7 days" -- a 3.9% end-to-end activation rate:
 
 ```text
 Analyze our funnel data from the last 90 days. Show conversion rates between each stage, median time between stages, and segment by signup source (organic, paid, referral).
 ```
 
-```text
-Funnel Analysis (last 90 days, 1,847 signups):
+| Stage Transition | Conversion | Users | Median Time |
+|---|---|---|---|
+| Signup -> Email verified | 78% | 1,441 | 4 min |
+| Email verified -> Profile setup | 61% | 879 | 2 min |
+| Profile setup -> First project | 54% | 475 | 18 min |
+| First project -> Invite teammate | 31% | 147 | 3 days |
+| Invite teammate -> First task | 72% | 106 | 12 min |
+| First task -> 7-day return | 68% | 72 | 2 days |
 
-Signup → Email verified:      78% (1,441) — median: 4 min
-Email verified → Profile:     61% (879)   — median: 2 min
-Profile → First project:      54% (475)   — median: 18 min ⚠️
-First project → Invite:       31% (147)   — median: 3 days ⚠️
-Invite → First task:          72% (106)   — median: 12 min
-First task → 7-day return:    68% (72)    — median: 2 days
+The good news: the stages that work, work well. Email verification at 78% is healthy. Once users invite a teammate, 72% complete a task -- the collaborative experience holds. The funnel is not uniformly leaky; it has two specific bottlenecks.
 
-Biggest drop-offs:
-1. Profile → First project (54%): users stall at blank project screen
-2. First project → Invite (31%): users don't discover team features
-```
+Two massive drop-offs jump out immediately.
 
-### 5. Segment by user type
+The first is profile-to-project at 54% -- users stall at the blank project screen with no guidance. The median time of 18 minutes is telling: users are not leaving instantly, they are poking around for 18 minutes and then giving up. That is frustration, not disinterest. A blank screen with a "Create Project" button is not enough -- these users need templates, examples, or a guided setup.
 
-Dig deeper into the data:
+The second is project-to-invite at 31% with a 3-day median -- users are not discovering the team features, or they are evaluating solo before deciding whether to bring teammates in. The 3-day gap is especially concerning because it means the product fails to demonstrate collaborative value in the first session. By day 3, urgency has faded.
+
+### Step 4: Segment by User Type
 
 ```text
 Break down the funnel by signup source and company size. Are enterprise trial users behaving differently from self-serve signups?
 ```
 
-```text
-Segment Analysis:
+The segments tell a dramatically different story:
 
-Self-serve (organic): 1,200 signups
-- Signup → First project: 41%
-- First project → 7-day return: 18%
+| Segment | Signups | Signup -> First Project | First Project -> 7-day Return |
+|---|---|---|---|
+| Self-serve (organic) | 1,200 | 41% | 18% |
+| Self-serve (paid ads) | 400 | 38% | 12% |
+| Enterprise trials | 247 | 82% | 61% |
 
-Self-serve (paid ads): 400 signups
-- Signup → First project: 38%
-- First project → 7-day return: 12%
+Enterprise users who get a guided onboarding call have 3x the activation rate. The call does not teach them anything magical -- it just walks them through creating a project with their real data instead of staring at a blank screen. Self-serve users need in-product guidance to match that experience.
 
-Enterprise trials: 247 signups
-- Signup → First project: 82%
-- First project → 7-day return: 61%
+Paid ad users perform worst of all at 12% seven-day return. This suggests a targeting problem -- the ads are reaching people who are curious but not ready to commit, or the landing page sets expectations the product does not immediately deliver on. That is $400/month in ad spend with a 12% activation rate vs. organic users at 18%. The paid channel may not be broken, but it needs different onboarding treatment than organic signups.
 
-Key insight: Enterprise users who get a guided onboarding call have 3x
-the activation rate. Self-serve users need in-product guidance to match.
-```
-
-### 6. Visualize and share findings
+### Step 5: Visualize and Share Findings
 
 ```text
 Create a funnel visualization showing these conversion rates with absolute numbers. Also create a retention curve chart showing weekly retention for cohorts from the last 3 months. Include the segment breakdown.
 ```
 
-The agent produces publication-ready funnel charts, cohort retention curves, and segment comparison views ready for the next product review meeting.
+The output includes three types of visualizations ready for the product review meeting:
+
+- **Funnel chart**: conversion rates with absolute numbers at each stage, showing exactly where the 1,847 signups narrow to 72 retained users
+- **Cohort retention curves**: weekly retention for each monthly cohort, so the team can see whether recent changes are improving retention
+- **Segment comparison**: side-by-side funnels for organic, paid, and enterprise users
+
+The retention curve reveals another insight: users who invite a teammate within 48 hours have 3x higher 30-day retention than users who invite after a week. The invite is not just a growth lever -- it is the single strongest predictor of whether a user sticks.
+
+The cohort view is particularly revealing. The January cohort (when the team shipped a quick-start wizard) retained 22% better at week 4 than the December cohort. That one feature change moved the needle more than the three marketing campaigns combined. Without cohort tracking, they would have credited the improvement to ad spend changes that happened in the same period.
 
 ## Real-World Example
 
-Tomas, a product manager at a 15-person B2B SaaS startup, needs to answer the founder's question: "Why do we have 2,000 signups but only 300 weekly active users?"
+Armed with data for the first time, Tomas presents two concrete findings at the weekly product meeting: 46% of users never create their first project (they stall at the blank screen for 18 minutes and leave), and users who invite a teammate within 48 hours retain at 3x the rate of those who invite later.
 
-1. Tomas asks the agent to design an activation funnel — it defines 7 stages and suggests tracking time between each
-2. The agent generates tracking code for the React frontend and Express backend — the engineering team integrates it in half a day
-3. After two weeks of data collection, Tomas asks for a funnel analysis — the agent reveals that 46% of users never create their first project, stalling at the blank project screen
-4. The agent creates funnel visualizations and a retention curve showing that users who invite a teammate within 48 hours have 3x higher 30-day retention
-5. Armed with data, the team ships a project template picker and an onboarding prompt to invite teammates — first-project creation jumps from 54% to 71% in the next month
+The team ships two changes: a project template picker that replaces the blank screen with "Start with a template" options, and an onboarding prompt that nudges users to invite a teammate before creating their first task. The engineering team integrates the tracking code in half a day.
+
+First-project creation jumps from 54% to 71% in the next month. The invite rate climbs more slowly but steadily. Weekly active users climb from 300 to 410 in the first month, and the team has a clear roadmap of what to build next: an in-product nudge to invite teammates at the 48-hour mark, when the data shows invites have the highest correlation with retention.
+
+For the first time, the founder's question has a data-driven answer -- and the team knows exactly which levers to pull. The funnel dashboard becomes a fixture in every weekly product meeting.

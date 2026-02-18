@@ -11,7 +11,9 @@ tags: [websocket, collaboration, realtime, editor, crdt, presence]
 
 ## The Problem
 
-Noa is building an internal knowledge base tool for her team. The key requirement: multiple people need to edit the same document at the same time, like Google Docs but self-hosted and private. She needs live cursors showing who's editing where, real-time text synchronization without conflicts, and user authentication so edits are attributed. Off-the-shelf solutions either cost too much or don't meet the data residency requirements.
+Noa is building an internal knowledge base tool for her five-person engineering team. The key requirement: multiple people need to edit the same document at the same time, like Google Docs but self-hosted and private. Off-the-shelf solutions either cost $12/user/month (adds up fast as the company grows) or run on someone else's servers -- which fails the data residency requirements for their enterprise clients.
+
+The real engineering challenge is conflict resolution. When two people type at the same position simultaneously, both edits need to survive. Naive approaches (last-write-wins, locking) either lose data or destroy the collaborative experience. Noa needs live cursors showing who is editing where, real-time text synchronization without conflicts, and user authentication so edits are attributed.
 
 ## The Solution
 
@@ -19,7 +21,7 @@ Use **auth-system-setup** to handle user accounts and session management, **webs
 
 ## Step-by-Step Walkthrough
 
-### 1. Set up authentication and document permissions
+### Step 1: Set Up Authentication and Document Permissions
 
 ```text
 I need user authentication for the editor. Simple email + password login,
@@ -28,32 +30,31 @@ The owner can share documents with others and set their role. Use
 PostgreSQL for storage.
 ```
 
-```text
-Created auth/users.ts — User management:
-  Table: users (id, email, password_hash, display_name, avatar_color, created_at)
-  avatar_color: randomly assigned from 12 distinct colors (for cursor display)
-  POST /auth/register — email + password, bcrypt(12 rounds)
-  POST /auth/login — returns JWT (24h expiry, contains user.id + display_name)
+Authentication is straightforward: email/password registration with bcrypt, JWT sessions with 24-hour expiry. Each user gets a randomly assigned avatar color from 12 distinct options -- these colors identify cursors in the editor later.
 
-Created auth/permissions.ts — Document access control:
-  Table: document_permissions (document_id, user_id, role, granted_at, granted_by)
-  Roles: owner (full control), editor (read + write), viewer (read only)
+Document access uses a simple permission model:
 
-  POST /documents/:id/share — owner only
-    Body: { email, role } → looks up user, creates permission
-  GET /documents/:id/collaborators — lists users with access
-  DELETE /documents/:id/share/:userId — owner only, revoke access
+| Role | Read | Write | Share | Delete |
+|---|---|---|---|---|
+| Owner | Yes | Yes | Yes | Yes |
+| Editor | Yes | Yes | No | No |
+| Viewer | Yes | No | No | No |
 
-  Middleware: requireDocumentAccess(minRole)
-    Checks JWT → extracts user → queries document_permissions
-    Returns 403 if role insufficient
+```typescript
+// auth/permissions.ts — Document access control
 
-  Document creation: POST /documents
-    Auto-assigns owner role to creator
-    Returns { documentId, title, createdAt }
+// POST /documents/:id/share — owner only
+// Body: { email: string, role: 'editor' | 'viewer' }
+// Looks up user by email, creates permission record
+
+// Middleware: requireDocumentAccess(minRole)
+// Checks JWT → extracts user → queries document_permissions
+// Returns 403 if role is insufficient
 ```
 
-### 2. Build the WebSocket server for real-time communication
+Document creation automatically assigns the creator as owner. The share endpoint lets owners invite collaborators by email and assign roles.
+
+### Step 2: Build the WebSocket Server for Real-Time Communication
 
 ```text
 Set up the WebSocket server. Each document is a "room" — when a user
@@ -62,41 +63,32 @@ opens a document, they join that room. I need: connection authentication
 in one client reach all others in the same room instantly.
 ```
 
-```text
-Created ws/server.ts — WebSocket server (ws library + Express upgrade):
+Every document is a WebSocket room. When a user opens a document, the connection flow is:
 
-  Connection flow:
-    1. Client connects: ws://host/ws?token=JWT&docId=abc123
-    2. Server verifies JWT (same key as HTTP auth)
-    3. Checks document_permissions for this user + document
-    4. If authorized: join room, broadcast presence update
-    5. If not: close connection with 4403 code
+1. Client connects: `ws://host/ws?token=JWT&docId=abc123`
+2. Server verifies JWT (same key as HTTP auth)
+3. Server checks `document_permissions` for this user and document
+4. If authorized: join the room, broadcast a presence update to other editors
+5. If not: close connection with a 4403 code
 
-  Room management (ws/rooms.ts):
-    Map<documentId, Set<Connection>>
-    Connection: { ws, userId, displayName, avatarColor, role, cursor }
+The room manager tracks connections per document:
 
-    join(docId, connection): add to room, broadcast "user_joined"
-    leave(docId, userId): remove from room, broadcast "user_left"
-    broadcast(docId, message, excludeUserId?): send to all in room
+```typescript
+// ws/rooms.ts — Room management
 
-  Message types:
-    Client → Server:
-      "operation" — text change (insert/delete at position)
-      "cursor" — cursor position update
-      "select" — selection range update
+// Map<documentId, Set<Connection>>
+// Connection: { ws, userId, displayName, avatarColor, role, cursor }
 
-    Server → Client:
-      "operation" — relayed change from another user
-      "cursor" — other user's cursor moved
-      "presence" — user joined/left/list
-      "sync" — full document state (on initial connect)
-
-  Heartbeat: ping every 30s, disconnect after 2 missed pongs
-  Reconnection: client auto-reconnects, server replays missed ops
+rooms.join(docId, connection);     // add to room, broadcast "user_joined"
+rooms.leave(docId, userId);        // remove from room, broadcast "user_left"
+rooms.broadcast(docId, message);   // send to all in room (optionally excluding sender)
 ```
 
-### 3. Implement conflict-free document synchronization
+Messages flow in both directions. Clients send operations (text changes), cursor positions, and selection ranges. The server relays operations to all other room members, sends presence updates, and provides a full document sync on initial connect.
+
+A 30-second heartbeat catches disconnected clients. If a client misses 2 consecutive pongs, the server drops the connection and broadcasts a leave event.
+
+### Step 3: Implement Conflict-Free Document Synchronization
 
 ```text
 The hard part: when two people type at the same position simultaneously,
@@ -105,39 +97,54 @@ operational transformation or CRDTs — whichever is simpler for a text
 editor. Persist every operation so we have full history.
 ```
 
-```text
-Created sync/crdt.ts — Yjs CRDT integration:
+This is the hard part. Two approaches exist: Operational Transformation (OT) and CRDTs. OT requires a central transform server and gets complex fast. CRDTs (Conflict-free Replicated Data Types) are simpler -- merges are commutative, so the order operations arrive does not matter.
 
-  Using Yjs (CRDT library) for conflict-free merging:
-    Y.Doc per document — shared data structure
-    Y.Text for the document body — supports concurrent inserts/deletes
-    Y.Map for document metadata (title, last_modified)
+The editor uses Yjs, a battle-tested CRDT library used by Notion, Jupyter, and others:
 
-  Why Yjs over OT:
-    No central transform server needed — merges are commutative
-    Works offline — clients can edit disconnected, sync on reconnect
-    Battle-tested: used by Notion, Jupyter, and others
+```typescript
+// sync/crdt.ts — Yjs integration
 
-  Server-side (sync/provider.ts):
-    On client connect: send Y.Doc state as sync step 1
-    On client update: apply to server Y.Doc, broadcast to room
-    Periodic persistence: debounced save to database every 2 seconds
-    Full state save: on last client disconnect
+import * as Y from 'yjs';
 
-  Database storage (realtime-database):
-    Table: documents (id, title, yjs_state BYTEA, version, updated_at)
-    Table: document_updates (id, document_id, update BYTEA, user_id, created_at)
-    yjs_state: compressed binary snapshot of Y.Doc
-    document_updates: append-only log for history replay
-
-  Conflict example:
-    User A types "hello" at position 0
-    User B types "world" at position 0 (simultaneously)
-    CRDT merges: "helloworld" or "worldhello" (deterministic by user ID order)
-    No data lost, no manual conflict resolution needed
+// One Y.Doc per document
+const doc = new Y.Doc();
+const yText = doc.getText('content');     // shared text, supports concurrent edits
+const yMeta = doc.getMap('metadata');     // title, last_modified, etc.
 ```
 
-### 4. Add live cursors and presence indicators
+When two users type at the same position simultaneously -- say User A types "hello" and User B types "world" at position 0 -- the CRDT merges them deterministically by user ID order. No data lost, no manual conflict resolution needed.
+
+The server-side persistence layer:
+
+- **On client connect**: send the Y.Doc state as a sync step
+- **On client update**: apply to server Y.Doc, broadcast to room
+- **Periodic persistence**: debounced save to PostgreSQL every 2 seconds
+- **Full state save**: on last client disconnect
+
+```sql
+-- Document storage
+CREATE TABLE documents (
+  id UUID PRIMARY KEY,
+  title TEXT,
+  yjs_state BYTEA,           -- compressed binary snapshot of Y.Doc
+  version INTEGER DEFAULT 0,
+  updated_at TIMESTAMPTZ
+);
+
+CREATE TABLE document_updates (
+  id BIGSERIAL PRIMARY KEY,
+  document_id UUID REFERENCES documents(id),
+  update_data BYTEA,          -- individual Y.Doc update
+  user_id UUID,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+The `document_updates` table is an append-only log. Full edit history can be replayed by applying updates in order -- useful for "who changed this paragraph?" questions.
+
+A major bonus: Yjs works offline. A client can edit while disconnected, and changes merge cleanly on reconnect. No special handling needed.
+
+### Step 4: Add Live Cursors and Presence Indicators
 
 ```text
 Show each user's cursor position and selection in real time. Each user
@@ -146,41 +153,25 @@ Also show a presence list in the sidebar — who's currently viewing the
 document and whether they're actively editing or idle.
 ```
 
-```text
-Created editor/cursors.ts — Remote cursor rendering:
+Live cursors make collaboration feel real. Each remote user's cursor is a 2px colored bar with a floating name label, rendered as CodeMirror 6 decorations:
 
-  Cursor data structure:
-    { userId, displayName, avatarColor, position: { line, ch }, selection?: { start, end } }
+- **Cursor**: vertical bar in the user's avatar color
+- **Name label**: small floating div above the cursor with the user's name
+- **Selection**: semi-transparent highlight at 20% opacity
+- **Idle state**: cursors fade to 50% opacity after 5 seconds of no movement
 
-  Client sends cursor updates:
-    On cursor move: throttled to max 50ms interval (20 updates/sec)
-    On selection change: immediate send
-    On idle (no movement for 5s): send { status: 'idle' }
+Cursor updates are throttled to 50ms intervals (20 updates/second). Selection changes send immediately. This keeps the experience smooth without overwhelming the WebSocket.
 
-  Rendering (CodeMirror 6 decorations):
-    Remote cursor: 2px wide bar in user's avatarColor
-    Name label: small floating div above cursor, same color, user's name
-    Selection: semi-transparent highlight in user's color (20% opacity)
-    Idle cursors: fade to 50% opacity after 5 seconds
+The sidebar presence panel shows everyone currently in the document:
 
-Created editor/presence.ts — Sidebar presence panel:
+- **Green dot**: actively editing
+- **Yellow dot**: idle for 30+ seconds
+- **Grey dot**: viewer (read-only access)
+- **Location hint**: "Editing near line 42"
 
-  Presence list shows:
-    Avatar circle (user's color) + display name
-    Status dot: green (active), yellow (idle 30s+), grey (viewer)
-    "Editing near line 42" — approximate location in document
+A 5-second grace period on disconnect prevents the presence list from flickering during page refreshes -- the user disappears from the list only if they do not reconnect within 5 seconds.
 
-  Broadcasts:
-    On connect: full presence list sent to joining user
-    On status change: broadcast to room
-    On disconnect: removed from list with 5s grace period (covers page refreshes)
-
-  Presence state managed server-side:
-    Map<docId, Map<userId, { displayName, color, status, lastActive, cursorLine }>>
-    Updated on every cursor message
-```
-
-### 5. Build the editor UI with document management
+### Step 5: Build the Editor UI with Document Management
 
 ```text
 Create the frontend: a clean editor interface with a document list sidebar,
@@ -189,41 +180,32 @@ Use CodeMirror 6 for the editor. Add markdown support since our team writes
 docs in markdown.
 ```
 
-```text
-Created editor/App.tsx — Main editor application (React + CodeMirror 6):
+The frontend uses React with CodeMirror 6 as the editor engine. The layout is a three-column CSS Grid:
 
-  Layout (CSS Grid):
-    Left sidebar (240px): document list, search, "New Document" button
-    Center (flex): CodeMirror editor, full height
-    Right panel (200px): presence list, share button
+- **Left sidebar (240px)**: document list with search and "New Document" button
+- **Center (flex)**: CodeMirror editor, full height
+- **Right panel (200px)**: presence list and share button
 
-  CodeMirror 6 setup (editor/codemirror-setup.ts):
-    Extensions:
-      markdown() — syntax highlighting + preview toggle
-      yCollab(yText, provider) — Yjs collaboration binding
-      cursors extension — renders remote cursors from awareness
-      keymap: defaultKeymap + markdownKeymap
-      theme: customized light theme, clean typography
+CodeMirror 6 extensions handle the heavy lifting:
 
-  Document list (editor/DocList.tsx):
-    Fetches GET /documents — user's documents + shared with them
-    Shows: title, last modified, collaborator count
-    Click to open: connects WebSocket, loads Y.Doc state
-    "New Document" → POST /documents, auto-opens
+```typescript
+// editor/codemirror-setup.ts
 
-  Share dialog (editor/ShareDialog.tsx):
-    Enter email, select role (editor/viewer)
-    POST /documents/:id/share
-    Shows current collaborators with role badges
-    Owner can remove access or change roles
-
-  Connection status bar (bottom):
-    "Connected — 3 collaborators" (green dot)
-    "Reconnecting..." (yellow dot, auto-retry)
-    "Offline — changes will sync when reconnected" (red dot)
-    Yjs handles offline: edits queue locally, merge on reconnect
+const extensions = [
+  markdown(),                         // syntax highlighting + preview
+  yCollab(yText, provider),          // Yjs collaboration binding
+  remoteCursors(),                   // renders other users' cursors
+  keymap.of([...defaultKeymap, ...markdownKeymap]),
+  customTheme,                       // clean typography, light theme
+];
 ```
+
+The connection status bar at the bottom shows the current state: "Connected -- 3 collaborators" (green dot), "Reconnecting..." (yellow dot, auto-retry), or "Offline -- changes will sync when reconnected" (red dot). Yjs handles the offline case transparently -- edits queue locally and merge on reconnect.
 
 ## Real-World Example
 
-Kai's five-person engineering team was paying for a collaboration tool they barely used outside of document editing. He set up this self-hosted editor on a small VPS in a weekend. The team writes specs, runbooks, and design docs collaboratively now — live cursors make pair-writing actually fun. When two engineers edited the same incident runbook during an outage, the CRDT merged their changes seamlessly. The full edit history also came in handy when they needed to trace when a particular section was added.
+Noa's five-person team sets up the self-hosted editor on a small VPS in a weekend. They start writing specs, runbooks, and design docs collaboratively. Live cursors make pair-writing unexpectedly fun -- two engineers can hammer out an API spec in real time, seeing each other's changes as they type.
+
+The CRDT earns its keep during an incident. Two engineers edit the same runbook simultaneously while troubleshooting a production issue -- one updating the timeline while the other documents the root cause. Their edits merge seamlessly with no conflicts and no coordination overhead.
+
+The full edit history also proves useful. When a question arises about when a particular decision was documented in a design spec, the team replays the document history to the exact update. Total cost: one $5/month VPS instead of $60/month for a hosted collaboration tool.

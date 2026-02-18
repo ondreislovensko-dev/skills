@@ -33,7 +33,7 @@ Tell the agent what skills matter for your team:
 >
 > Here's the team skills survey results: skills-survey.csv
 
-### 2. The agent analyzes the data
+### 2. Analyze the skills data
 
 ```text
 Skills Gap Analysis — Engineering Team (12 members)
@@ -57,7 +57,7 @@ and only 1 can handle real-time data processing independently.
 
 > Generate a personalized development plan for each team member based on their current skills and the team's gaps. Prioritize so we cover the critical gaps fastest.
 
-### 4. The agent creates targeted plans
+### 4. Create targeted development plans
 
 ```text
 Individual Development Plans:

@@ -11,49 +11,77 @@ tags: [chaos-engineering, resilience, reliability, testing, infrastructure]
 
 ## The Problem
 
-A 30-person fintech team runs 12 microservices in Kubernetes. They have never tested what happens when the payment gateway times out, when a database replica goes down, or when network latency spikes between services. Last month, a 90-second Redis outage cascaded into 45 minutes of downtime because no circuit breaker was configured. The team knows they need chaos engineering but nobody has time to learn Chaos Mesh or LitmusChaos from scratch, write experiment definitions, and figure out safe blast radius limits.
+Marta's 30-person fintech team runs 12 microservices in Kubernetes. They have never tested what happens when the payment gateway times out, when a database replica goes down, or when network latency spikes between services. The assumption is that everything will hold -- until it doesn't.
+
+Last month, a 90-second Redis outage cascaded into 45 minutes of downtime. No circuit breaker was configured. The payment service kept hammering Redis with retries, exhausting its connection pool, which caused it to reject new requests, which backed up the API gateway, which started returning 502s to every user. Ninety seconds of Redis being unavailable turned into 45 minutes of complete service failure.
+
+The team knows they need chaos engineering. But nobody has time to learn Chaos Mesh or LitmusChaos from scratch, write experiment definitions, and figure out safe blast radius limits -- especially when getting it wrong could cause the exact kind of outage they are trying to prevent.
 
 ## The Solution
 
-Use the **coding-agent** skill to generate chaos experiment configurations, the **docker-helper** skill to set up local chaos testing environments, and the **cicd-pipeline** skill to integrate chaos tests into the deployment pipeline.
+Using the **coding-agent**, **docker-helper**, and **cicd-pipeline** skills, this walkthrough maps failure modes by business impact, generates Chaos Mesh experiments with safe blast radius limits, builds a local test environment with toxiproxy for safe iteration, and integrates chaos tests into the CI pipeline so resilience gets verified on every deploy.
 
 ## Step-by-Step Walkthrough
 
-### 1. Map your failure modes
+### Step 1: Map Failure Modes by Business Impact
 
-Start by telling the agent about your architecture:
-
-```text
-We run 12 microservices on Kubernetes. Critical path: API gateway → auth-service → payment-service → PostgreSQL. We also depend on Redis for session caching and RabbitMQ for async jobs. List the top 10 failure scenarios we should test, ranked by business impact.
-```
-
-### 2. The agent produces a failure catalog
+Before injecting any chaos, Marta needs a catalog of what could go wrong and how much it would hurt. She describes the architecture:
 
 ```text
-Failure Scenarios (ranked by impact):
-1. payment-service → PostgreSQL connection timeout (revenue impact: direct)
-2. Redis cluster complete outage (session loss for all users)
-3. auth-service latency spike >5s (cascading timeout to all services)
-4. RabbitMQ partition between nodes (job duplication risk)
-5. API gateway memory pressure (OOMKill → total outage)
-6. payment-service pod crash during transaction
-7. DNS resolution failure between services
-8. Network partition: payment-service ↔ auth-service
-9. Disk pressure on PostgreSQL primary
-10. Certificate expiry on internal mTLS
+We run 12 microservices on Kubernetes. Critical path: API gateway -> auth-service -> payment-service -> PostgreSQL. We also depend on Redis for session caching and RabbitMQ for async jobs. List the top 10 failure scenarios we should test, ranked by business impact.
 ```
 
-### 3. Generate experiment definitions
+The failure catalog comes back ranked by revenue and user impact:
 
-Pick the first experiment:
+| Rank | Failure Scenario | Impact |
+|------|------------------|--------|
+| 1 | payment-service to PostgreSQL connection timeout | Direct revenue loss |
+| 2 | Redis cluster complete outage | Session loss for all users |
+| 3 | auth-service latency spike >5s | Cascading timeout to all services |
+| 4 | RabbitMQ partition between nodes | Job duplication risk |
+| 5 | API gateway memory pressure | OOMKill, total outage |
+| 6 | payment-service pod crash during transaction | Partial transaction risk |
+| 7 | DNS resolution failure between services | Silent request failures |
+| 8 | Network partition: payment-service to auth-service | Auth bypass or hard failure |
+| 9 | Disk pressure on PostgreSQL primary | Write failures, replication lag |
+| 10 | Certificate expiry on internal mTLS | Service-to-service comm breakdown |
+
+This is where it gets interesting: scenario #1 is almost exactly what happened with Redis, just with PostgreSQL instead. If the same lack of circuit breakers exists on the database connection, the same cascade will happen again.
+
+### Step 2: Define Steady-State Hypotheses
+
+Before running any experiment, you need to know what "normal" looks like. Otherwise there is no way to tell if the system survived:
+
+```text
+For each of the top 3 experiments, define a steady-state hypothesis with specific metrics. What response times, error rates, and throughput numbers should hold true even under failure conditions?
+```
+
+**Scenario 1 -- Payment DB latency:**
+- Payment API p99 latency stays under 2s (current baseline: 340ms)
+- Error rate stays below 1% (current: 0.02%)
+- No transactions are lost (consistency check via reconciliation query)
+
+**Scenario 2 -- Redis outage:**
+- Users with active sessions can still access the app (graceful degradation)
+- Session recreation rate stays under 50/min
+- No data corruption in session store after recovery
+
+**Scenario 3 -- Auth service latency:**
+- Circuit breaker trips within 10s of detecting >3s latency
+- Downstream services return cached auth tokens for up to 60s
+- No cascading timeouts beyond the auth boundary
+
+These hypotheses define success. If the system holds these numbers under fault injection, the architecture is resilient. If it doesn't, the experiment just found a bug before production did.
+
+### Step 3: Generate the First Experiment
+
+Marta starts with the highest-impact scenario:
 
 ```text
 Generate a Chaos Mesh experiment for scenario 1: inject a 30-second network delay between payment-service and PostgreSQL. The blast radius should be 1 pod only. Include a rollback mechanism and steady-state hypothesis.
 ```
 
-### 4. The agent writes the experiment
-
-The agent produces a complete YAML definition with annotations, steady-state probes, and automatic rollback:
+The experiment definition targets a single payment-service pod with a 30-second latency injection to all PostgreSQL traffic, running for 2 minutes total:
 
 ```yaml
 # chaos-experiments/payment-db-latency.yaml
@@ -64,13 +92,13 @@ metadata:
   namespace: chaos-testing
 spec:
   action: delay
-  mode: one
+  mode: one              # Only 1 pod affected — safe blast radius
   selector:
     labelSelectors:
       app: payment-service
   delay:
     latency: "30s"
-  duration: "120s"
+  duration: "120s"        # Auto-reverts after 2 minutes
   target:
     selector:
       labelSelectors:
@@ -78,52 +106,41 @@ spec:
     mode: all
 ```
 
-### 5. Define steady-state hypotheses
+The `mode: one` setting is critical -- it ensures only a single pod gets the fault injection. If the payment service has 4 replicas, 3 continue operating normally. The `duration: 120s` means Chaos Mesh automatically removes the fault after 2 minutes even if someone forgets to stop the experiment.
 
-Before running any experiment, you need to know what "normal" looks like:
+### Step 4: Test Locally Before Touching Staging
 
-```text
-For each of the top 3 experiments, define a steady-state hypothesis with specific metrics. What response times, error rates, and throughput numbers should hold true even under failure conditions?
-```
+Running chaos experiments directly against staging is risky when you don't know how the system will react. A local environment with controlled fault injection is safer for the first round:
 
 ```text
-Steady-State Hypotheses:
-1. Payment DB latency test:
-   - Payment API p99 latency stays under 2s (current baseline: 340ms)
-   - Error rate stays below 1% (current: 0.02%)
-   - No transactions are lost (consistency check via reconciliation query)
-
-2. Redis outage test:
-   - Users with active sessions can still access the app (graceful degradation)
-   - Session recreation rate stays under 50/min
-   - No data corruption in session store after recovery
-
-3. Auth service latency test:
-   - Circuit breaker trips within 10s of detecting >3s latency
-   - Downstream services return cached auth tokens for up to 60s
-   - No cascading timeouts beyond the auth boundary
+Create a docker-compose setup that mimics our payment-service -> PostgreSQL flow so we can run the chaos experiment locally before touching staging.
 ```
 
-### 6. Set up a safe local test first
+The docker-compose file spins up the payment service, a PostgreSQL instance, and toxiproxy sitting between them. Toxiproxy lets Marta inject the same latency fault locally:
 
-```text
-Create a docker-compose setup that mimics our payment-service → PostgreSQL flow so we can run the chaos experiment locally before touching staging.
+```bash
+# Add 30-second latency to the PostgreSQL connection
+toxiproxy-cli toxic add -t latency -a latency=30000 postgres_proxy
 ```
 
-The agent generates a docker-compose file with the payment service, a PostgreSQL instance, and toxiproxy for fault injection.
+This is where the team discovers the first real finding: the payment service has no connection retry logic. On the first timeout, it crashes. No circuit breaker, no graceful degradation -- just an unhandled exception that kills the process. In production, Kubernetes would restart the pod, but during the restart window all in-flight transactions would fail.
 
-### 7. Integrate into CI pipeline
+### Step 5: Fix and Re-Test, Then Integrate into CI
+
+After adding retry logic and a circuit breaker to the payment service, the local chaos experiment passes cleanly -- the service degrades to slower responses but stays alive and processes transactions.
+
+Now the experiments move into the CI pipeline:
 
 ```text
 Add a chaos testing stage to our GitHub Actions pipeline that runs the top 3 experiments against staging after every deployment, with automatic rollback if error rate exceeds 5%.
 ```
 
+Every staging deploy now runs a 2-minute resilience check. The pipeline injects each of the top 3 faults, monitors the steady-state hypotheses, and fails the deploy if any hypothesis is violated. The team catches resilience regressions the same way they catch test failures -- before the code reaches production.
+
 ## Real-World Example
 
-Marta, an SRE at a 30-person fintech team, needs to prove the system can survive a database failover before the team migrates to a multi-region setup.
+Two weeks after setting up the chaos pipeline, a developer pushes a change that refactors the database connection pooling in the payment service. The code passes all unit and integration tests. But the chaos test at the CI stage catches something: under the simulated PostgreSQL latency, the new connection pool exhausts itself in 40 seconds instead of gracefully queuing requests. The circuit breaker never trips because the pool exhaustion happens at a layer below it.
 
-1. Marta asks the agent to catalog failure modes based on the architecture — it identifies 10 scenarios in priority order
-2. She picks the top 3 and the agent generates Chaos Mesh YAML definitions with steady-state hypotheses and rollback rules
-3. The agent creates a local docker-compose environment with toxiproxy so the team can validate experiments safely
-4. Running locally, they discover the payment service has no connection retry logic — it crashes on the first timeout
-5. After fixing the retry logic, Marta has the agent add chaos tests to the CI pipeline — now every staging deploy runs a 2-minute resilience check automatically
+The developer adds pool overflow handling, the chaos test passes, and the deploy goes through. Without the experiment, this would have been another 45-minute cascading outage -- discovered at 3 AM instead of during a CI run.
+
+Marta tracks the numbers over the first quarter: the chaos pipeline has caught 3 resilience regressions, all at the CI stage. Zero cascading outages in production. The 90-second-to-45-minute Redis incident that started this project has not repeated.

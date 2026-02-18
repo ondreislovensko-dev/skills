@@ -23,110 +23,111 @@ The **page-cro** skill audits your page against CRO frameworks — structure, me
 
 ## Step-by-Step Walkthrough
 
-### 1. Run a CRO audit
+### Step 1: Run a CRO Audit
 
 ```text
 Audit our landing page at app.ourproduct.com/signup for conversion issues.
 ```
 
-```text
-CRO Audit Results:
+The audit scores every section of the page and ranks findings by estimated conversion impact:
 
-PAGE SPEED: 🔴 FCP 3.8s, LCP 6.2s (2.4MB hero, 847KB JS bundle)
-  ~7% conversion loss per second after 3s
+**Page Speed: Critical.** First Contentful Paint at 3.8 seconds, Largest Contentful Paint at 6.2 seconds. The hero image is 2.4MB uncompressed and the JS bundle is 847KB. Research consistently shows roughly 7% conversion loss per second after the 3-second mark — by the time this page finishes loading, it has already lost a significant chunk of potential conversions. Visitors don't wait around to be convinced.
 
-ABOVE THE FOLD: 🟠
-  Headline: "The All-in-One Platform for Modern Teams" — generic, no value prop
-  CTA below fold on mobile (68% of traffic can't see it)
-  Stock photo hero — doesn't show the product
+**Above the Fold: Weak.** The headline reads "The All-in-One Platform for Modern Teams" — generic enough to apply to literally any SaaS product. It says nothing about what the product does, who it's for, or why someone should care. The CTA button sits below the fold on mobile, where 68% of traffic arrives. The hero image is a stock photo that doesn't show the product. Visitors are making a stay-or-leave decision without seeing a single compelling reason to stay.
 
-FORM: 🔴 5 fields including required phone — 23-31% abandonment from phone alone
+**Form: Critical.** Five fields including a required phone number. Phone number fields alone cause 23-31% form abandonment — people don't want to be cold called. Every field above two reduces completion rates. This form is actively repelling the visitors the ad spend worked hard to attract.
 
-TRUST: 🟠 No logos above fold, testimonials buried 3 scrolls down
+**Trust: Weak.** No customer logos above the fold. Testimonials are buried three scrolls down, below the point where most visitors have already left. Social proof only works if people see it.
 
-PRIORITY FIXES (by conversion impact):
-  1. Reduce form to 2 fields .............. +1.2% estimated
-  2. Rewrite headline with specific value .. +0.6%
-  3. Move CTA above fold .................. +0.4%
-  4. Fix page speed ....................... +0.3%
-  5. Add social proof above fold .......... +0.3%
-  Projected: 0.9% → 2.5-3.7%
-```
+Priority fixes ranked by estimated conversion impact:
 
-### 2. Redesign the hero section
+| Fix | Estimated lift |
+|-----|---------------|
+| Reduce form to 2 fields | +1.2% |
+| Rewrite headline with specific value | +0.6% |
+| Move CTA above fold on mobile | +0.4% |
+| Fix page speed (LCP under 2.5s) | +0.3% |
+| Add social proof above fold | +0.3% |
+| **Projected total** | **0.9% to 2.5-3.7%** |
+
+### Step 2: Redesign the Hero Section
 
 ```text
 Redesign with a specific headline, 2-field form, trust badges, and product screenshot.
 ```
 
-```text
-  Headline: "Cut Your Reporting Time from 4 Hours to 15 Minutes"
-  Subheadline: "Automated dashboards from Salesforce, HubSpot, and 50+ tools."
+The headline changes from vague to specific: **"Cut Your Reporting Time from 4 Hours to 15 Minutes."** This tells visitors exactly what the product does and what they'll gain. The subheadline adds context: "Automated dashboards from Salesforce, HubSpot, and 50+ tools."
 
-  Form: [Work email] [Start Free Trial →]
-  "Free 14-day trial · No credit card · Setup in 2 minutes"
+The form drops from 5 fields to 2: work email and a submit button labeled "Start Free Trial." Below the button, friction-reducing copy addresses the three most common objections: "Free 14-day trial. No credit card. Setup in 2 minutes." Customer logos (Stripe, Shopify, Notion, Linear) and a social proof count ("Trusted by 2,400+ teams") sit directly under the form — visible without scrolling.
 
-  Social proof: [Stripe] [Shopify] [Notion] [Linear] "Trusted by 2,400+ teams"
+The generated `Hero.tsx` (67 lines) and `Hero.module.css` (89 lines) are production-ready code, not mockups. Mobile-first: CTA visible without scrolling, 48px touch targets for comfortable thumb tapping. Images use `srcset` with WebP/AVIF formats and lazy loading below the fold.
 
-Generated: Hero.tsx (67 lines) + Hero.module.css (89 lines)
-  Mobile: CTA visible without scroll, 48px touch targets
-  Images: srcset with WebP/AVIF, lazy loading below fold
-```
-
-### 3. Fix page speed
+### Step 3: Fix Page Speed
 
 ```text
 Get LCP under 2.5 seconds without losing visual quality.
 ```
 
-```text
-  Hero image: 2.4MB → 148KB (WebP + responsive srcset)
-  JS bundle: 847KB → 124KB critical + 323KB deferred
-  CSS: critical inlined (4.2KB), rest async
+Three changes make the difference:
 
-  FCP: 3.8s → 1.1s | LCP: 6.2s → 1.8s
-  Page weight: 3.6MB → 486KB | PageSpeed: 34 → 91
-```
+| Asset | Before | After |
+|-------|--------|-------|
+| Hero image | 2.4MB PNG | 148KB WebP with responsive srcset |
+| JS bundle | 847KB (all loaded upfront) | 124KB critical + 323KB deferred |
+| CSS | All render-blocking | 4.2KB critical inlined, rest loaded async |
 
-### 4. Set up A/B testing
+The results speak for themselves:
+
+| Metric | Before | After |
+|--------|--------|-------|
+| First Contentful Paint | 3.8s | 1.1s |
+| Largest Contentful Paint | 6.2s | 1.8s |
+| Total page weight | 3.6MB | 486KB |
+| PageSpeed score | 34 | 91 |
+
+The page now loads before visitors have time to decide to leave. On mobile, the hero, headline, form, and trust badges are all visible within 1.1 seconds of the first paint.
+
+### Step 4: Set Up A/B Testing
 
 ```text
 A/B test current page vs redesign with proper statistics.
 ```
 
-```text
-  Variant A: Current page | Variant B: Redesigned hero + 2-field form
-  Split: 50/50 | Sample needed: 3,847/variant (95% confidence, 80% power)
-  Duration: ~14 days at 450 visits/day
+The test splits traffic 50/50 between the current page (Variant A) and the redesigned hero with the 2-field form (Variant B). Statistical rigor matters here — peeking at results too early is the most common A/B testing mistake.
 
-  Guardrails: No peeking until minimum sample, sequential boundary at p<0.001
-  Tracking: page_view, form_start, form_submit, form_abandon (by variant)
-  Segments: desktop/mobile, organic/paid, new/returning
-```
+With 450 visits per day, reaching statistical significance at 95% confidence and 80% power requires approximately 3,847 visitors per variant — about 14 days of traffic. Guardrails prevent premature conclusions: no peeking until the minimum sample size is reached, with a sequential boundary at p<0.001 for early stopping only on overwhelming differences.
 
-### 5. Analyze results
+Tracking covers four events per variant: page_view, form_start, form_submit, and form_abandon. The form_abandon event is particularly valuable — it shows where in the form people give up. Segment analysis breaks results down by desktop/mobile, organic/paid, and new/returning visitors to reveal which audience benefits most from the redesign.
+
+### Step 5: Analyze Results
 
 ```text
 The test ran 16 days. Show me the results.
 ```
 
-```text
-  Control:   3,641 visitors → 34 conversions (0.93%)
-  Treatment: 3,671 visitors → 112 conversions (3.05%)
+The numbers tell a clear story:
 
-  Lift: +228% relative | Confidence: 99.7%
-  Mobile: 1.02% → 3.58% (biggest gain — speed + above-fold CTA)
+| Metric | Control | Treatment |
+|--------|---------|-----------|
+| Visitors | 3,641 | 3,671 |
+| Conversions | 34 | 112 |
+| Conversion rate | 0.93% | 3.05% |
+| **Relative lift** | | **+228%** |
+| Statistical confidence | | 99.7% |
 
-  Cost per lead: $33.00 → $9.68
-  Leads/month: 127 → 437 (+244%)
+Mobile traffic saw the biggest gain: 1.02% to 3.58%. That makes sense — the combination of faster load time and an above-the-fold CTA solved the two problems that hit mobile users hardest. Desktop improved too (0.82% to 2.41%), but the mobile delta is where most of the value came from, since 68% of traffic arrives on phones.
 
-  Deploy Variant B immediately ✓
-```
+The business impact:
+- Cost per lead: **$33.00 to $9.68**
+- Leads per month: **127 to 437** (+244%)
+- Same ad spend, nearly 3.5x more leads
 
 ## Real-World Example
 
 The solo founder of a bootstrapped project management SaaS was acquiring leads at $38 each on $3,800/month ad spend — nearly double his $20 target. His freelancer-designed landing page said "Project Management Reimagined" (meaningless), had 6 form fields including a required phone number, and took 5.1 seconds to load on mobile where 61% of traffic arrived.
 
-He ran the CRO audit Monday morning. Findings were immediately actionable. The redesigned hero was generated that afternoon. He launched the A/B test Tuesday and let it run 18 days. Result: 2.8% conversion vs 0.7%. Cost-per-lead dropped from $38 to $9.50 — same budget, 4x more leads.
+He ran the CRO audit Monday morning. The findings were immediately actionable — not vague recommendations like "improve your messaging," but specific fixes ranked by estimated impact: kill the phone field (+1.2%), rewrite the headline with a concrete number (+0.6%), move the CTA above the fold (+0.4%). The redesigned hero section was generated that afternoon with production-ready React components.
 
-The improved economics gave him confidence to increase ad spend to $6,000/month, which his investor had pushed for but hadn't made sense at the old conversion rate. Three months and two more optimization rounds later: 3.4% conversion, $28K additional monthly pipeline directly traceable to CRO improvements.
+He launched the A/B test Tuesday and let it run 18 days without peeking. Result: 2.8% conversion versus 0.7%. Cost-per-lead dropped from $38 to $9.50 — same budget, 4x more leads.
+
+The improved economics gave him confidence to increase ad spend to $6,000/month, which his investor had pushed for but hadn't made sense at the old conversion rate. Three months and two more optimization rounds later: 3.4% conversion, $28K additional monthly pipeline directly traceable to CRO improvements. The landing page stopped being the bottleneck and became the growth engine.

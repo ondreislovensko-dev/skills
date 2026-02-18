@@ -11,7 +11,9 @@ tags: [llm, local-ai, ollama, langchain, development-environment, privacy]
 
 ## The Problem
 
-Dani works at a healthcare startup where patient data can never leave the company network. He needs to prototype an AI assistant that summarizes medical notes, but every cloud LLM API is off-limits due to compliance. He has a workstation with a 24GB GPU and needs a local development environment where he can experiment with different models, build LangChain pipelines, and iterate quickly — all without any data leaving the machine.
+Dani works at a healthcare startup where patient data can never leave the company network. He needs to prototype an AI assistant that summarizes medical notes, but every cloud LLM API is off-limits due to HIPAA compliance. He has a workstation with a 24GB GPU and needs a local development environment where he can experiment with different models, build LangChain pipelines, and iterate quickly — all without any data leaving the machine.
+
+The cloud API route is a dead end. Even with a BAA, the compliance team won't sign off on sending patient notes to a third-party endpoint. The prototype needs to run entirely on-premises.
 
 ## The Solution
 
@@ -19,7 +21,7 @@ Use **ollama-local** to run and manage local LLM models, **lm-studio-subagents**
 
 ## Step-by-Step Walkthrough
 
-### 1. Install Ollama and pull the right models
+### Step 1: Install Ollama and Pull the Right Models
 
 ```text
 I'm on Ubuntu 22.04 with an NVIDIA RTX 4090 (24GB VRAM). I need to run
@@ -28,37 +30,29 @@ pick appropriate models that fit in 24GB VRAM, and verify GPU acceleration
 is working.
 ```
 
-```text
-Setup guide for Ollama on Ubuntu 22.04 + RTX 4090:
+Installation is straightforward:
 
-Install Ollama:
-  curl -fsSL https://ollama.ai/install.sh | sh
-  systemctl status ollama  # verify running
-
-Verify GPU detection:
-  ollama run llama3.2 "hello"  # quick test
-  Check logs: journalctl -u ollama | grep -i gpu
-  Should see: "using CUDA" and "VRAM: 24576 MiB"
-
-Recommended models for 24GB VRAM:
-  Primary (summarization):
-    ollama pull llama3.1:8b-instruct-q8_0     # 8.5GB, best quality 8B
-    ollama pull llama3.1:70b-instruct-q4_K_M   # 40GB — won't fit, skip
-    ollama pull mistral:7b-instruct-v0.3-q8_0  # 8.2GB, good at following instructions
-
-  For comparison/experimentation:
-    ollama pull gemma2:9b-instruct-q6_K        # 7.3GB, strong reasoning
-    ollama pull phi3:14b-instruct-q5_K_M        # 10GB, good for structured output
-
-  You can load two 8B models simultaneously for A/B testing (~17GB total).
-
-Ollama API available at: http://localhost:11434
-  POST /api/generate — single completion
-  POST /api/chat — multi-turn conversation
-  GET /api/tags — list installed models
+```bash
+curl -fsSL https://ollama.ai/install.sh | sh
+systemctl status ollama  # verify running
+ollama run llama3.2 "hello"  # quick GPU test
+journalctl -u ollama | grep -i gpu  # should show "using CUDA" and "VRAM: 24576 MiB"
 ```
 
-### 2. Set up LM Studio for model comparison
+Model selection matters here — 24GB of VRAM is generous but not unlimited. The sweet spot for summarization:
+
+| Model | Size | Purpose |
+|-------|------|---------|
+| `llama3.1:8b-instruct-q8_0` | 8.5GB | Primary summarization, best quality at 8B |
+| `mistral:7b-instruct-v0.3-q8_0` | 8.2GB | Strong instruction following, good for comparison |
+| `gemma2:9b-instruct-q6_K` | 7.3GB | Strong reasoning, worth testing |
+| `phi3:14b-instruct-q5_K_M` | 10GB | Good for structured output |
+
+Two 8B models can be loaded simultaneously for A/B testing at around 17GB total. The 70B variants won't fit — skip those.
+
+Ollama exposes an API at `http://localhost:11434` with three key endpoints: `/api/generate` for single completions, `/api/chat` for multi-turn conversations, and `/api/tags` to list installed models.
+
+### Step 2: Set Up LM Studio for Model Comparison
 
 ```text
 I also want LM Studio so I can quickly test prompts with different models
@@ -67,35 +61,22 @@ alongside Ollama without port conflicts, and set up a workflow for
 comparing model outputs on the same medical note prompts.
 ```
 
-```text
-LM Studio setup alongside Ollama:
+LM Studio provides what Ollama doesn't: a visual side-by-side comparison interface. The key is avoiding port conflicts — Ollama runs on 11434, so LM Studio goes on 1234. This gives two OpenAI-compatible endpoints:
 
-Install: Download from lmstudio.ai — AppImage for Linux
-  chmod +x LM-Studio-*.AppImage && ./LM-Studio-*.AppImage
+- **Ollama:** `http://localhost:11434/v1`
+- **LM Studio:** `http://localhost:1234/v1`
 
-Port configuration (avoid conflict with Ollama on 11434):
-  LM Studio → Settings → Server → Port: 1234
-  This gives you two OpenAI-compatible endpoints:
-    Ollama:    http://localhost:11434/v1  (OpenAI-compatible mode)
-    LM Studio: http://localhost:1234/v1
+The comparison workflow that saves the most time:
 
-Model comparison workflow:
-  1. In LM Studio, download the same model variants in GGUF format
-  2. Create a "Medical Summary" preset with your system prompt:
-     "You are a medical note summarizer. Given raw clinical notes,
-      produce a structured summary with: Chief Complaint, History,
-      Assessment, and Plan."
-  3. Load two models in split-view (LM Studio supports dual pane)
-  4. Paste the same clinical note, compare outputs side by side
-  5. Adjust temperature, top_p, and context length per model
+1. Download the same model variants in GGUF format inside LM Studio
+2. Create a "Medical Summary" preset with the system prompt: *"You are a medical note summarizer. Given raw clinical notes, produce a structured summary with: Chief Complaint, History, Assessment, and Plan."*
+3. Load two models in split-view (LM Studio supports dual pane)
+4. Paste the same clinical note into both, compare outputs side by side
+5. Adjust temperature, top_p, and context length per model
 
-Recommended GGUF models to download in LM Studio:
-  TheBloke/Llama-3.1-8B-Instruct-GGUF (Q8_0)
-  TheBloke/Mistral-7B-Instruct-v0.3-GGUF (Q8_0)
-  Compare outputs on 10 sample notes → pick the best performer
-```
+This visual comparison step saves hours of guessing. Dani can see immediately that one model hallucinates medication dosages while another reliably extracts them.
 
-### 3. Build a LangChain RAG pipeline for medical notes
+### Step 3: Build a LangChain RAG Pipeline for Medical Notes
 
 ```text
 Now build the actual application. I have ~2,000 past medical notes as
@@ -104,45 +85,51 @@ store in a local vector database, and let me query with natural language.
 Everything must stay local — no external API calls.
 ```
 
-```text
-Created medical_rag/ingest.py — Document ingestion pipeline:
+The ingestion pipeline reads all 2,000 notes, splits them into searchable chunks, and embeds them locally:
 
-  from langchain_community.document_loaders import DirectoryLoader, TextLoader
-  from langchain.text_splitter import RecursiveCharacterTextSplitter
-  from langchain_community.embeddings import OllamaEmbeddings
-  from langchain_community.vectorstores import Chroma
+```python
+# medical_rag/ingest.py
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import Chroma
 
-  Loader: DirectoryLoader("./notes/", glob="*.txt", loader_cls=TextLoader)
-  Splitter: RecursiveCharacterTextSplitter(
+loader = DirectoryLoader("./notes/", glob="*.txt", loader_cls=TextLoader)
+splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, chunk_overlap=200,
     separators=["\n\n", "\n", ". ", " "]
-  )
-  Embeddings: OllamaEmbeddings(model="nomic-embed-text", base_url="http://localhost:11434")
-    Pull the model first: ollama pull nomic-embed-text  # 274MB, runs on CPU fine
-  Vector store: Chroma(persist_directory="./chroma_db")
+)
+embeddings = OllamaEmbeddings(model="nomic-embed-text", base_url="http://localhost:11434")
+# Pull the embedding model first: ollama pull nomic-embed-text (274MB, runs fine on CPU)
 
-  Ingestion stats (2,000 notes):
-    ~8,500 chunks after splitting
-    Embedding time: ~12 minutes on CPU (nomic-embed-text is fast)
-    ChromaDB size on disk: ~180MB
-
-Created medical_rag/query.py — Query interface:
-
-  from langchain.chains import RetrievalQA
-  from langchain_community.llms import Ollama
-
-  llm = Ollama(model="llama3.1:8b-instruct-q8_0", temperature=0.1)
-  retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
-  chain = RetrievalQA.from_chain_type(
-    llm=llm, retriever=retriever, chain_type="stuff",
-    return_source_documents=True
-  )
-
-  Example query: "Summarize all visits for patient ID 4821"
-  Returns: structured summary + source document references
+docs = loader.load()
+chunks = splitter.split_documents(docs)
+vectorstore = Chroma.from_documents(chunks, embeddings, persist_directory="./chroma_db")
 ```
 
-### 4. Add a conversational interface with memory
+Ingestion stats for 2,000 notes: roughly 8,500 chunks after splitting, about 12 minutes to embed on CPU (nomic-embed-text is fast), and 180MB on disk for the ChromaDB.
+
+The query interface wires the vector store to a local LLM:
+
+```python
+# medical_rag/query.py
+from langchain.chains import RetrievalQA
+from langchain_community.llms import Ollama
+
+llm = Ollama(model="llama3.1:8b-instruct-q8_0", temperature=0.1)
+retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+chain = RetrievalQA.from_chain_type(
+    llm=llm, retriever=retriever, chain_type="stuff",
+    return_source_documents=True
+)
+
+# Example: "Summarize all visits for patient ID 4821"
+# Returns: structured summary + source document references
+```
+
+Every query stays on the machine. The LLM never sees data it shouldn't, and nothing hits the network.
+
+### Step 4: Add a Conversational Interface with Memory
 
 ```text
 Make it conversational so I can ask follow-up questions. It should
@@ -150,40 +137,28 @@ remember context within a session but not leak information between
 sessions. Add a simple terminal UI.
 ```
 
-```text
-Created medical_rag/chat.py — Conversational RAG with memory:
+The conversational chain adds session memory that tracks the last 10 exchanges — enough for natural follow-ups like "what about their blood pressure?" without restating the patient ID:
 
-  from langchain.memory import ConversationBufferWindowMemory
-  from langchain.chains import ConversationalRetrievalChain
+```python
+# medical_rag/chat.py
+from langchain.memory import ConversationBufferWindowMemory
+from langchain.chains import ConversationalRetrievalChain
 
-  memory = ConversationBufferWindowMemory(
-    k=10,  # remember last 10 exchanges
-    memory_key="chat_history",
-    return_messages=True,
-    output_key="answer"
-  )
+memory = ConversationBufferWindowMemory(
+    k=10, memory_key="chat_history",
+    return_messages=True, output_key="answer"
+)
 
-  chain = ConversationalRetrievalChain.from_llm(
+chain = ConversationalRetrievalChain.from_llm(
     llm=Ollama(model="llama3.1:8b-instruct-q8_0", temperature=0.1),
     retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
-    memory=memory,
-    return_source_documents=True,
-    verbose=False
-  )
-
-  Terminal UI (rich library):
-    - Color-coded: user input in green, AI response in white, sources in dim
-    - Shows retrieved document IDs below each answer
-    - Commands: /clear (reset memory), /model (switch model), /quit
-    - Session memory dies on /quit — no persistence between sessions
-
-  Model switching at runtime:
-    /model mistral:7b-instruct-v0.3-q8_0
-    → Swaps the LLM in the chain without re-embedding documents
-    → Useful for comparing answer quality mid-session
+    memory=memory, return_source_documents=True
+)
 ```
 
-### 5. Create a testing and evaluation harness
+The terminal UI (built with the `rich` library) color-codes user input in green, AI responses in white, and source references in dim. Three commands keep things simple: `/clear` resets memory, `/model mistral:7b-instruct-v0.3-q8_0` swaps the LLM without re-embedding documents, and `/quit` ends the session. Memory dies on quit — no data persists between sessions.
+
+### Step 5: Create a Testing and Evaluation Harness
 
 ```text
 I need to evaluate which model gives the best summaries before deploying
@@ -192,34 +167,22 @@ each model and scores the outputs for completeness, accuracy against
 a reference summary, and response time.
 ```
 
-```text
-Created medical_rag/eval.py — Model evaluation harness:
+The eval harness runs 50 test notes (each with a human-written reference summary) through three models and scores them:
 
-  Test set: 50 notes with human-written reference summaries in eval/ground_truth/
+| Metric | llama3.1:8b-q8 | mistral:7b-v0.3-q8 | gemma2:9b-q6 |
+|--------|----------------|--------------------:|-------------:|
+| Completeness (0-4) | 3.8 | 3.6 | 3.9 |
+| ROUGE-L | 0.62 | 0.58 | 0.65 |
+| Avg response time | 4.2s | 3.8s | 5.1s |
 
-  Models to evaluate:
-    - llama3.1:8b-instruct-q8_0 (via Ollama)
-    - mistral:7b-instruct-v0.3-q8_0 (via Ollama)
-    - gemma2:9b-instruct-q6_K (via Ollama)
+Completeness checks for the four required sections (Chief Complaint, History, Assessment, Plan). ROUGE-L measures overlap with the reference summary. Results are reproducible — temperature is set to 0 with fixed seeds where supported.
 
-  Metrics per response:
-    Completeness: checks presence of required sections
-      (Chief Complaint, History, Assessment, Plan) → 0-4 score
-    ROUGE-L: overlap with reference summary (using rouge-score library)
-    Response time: wall-clock seconds from request to full response
-    Token count: output tokens (estimated from word count × 1.3)
-
-  Output: eval/results.json and eval/results_summary.md
-
-  Sample results (50 notes):
-    Model                    | Completeness | ROUGE-L | Avg Time
-    llama3.1:8b-q8           | 3.8/4        | 0.62    | 4.2s
-    mistral:7b-v0.3-q8       | 3.6/4        | 0.58    | 3.8s
-    gemma2:9b-q6             | 3.9/4        | 0.65    | 5.1s
-
-  Run with: python eval.py --notes-dir ./eval/test_notes --models all
-  Results are reproducible (temperature=0, fixed seed where supported)
+```bash
+python eval.py --notes-dir ./eval/test_notes --models all
+# Output: eval/results.json and eval/results_summary.md
 ```
+
+Gemma 2 wins on accuracy but takes longer. Llama 3.1 is the best balance of quality and speed. Mistral is fastest but scores lowest. The numbers make the decision easy — no more guessing.
 
 ## Real-World Example
 

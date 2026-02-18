@@ -11,15 +11,17 @@ tags: [s3, object-storage, file-upload, minio, cloud-storage, cdn]
 
 ## The Problem
 
-A SaaS platform stores user files on the application server's local disk. The `/uploads` directory has grown to 280 GB — it is not backed up, not replicated, and a single disk failure would lose everything. File downloads go through the API server, eating 60% of its bandwidth during peak hours. There is no access control — anyone with the file path can download any file. Image thumbnails are generated on every request instead of being cached. Last month the disk hit 95% capacity at 2 AM and the entire platform went down.
+A SaaS platform stores user files on the application server's local disk. The `/uploads` directory has grown to 280 GB -- not backed up, not replicated, and a single disk failure would lose everything. There's no RAID, no snapshots, no recovery plan. The last time someone asked about backups, the answer was "we should probably set those up."
+
+File downloads go through the API server, eating 60% of its bandwidth during peak hours. Every image request hits the Express server, which reads the file from disk and pipes it to the response -- a 5 MB photo ties up a connection for the entire transfer. There is no access control: anyone who guesses the file path pattern (`/uploads/{userId}/{filename}`) can download any user's files. Image thumbnails are generated on every request instead of being cached, so the same 200x200 avatar gets resized hundreds of times per day. Last month the disk hit 95% capacity at 2 AM and the entire platform went down -- the database transaction logs had nowhere to write, and Postgres crashed.
 
 ## The Solution
 
-Use `s3-storage` to implement a proper object storage backend with presigned URLs for direct client uploads, `coding-agent` to build the file management API and image processing pipeline, and `security-audit` to lock down bucket policies and access patterns.
+Using **s3-storage** to implement a proper object storage backend with presigned URLs for direct client uploads, **coding-agent** to build the file management API and image processing pipeline, and **security-audit** to lock down bucket policies and access patterns, the agent replaces the fragile local disk setup with a production-grade storage system.
 
 ## Step-by-Step Walkthrough
 
-### 1. Design the storage architecture and migrate existing files
+### Step 1: Design the Storage Architecture and Migrate Existing Files
 
 ```text
 We have 280 GB of user files on a local disk in /uploads/{userId}/{filename}.
@@ -34,12 +36,16 @@ We want to use AWS S3 for production and MinIO for local development.
 Write a storage abstraction layer that works with both.
 ```
 
-The agent designs a 3-bucket architecture (uploads-raw, uploads-processed, system-backups), creates a storage client factory that switches between AWS S3 and MinIO based on environment, writes a migration script that streams files with progress tracking and checksum verification, and produces a Docker Compose setup for local MinIO with matching bucket configuration.
+The architecture uses three buckets -- `uploads-raw` for original files, `uploads-processed` for thumbnails and optimized images, and `system-backups` for database dumps and configuration snapshots. Object keys follow the pattern `{userId}/{fileId}/{filename}` for efficient per-user listing.
 
-### 2. Implement secure direct uploads with presigned URLs
+A storage client factory switches between AWS S3 and MinIO based on the `STORAGE_PROVIDER` environment variable, so development uses a local MinIO container with matching bucket configuration and production hits AWS. The migration script streams files from disk in batches with progress tracking -- no loading 280 GB into memory. Each file gets a SHA-256 checksum on upload, and a verification pass compares checksums and file counts between source and destination.
+
+A Docker Compose setup provides local MinIO with pre-created buckets and matching CORS configuration, so developers never need an AWS account to work on file features.
+
+### Step 2: Implement Secure Direct Uploads with Presigned URLs
 
 ```text
-Replace our current upload flow (file → API server → disk) with direct-to-S3
+Replace our current upload flow (file -> API server -> disk) with direct-to-S3
 uploads using presigned URLs. The flow should be:
 1. Client requests upload URL from our API (sends filename, size, content type)
 2. API validates: file type allowlist (images, PDFs, docs), max size 50MB,
@@ -53,9 +59,15 @@ Include CORS configuration for browser uploads and handle multipart uploads
 for files over 10MB.
 ```
 
-The agent implements the full flow: an Express endpoint that validates requests and generates presigned URLs with content-type and size constraints, CORS configuration for the upload bucket, a webhook handler that receives S3 event notifications, file validation (magic bytes check, not just extension), and a multipart upload helper for the frontend that splits large files into 5MB chunks with progress tracking and retry logic.
+The old flow proxied every byte through the API server -- a 50 MB upload occupied a server connection for the entire transfer. The new flow eliminates that bottleneck entirely.
 
-### 3. Build the image processing pipeline
+An Express endpoint validates the request (file type against an allowlist, size within limits, user quota not exceeded) and generates a presigned PUT URL with content-type and content-length constraints baked in. The client uploads directly to S3 -- the API server never touches the file data.
+
+For files over 10 MB, a multipart upload helper on the frontend splits the file into 5 MB chunks and uploads them in parallel with retry logic. A progress bar tracks completion across all chunks.
+
+After the file lands in S3, an event notification triggers a webhook handler that validates the actual file content (magic bytes check, not just the extension the client claimed), updates the database record, and queues processing jobs. CORS configuration on the upload bucket allows browser-based PUT requests from the application domain only.
+
+### Step 3: Build the Image Processing Pipeline
 
 ```text
 When a user uploads an image, automatically generate:
@@ -73,9 +85,11 @@ and run as a background worker. Add a fallback that generates images
 on-demand if the processed version doesn't exist yet.
 ```
 
-The agent creates a worker service that listens for S3 ObjectCreated events, processes images with Sharp (resize, format conversion, EXIF stripping), uploads all variants to the processed bucket, and updates the database with URLs. The on-demand fallback checks if processed versions exist, generates them if missing, and caches the result — ensuring zero broken images even if the worker falls behind.
+A worker service listens for S3 `ObjectCreated` events on the raw uploads bucket. When an image arrives, Sharp handles the processing: resize to thumbnail (150x150 cover crop), generate a medium variant (800px wide, aspect preserved), strip all EXIF data from the original for privacy, and convert variants to WebP. All three versions upload to the processed bucket, and the database record updates with their URLs.
 
-### 4. Set up lifecycle policies and cost optimization
+The on-demand fallback is the safety net. If a client requests a processed image that doesn't exist yet -- maybe the worker fell behind or crashed mid-job -- the request generates the variant on the fly, caches the result in the processed bucket, and serves it. Zero broken image links, ever.
+
+### Step 4: Set Up Lifecycle Policies and Cost Optimization
 
 ```text
 Configure lifecycle policies for all buckets:
@@ -91,15 +105,20 @@ accidentally deleted files within 30 days. Add a lifecycle rule to
 delete old versions after 30 days.
 ```
 
-The agent configures lifecycle rules for all three buckets, enables versioning with a noncurrent version expiration policy, adds an intelligent cleanup script for premium user exemptions (checks user plan before applying deletion rules), and sets up a cost monitoring dashboard that tracks storage usage per bucket and per storage class.
+Lifecycle rules handle the boring but expensive work of storage class management automatically. Raw uploads transition to Infrequent Access after 30 days -- most files are accessed heavily in the first week then rarely again. After a year, they're deleted unless the user has a premium plan. An intelligent cleanup script checks the user's plan before applying deletion rules, so premium users keep their files indefinitely.
 
-### 5. Secure the storage and add CDN delivery
+Incomplete multipart uploads are the hidden cost sink -- abandoned uploads from crashed browsers or network failures accumulate silently. The 7-day abort rule prevents them from piling up.
+
+Versioning on the raw uploads bucket enables 30-day recovery for accidentally deleted files. A noncurrent version expiration rule automatically cleans up old versions after 30 days, preventing version history from inflating storage costs.
+
+A cost monitoring dashboard tracks storage usage per bucket and per storage class, with alerts when costs exceed projected thresholds.
+
+### Step 5: Secure the Storage and Add CDN Delivery
 
 ```text
 Security audit all bucket configurations:
 - Block all public access on raw uploads bucket
-- Processed images served through CloudFront (or Cloudflare R2 public URL)
-  with signed cookies for premium content
+- Processed images served through CloudFront with signed cookies for premium content
 - All presigned URLs have minimum necessary expiry time
 - No wildcard CORS origins in production
 - Enable server-side encryption (AES-256) on all buckets
@@ -110,14 +129,18 @@ Set up CloudFront distribution for processed images with 1-year cache headers
 for immutable content (thumbnails, processed images with content-addressed keys).
 ```
 
-The agent produces a comprehensive security configuration: bucket policies with explicit deny on public access, CloudFront distribution with OAI (Origin Access Identity) so files are only accessible through the CDN, signed cookies for premium content, AES-256 server-side encryption, access logging, and a minimal IAM policy. Cache headers are set to `max-age=31536000, immutable` for processed images using content-addressed keys.
+Security starts with explicit deny policies on public access for the raw uploads bucket. Processed images route through a CloudFront distribution with Origin Access Identity -- files are only accessible through the CDN, never via direct S3 URLs. Premium content uses signed cookies for access control.
+
+AES-256 server-side encryption covers all three buckets. Access logging goes to a separate logging bucket for audit trails. The application's IAM policy follows least privilege: `PutObject` on the raw bucket, `GetObject` on both raw and processed, `DeleteObject` only on raw, and no permissions it doesn't need.
+
+Cache headers on processed images use `max-age=31536000, immutable` because the content-addressed keys (containing a hash of the source file) guarantee that a URL always maps to the same content. CloudFront caches these at the edge indefinitely, so image load times drop to single-digit milliseconds for repeat visitors.
 
 ## Real-World Example
 
 A CTO at a 15-person SaaS company watches the `/uploads` directory grow past 280 GB on a single server. File downloads eat 60% of API bandwidth, images are re-processed on every request, and a disk failure would mean total data loss.
 
-1. She migrates all 280 GB to S3 with checksum verification — zero files lost, migration takes 4 hours
-2. Direct uploads via presigned URLs eliminate file proxying — API server CPU drops 40%
-3. The image processing pipeline generates thumbnails once and serves them through CloudFront — image load times drop from 1.2s to 80ms
-4. Lifecycle policies move old files to Infrequent Access — storage costs drop 35% in the first month
-5. After the migration: the API server runs on a smaller instance (saving $200/month), files are replicated across 3 AZs, and the team sleeps through the night without disk space alerts
+She migrates all 280 GB to S3 with checksum verification -- zero files lost, migration takes 4 hours. Direct uploads via presigned URLs eliminate file proxying, and API server CPU drops 40%. The image processing pipeline generates thumbnails once and serves them through CloudFront -- image load times drop from 1.2 seconds to 80ms. Lifecycle policies move old files to Infrequent Access, cutting storage costs 35% in the first month.
+
+After the migration: the API server runs on a smaller instance (saving $200/month), files are replicated across 3 availability zones with 99.999999999% durability, and the team sleeps through the night without disk space alerts. The CDN serves images from edge locations worldwide, so a user in Tokyo gets the same sub-100ms load time as a user in New York.
+
+The biggest change is psychological. The team stops worrying about storage. No more disk space monitoring, no more manual cleanup scripts, no more "what happens if the server dies" anxiety. S3 handles durability, CloudFront handles performance, and lifecycle policies handle cost optimization -- all automatically.

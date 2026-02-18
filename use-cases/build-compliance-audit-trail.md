@@ -11,15 +11,21 @@ tags: [compliance, audit-trail, logging, sox, security]
 
 ## The Problem
 
-Your application handles sensitive financial data, and your compliance auditor just flagged a critical gap: there is no audit trail for who accessed what data and when. Your application logs show HTTP requests, but they do not capture business-level events like "user exported all customer records" or "admin changed billing plan for account X." When the auditor asks "can you prove that only authorized users accessed PII in the last 90 days?" you cannot answer. Building a proper audit trail means instrumenting dozens of endpoints, designing a tamper-evident storage scheme, and creating query interfaces for auditors — a project your team estimated at six weeks.
+Your application handles sensitive financial data, and your compliance auditor just flagged a critical gap: there is no audit trail for who accessed what data and when. The application logs show HTTP requests, but they do not capture business-level events like "user exported all customer records" or "admin changed billing plan for account X."
+
+When the auditor asks "can you prove that only authorized users accessed PII in the last 90 days?" -- you cannot answer. The access logs show that someone hit `GET /customers/export`, but not who made the request, not which fields they pulled, and not whether they were authorized to do so. That is a finding that can block SOC 2 certification entirely.
+
+Building a proper audit trail means instrumenting dozens of endpoints, designing a tamper-evident storage scheme, and creating query interfaces for auditors who do not write SQL. The team estimated six weeks of engineering time. The auditor is coming back in three.
 
 ## The Solution
 
-Use the **coding-agent** to instrument your application with structured audit events, **security-audit** to validate the audit trail meets compliance requirements, and **data-analysis** to build queries and reports for auditor access.
+Using the **coding-agent**, **security-audit**, and **data-analysis** skills, the agent designs a tamper-evident audit event schema, instruments 34 endpoints with middleware and decorators, builds integrity verification with chained SHA-256 checksums, and generates auditor-facing query endpoints and downloadable reports -- all in a single session.
 
 ## Step-by-Step Walkthrough
 
-### 1. Define your audit requirements
+### Step 1: Define Audit Requirements
+
+Start by telling the agent what needs to be tracked and why:
 
 ```text
 We're a fintech startup preparing for SOC 2 Type II. We need an audit trail for:
@@ -31,11 +37,11 @@ We're a fintech startup preparing for SOC 2 Type II. We need an audit trail for:
 Our stack: Express API, Postgres, React frontend. Show me how to build this.
 ```
 
-### 2. The agent designs the audit event schema
+### Step 2: Design the Audit Event Schema
 
-```text
-Audit Event Schema:
+Every audit event needs to answer four questions: who did it, what did they do, what resource did they touch, and what was the outcome. The schema captures all four in a single structured record:
 
+```json
 {
   "eventId": "uuid-v4",
   "timestamp": "2026-02-17T14:23:01.445Z",
@@ -60,77 +66,84 @@ Audit Event Schema:
   "result": "success",
   "checksum": "sha256:a1b2c3..."
 }
-
-Storage: append-only Postgres table with row-level checksums.
-Retention: 7 years (configurable per compliance framework).
 ```
 
-### 3. The agent generates audit middleware
+The storage design is critical for compliance. The audit table is append-only in Postgres -- the application role has INSERT permission only, no UPDATE or DELETE. Row-level security enforces this at the database level, not just the application level. Even if the application code has a bug, the database will not allow audit records to be modified. Retention is set to 7 years, configurable per compliance framework.
 
-```text
-Generated audit infrastructure:
+### Step 3: Generate Audit Middleware and Infrastructure
 
+The core infrastructure lives in five files:
+
+```
 src/audit/
-├── audit-logger.ts        # Core logging function with checksum generation
-├── middleware.ts           # Express middleware for automatic capture
-├── decorators.ts          # @Audited() decorator for service methods
-├── events.ts              # Typed event catalog (47 event types)
-└── integrity.ts           # Checksum chain verification
-
-Key features:
-- Automatic capture: middleware logs all state-changing requests
-- Explicit capture: @Audited() decorator for business-logic events
-- Tamper detection: each event includes SHA-256 of previous event
-- PII detection: auto-flags events that access fields marked as PII
-- Immutable storage: audit table uses Postgres row-level security,
-  no UPDATE or DELETE permissions for application role
+  audit-logger.ts        # Core logging function with checksum generation
+  middleware.ts           # Express middleware for automatic capture
+  decorators.ts          # @Audited() decorator for service methods
+  events.ts              # Typed event catalog (47 event types)
+  integrity.ts           # Checksum chain verification
 ```
 
-### 4. The agent instruments your critical endpoints
+The design uses two capture strategies that work together:
 
-```text
-Instrumented 34 endpoints across 6 route files:
+**Automatic capture** via Express middleware logs all state-changing requests (POST, PUT, DELETE) without any code changes to existing routes. Drop it in, and every mutation is recorded.
 
-Authentication (8 events):
-  POST /auth/login         → auth.login.success / auth.login.failure
-  POST /auth/logout        → auth.logout
-  POST /auth/password      → auth.password.change
-  POST /auth/mfa/enable    → auth.mfa.enable
+**Explicit capture** via the `@Audited()` decorator handles business-logic events that do not map cleanly to HTTP requests -- like a background job that processes a data export, or a cron task that purges expired records. These events need to be audited too, and middleware alone cannot catch them.
 
-Customer PII (14 events):
-  GET  /customers/:id      → customer.pii.view
-  GET  /customers/export   → customer.pii.export (bulk)
-  PUT  /customers/:id      → customer.pii.update (captures before/after)
+Tamper detection works through chained SHA-256 checksums: each event includes a hash of the previous event, creating a blockchain-like chain. Modifying or deleting any record breaks the chain, and the integrity checker detects the break in seconds. This is what separates a compliance-grade audit trail from a regular log table.
 
-Admin Actions (12 events):
-  PUT  /admin/users/:id/role  → admin.role.change
-  POST /admin/config          → admin.config.update
-```
+PII detection is automatic -- any event that touches fields marked as PII in the schema gets flagged, making it trivial to generate the PII access reports auditors always ask for.
 
-### 5. The agent creates auditor-facing query interface
+### Step 4: Instrument Critical Endpoints
 
-```text
-Generated audit query endpoints and reports:
+With the infrastructure in place, instrumentation covers 34 endpoints across 6 route files:
 
-GET /audit/events?actor=usr_123&from=2026-01-01&to=2026-02-01
-GET /audit/events?action=customer.pii.*&resource=cust_456
-GET /audit/integrity-check?from=2026-01-01  (verifies checksum chain)
+**Authentication (8 event types):**
 
-Reports:
-- PII Access Report: who accessed what PII, when, from where
-- Failed Auth Report: failed login attempts with IP and frequency
-- Admin Actions Report: all privilege escalations and config changes
-- Integrity Report: confirms no audit records have been tampered with
+| Endpoint | Events |
+|----------|--------|
+| `POST /auth/login` | `auth.login.success`, `auth.login.failure` |
+| `POST /auth/logout` | `auth.logout` |
+| `POST /auth/password` | `auth.password.change` |
+| `POST /auth/mfa/enable` | `auth.mfa.enable` |
 
-Exported to: audit-reports/pii-access-2026-Q1.pdf
-```
+**Customer PII (14 event types):**
+
+| Endpoint | Events |
+|----------|--------|
+| `GET /customers/:id` | `customer.pii.view` |
+| `GET /customers/export` | `customer.pii.export` (bulk -- records count and fields accessed) |
+| `PUT /customers/:id` | `customer.pii.update` (captures before/after diff) |
+
+**Admin Actions (12 event types):**
+
+| Endpoint | Events |
+|----------|--------|
+| `PUT /admin/users/:id/role` | `admin.role.change` (records old and new role) |
+| `POST /admin/config` | `admin.config.update` (records which setting changed) |
+
+Every event captures the actor, resource, result, and relevant details. PII updates include before/after snapshots so the auditor can see exactly what changed, when, and by whom. Failed authentication attempts record the IP address and user agent for security analysis.
+
+### Step 5: Build Auditor-Facing Query Interface
+
+Auditors do not want to write SQL. They need clean endpoints and downloadable reports they can drop into their compliance binder:
+
+**Query endpoints:**
+- `GET /audit/events?actor=usr_123&from=2026-01-01&to=2026-02-01` -- all actions by a specific user
+- `GET /audit/events?action=customer.pii.*&resource=cust_456` -- all PII access for a specific customer
+- `GET /audit/integrity-check?from=2026-01-01` -- verifies the entire checksum chain is unbroken
+
+**Generated reports (PDF):**
+- **PII Access Report** -- who accessed what PII, when, from which IP address
+- **Failed Auth Report** -- failed login attempts with IP addresses and frequency patterns (useful for detecting brute-force attempts)
+- **Admin Actions Report** -- all privilege escalations and configuration changes
+- **Integrity Report** -- mathematical proof that no audit records have been tampered with
+
+The integrity report is the one auditors care about most. It walks the checksum chain from the first event to the last and confirms every link is intact. If someone had modified or deleted a record, the chain would break at that point -- and the report would flag exactly where.
 
 ## Real-World Example
 
-Nadia is the engineering lead at a 15-person fintech team preparing for their first SOC 2 Type II audit. The auditor's preliminary assessment flagged "insufficient audit trail" as a critical finding that could block certification.
+Nadia is the engineering lead at a 15-person fintech team preparing for their first SOC 2 Type II audit. The auditor's preliminary assessment flagged "insufficient audit trail" as a critical finding that could block certification. The team estimated six weeks to build what the auditor described. They had three weeks before the follow-up visit.
 
-1. Nadia asks the agent to build a compliance-grade audit trail for their Express API
-2. The agent designs a tamper-evident event schema, generates middleware and decorators, and instruments 34 endpoints in a single session
-3. It creates an integrity verification system using chained SHA-256 checksums
-4. The agent generates auditor-friendly query endpoints and PDF reports for PII access, authentication events, and admin actions
-5. When the auditor returns, Nadia demonstrates real-time audit queries and hands over a clean integrity report — the finding is resolved, and they pass the audit
+The agent designs a tamper-evident event schema, generates middleware and decorators, and instruments 34 endpoints in a single session. The integrity verification system uses chained SHA-256 checksums -- modifying or deleting any audit record breaks the chain and gets flagged immediately.
+
+When the auditor returns, Nadia demonstrates real-time audit queries: "Show me all PII access by admin users in Q1." The query returns in under a second with structured results -- who accessed which customer records, what fields they viewed, and from what IP. She hands over a clean integrity report proving no audit records have been tampered with since the system went live. The finding is resolved, and they pass the audit. What was estimated as a six-week project shipped in days, with the kind of tamper-evidence that most companies at their stage do not have.

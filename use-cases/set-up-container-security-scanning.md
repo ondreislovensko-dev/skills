@@ -11,91 +11,134 @@ tags: [containers, docker, security, vulnerability-scanning, devops]
 
 ## The Problem
 
-Your team builds and deploys 15 Docker images across microservices. Each image pulls in base layers, system packages, and application dependencies — any of which could have known vulnerabilities. You know you should be scanning images, but Trivy output is walls of CVE numbers, severity levels, and package names. Nobody has time to triage 200 vulnerabilities per image, figure out which ones are actually exploitable, and create upgrade plans that won't break anything.
+Soren's team builds and deploys 15 Docker images across microservices at a healthcare startup that must pass security audits quarterly. Each image pulls in base layers, system packages, and application dependencies -- any of which could have known vulnerabilities. Everyone knows they should be scanning images, but Trivy output is a wall of CVE numbers, severity levels, and package names. The last time someone ran it against the API server, 136 vulnerabilities came back. Nobody had time to triage which ones were actually exploitable, which were false positives for their stack, and which upgrades would break things.
+
+So the scan results sit in a Slack thread, unread, while the team ships features. Then the quarterly security audit arrives and 12 critical CVEs get flagged across container images. The compliance team is concerned. The team has 30 days to remediate, and suddenly container security is everyone's emergency.
 
 ## The Solution
 
-Use **docker-helper** to inspect and manage container images, **security-audit** to analyze vulnerabilities and assess real-world risk, and **coding-agent** to generate Dockerfile fixes and dependency updates.
+Using the **docker-helper**, **security-audit**, and **coding-agent** skills, this walkthrough scans all container images, separates real risks from noise, generates actionable remediation plans with exact Dockerfile changes, and produces fixed images that pass the audit.
 
 ## Step-by-Step Walkthrough
 
-### 1. Scan your container images
+### Step 1: Scan and Summarize All Images
 
-Point the agent at your images:
+Instead of dumping raw Trivy output, the scan groups findings by what actually matters -- severity and fixability:
 
 ```text
 Scan our Docker images for vulnerabilities: api-server:latest, worker:latest, and web-frontend:latest. Use Trivy and give me a summary grouped by severity and fixability.
 ```
 
-### 2. The agent runs scans and summarizes
+| Image | Base | Critical | High | Medium | Low | Size | Layers | Base Age |
+|-------|------|----------|------|--------|-----|------|--------|----------|
+| `api-server:latest` | `node:18-bullseye` | 3 (all fixable) | 12 (9 fixable) | 34 | 87 | 1.2 GB | 23 | 4 months |
+| `worker:latest` | `python:3.11-slim` | 0 | 4 (3 fixable) | 18 | 42 | 340 MB | 14 | 2 months |
+| `web-frontend:latest` | `nginx:1.24-alpine` | 1 (fixable) | 2 (2 fixable) | 8 | 15 | 45 MB | 8 | 6 months |
 
-```text
-Container Vulnerability Scan Results:
+The headline number: **4 fixable critical and 14 fixable high vulnerabilities** across three images. The api-server is the worst offender -- an old Debian bullseye base with a 4-month-old Node image accounts for most of the findings. The web-frontend, despite being the smallest image, has a critical finding because the nginx base is 6 months old.
 
-api-server:latest (node:18-bullseye base)
-  Critical: 3 (all fixable)  |  High: 12 (9 fixable)  |  Medium: 34  |  Low: 87
-  Image size: 1.2GB  |  Layers: 23  |  Base image age: 4 months
+A pattern is already visible: most vulnerabilities come from base images and system packages, not from application code. This matters for prioritization -- base image updates are usually low-risk and high-impact.
 
-worker:latest (python:3.11-slim base)
-  Critical: 0  |  High: 4 (3 fixable)  |  Medium: 18  |  Low: 42
-  Image size: 340MB  |  Layers: 14  |  Base image age: 2 months
+### Step 2: Triage by Exploitability
 
-web-frontend:latest (nginx:1.24-alpine base)
-  Critical: 1 (fixable)  |  High: 2 (2 fixable)  |  Medium: 8  |  Low: 15
-  Image size: 45MB  |  Layers: 8  |  Base image age: 6 months
-
-Total fixable critical/high vulnerabilities: 4 critical, 14 high
-```
-
-### 3. Get actionable remediation plans
+Raw CVE counts are misleading. A critical vulnerability in a library your code never calls is less urgent than a moderate one in your hot path:
 
 ```text
 For each critical and high-severity fixable vulnerability, tell me exactly what to change in the Dockerfile or package files to fix it. Prioritize by exploitability.
 ```
 
-### 4. The agent creates a remediation plan
+The triage reveals that not all "critical" findings are equal:
 
-```text
-Remediation Plan — Priority Order:
+**CVE-2024-38816** (Critical) -- Spring Web path traversal in `api-server`
 
-1. CRITICAL: CVE-2024-38816 in api-server (Spring Web path traversal)
-   Not applicable — this is a Node.js service, Spring is an unused transitive dependency
-   Fix: Add to .dockerignore or remove with multi-stage build
-   Risk: None (false positive for this service)
+This is a false positive. The api-server is a Node.js service -- Spring Web is an unused transitive dependency pulled in by a Java-based build tool that exists in the full `bullseye` base image but is never invoked at runtime. Switching to a multi-stage build that only copies the Node.js runtime into the final image eliminates it entirely. Risk: none. This CVE should never have been attributed to this service.
 
-2. CRITICAL: CVE-2025-1023 in api-server (OpenSSL buffer overflow)
-   Fix: Update base image from node:18-bullseye to node:18-bookworm
-   Dockerfile change: Line 1: FROM node:18-bookworm
-   Risk: Low — Debian bookworm is the current stable
+**CVE-2025-1023** (Critical) -- OpenSSL buffer overflow in `api-server`
 
-3. CRITICAL: CVE-2024-45490 in web-frontend (libexpat heap overflow)
-   Fix: Update base image from nginx:1.24-alpine to nginx:1.27-alpine
-   Dockerfile change: Line 1: FROM nginx:1.27-alpine
-   Risk: Low — nginx 1.27 is backward compatible with 1.24 config
+Real vulnerability in the base image's OpenSSL package. The api-server makes TLS connections to external APIs, so OpenSSL is in the active code path. Fix: update the base image from `node:18-bullseye` to `node:18-bookworm`. This is a single-line Dockerfile change:
+
+```dockerfile
+# Before
+FROM node:18-bullseye
+
+# After — Debian Bookworm is the current stable release
+FROM node:18-bookworm
 ```
 
-### 5. Generate fixed Dockerfiles
+Risk: low. Bookworm is Debian's current stable, and the Node.js runtime is identical across both base images.
+
+**CVE-2024-45490** (Critical) -- libexpat heap overflow in `web-frontend`
+
+Real vulnerability in the nginx base image's XML parsing library. Even though the web-frontend is a simple static file server, libexpat is part of the Alpine base and could be exploited if the server processes any XML-like content. Fix: update from `nginx:1.24-alpine` to `nginx:1.27-alpine`. Risk: low -- nginx 1.27 is backward compatible with 1.24 config files; no configuration changes needed.
+
+This is the value of triage: 3 "critical" vulnerabilities, but one is a false positive, and the other two are single-line base image updates. Without triage, Soren's team would be staring at 136 CVEs trying to figure out where to start.
+
+### Step 3: Generate Fixed Dockerfiles
+
+With the remediation plan clear, the actual fixes get applied:
 
 ```text
 Generate updated Dockerfiles for all three images with the security fixes applied. Add a comment explaining each change.
 ```
 
-The agent produces updated Dockerfiles with base image upgrades, removed unnecessary packages, and multi-stage build improvements.
+The api-server gets the biggest overhaul. The original Dockerfile uses a single-stage build on `node:18-bullseye` -- a 1.2 GB image that includes compilers, build tools, and system libraries that have nothing to do with running a Node.js API. The updated Dockerfile uses a multi-stage build:
+
+```dockerfile
+# Build stage — full image with compilers and dev tools
+FROM node:18-bookworm AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Runtime stage — only what's needed to run
+FROM node:18-bookworm-slim
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./
+USER node
+HEALTHCHECK --interval=30s CMD curl -f http://localhost:3000/health || exit 1
+CMD ["node", "dist/server.js"]
+```
+
+The build stage installs dependencies and compiles TypeScript. The runtime stage copies only the compiled output and production `node_modules`.
+
+This eliminates the entire class of "system package" vulnerabilities -- the build tools and their transitive dependencies never make it into the final image. The image drops from 1.2 GB to around 180 MB.
+
+The worker gets a base image bump from `python:3.11-slim` to `python:3.11-slim-bookworm` with a pinned digest. The web-frontend gets an nginx version bump from 1.24 to 1.27, also pinned by digest. Both changes are single-line edits with no configuration changes needed.
+
+### Step 4: Verify the Fixes
+
+A re-scan after applying all changes confirms the results:
+
+| Image | Before (Critical/High) | After (Critical/High) | Size Change |
+|-------|------------------------|----------------------|-------------|
+| `api-server:latest` | 3 / 12 | 0 / 1 (unfixable, no upstream patch) | 1.2 GB to 180 MB |
+| `worker:latest` | 0 / 4 | 0 / 0 | 340 MB to 290 MB |
+| `web-frontend:latest` | 1 / 2 | 0 / 0 | 45 MB to 42 MB |
+
+The single remaining high-severity finding in api-server is in a system library with no upstream fix yet -- the maintainers have acknowledged the CVE but have not released a patch. It goes into a tracking list for monthly re-check with a documented risk acceptance: "CVE-XXXX in libfoo: no upstream patch available, not directly exploitable in our usage pattern, monitored monthly." When the upstream fix arrives, the base image will pick it up automatically on the next rebuild.
+
+The size reductions are a bonus. The api-server went from 1.2 GB to 180 MB -- an 85% reduction. Smaller images mean faster pulls, faster deploys, and less storage cost. But the security benefit is the real win: fewer packages in the image means fewer things that can have vulnerabilities.
+
+### Step 5: Add Scanning to the CI Pipeline
+
+Fixing existing images is a one-time effort. Preventing new vulnerabilities from shipping requires continuous scanning:
+
+```text
+Add Trivy scanning to our CI pipeline. Fail builds on any critical vulnerability. Warn on high. Post results as a PR comment so developers see the findings during code review.
+```
+
+The CI integration scans every Docker image at build time, before it can be pushed to the container registry. Critical findings block the build. High findings post a warning comment on the PR with the specific CVE, affected package, and recommended fix. Developers see security findings during normal code review instead of months later during an audit.
+
+The pipeline also pins base image digests in each Dockerfile and checks for newer base images weekly. When a base image update is available that resolves known CVEs, the pipeline opens a PR with the digest update. This prevents the "6-month-old base image" problem that caused most of the original findings -- base images stay current without anyone needing to remember to update them.
 
 ## Real-World Example
 
-Soren is a DevOps engineer at a healthcare startup that must pass security audits quarterly. Their last audit flagged 12 critical CVEs across container images, and the team had 30 days to remediate. Using the container security scanning workflow:
+Soren applies all fixes in one afternoon. The re-scan shows zero critical CVEs across all 8 production images. The quarterly security audit passes with two weeks to spare.
 
-1. Soren asks the agent to scan all 8 production images and triage the findings
-2. The agent finds 7 of the 12 critical CVEs are in base image system packages — fixable by updating base images
-3. Three more are in transitive npm dependencies not actually imported at runtime — the agent marks these as false positives with evidence
-4. The remaining two require actual dependency upgrades — the agent generates the package.json changes and test commands
-5. Soren applies all fixes in one afternoon, re-scans to confirm zero critical CVEs, and passes the audit with two weeks to spare
+But the real payoff is what happens next. Three weeks later, a developer adds a new dependency that pulls in a library with a known critical CVE. The CI pipeline catches it before the image reaches staging. The developer swaps in an alternative library, and the build passes cleanly. The whole interaction takes 20 minutes -- no Slack threads, no audit scramble, no emergency.
 
-## Tips for Container Security
-
-- **Use minimal base images** — alpine and distroless images have fewer packages and therefore fewer vulnerabilities
-- **Pin base image digests** — using `node:18` pulls whatever the latest build is; pin the SHA256 digest for reproducibility
-- **Scan in CI, not just locally** — developers forget to scan; automated gates don't
-- **Don't ignore unfixable CVEs forever** — track them and re-check monthly; upstream fixes arrive over time
-- **Separate build-time from runtime dependencies** — multi-stage builds ensure dev tools don't ship to production
+The team goes from "136 CVEs in a Slack thread nobody reads" to "zero critical vulnerabilities, caught at build time." The quarterly audit scramble is replaced by continuous verification that takes zero ongoing effort.

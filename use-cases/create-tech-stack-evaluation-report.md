@@ -25,7 +25,7 @@ Tell the agent what you're evaluating and what matters:
 
 > We need to choose a message queue for our event-driven architecture. Compare RabbitMQ, Apache Kafka, Amazon SQS, and Redis Streams. Our criteria: throughput (>50k msgs/sec), latency (<10ms p99), operational complexity, cost at our scale (500M messages/month), and ecosystem maturity.
 
-### 2. The agent researches each option
+### 2. Research each option
 
 The agent searches for recent benchmarks, documentation, pricing pages, and community discussions for each technology:
 
@@ -40,7 +40,6 @@ Research complete. Sources analyzed:
 
 ### 3. Review the scoring matrix
 
-```text
 Tech Stack Evaluation — Message Queue
 
 | Criteria              | Weight | Kafka  | RabbitMQ | SQS    | Redis Streams |
@@ -52,13 +51,12 @@ Tech Stack Evaluation — Message Queue
 | Ecosystem maturity    | 15%    | 9/10   | 8/10     | 7/10   | 5/10          |
 |                       |        |        |          |        |               |
 | **Weighted Score**    |        | **7.1**| **6.8**  | **7.2**| **7.2**       |
-```
 
 ### 4. Get the detailed recommendation
 
 > Give me the full recommendation with trade-offs for each option and your top pick for our use case.
 
-### 5. The agent delivers a structured report
+### 5. Generate the structured report
 
 The agent generates a complete evaluation document with an executive summary, detailed analysis per option, risk assessment, migration considerations, and a final recommendation with reasoning — ready to share with stakeholders.
 

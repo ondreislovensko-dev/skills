@@ -11,115 +11,120 @@ tags: [api-deprecation, api-lifecycle, versioning, developer-experience]
 
 ## The Problem
 
-A 30-person platform team maintains a REST API with 140 endpoints. Over the years, 23 endpoints have been superseded by newer versions but never removed because nobody knows who's still calling them. The deprecated endpoints still get bug reports, need security patches, and slow down every refactor. When someone tried removing an endpoint last year, it broke a partner integration nobody knew about — causing a 4-hour outage. Now nobody dares remove anything, and the API surface keeps growing. The team spends 20% of their maintenance time on endpoints that should no longer exist.
+A 30-person platform team maintains a REST API with 140 endpoints. Over the years, 23 endpoints have been superseded by newer versions but never removed — because nobody knows who's still calling them. These zombie endpoints still get bug reports, need security patches, and slow down every refactor. The team spends 20% of their maintenance time on code that should no longer exist.
+
+When someone tried removing an endpoint last year, it broke a partner integration nobody knew about — causing a 4-hour outage and a difficult conversation with a customer who was paying $50K/year. Now nobody dares touch anything deprecated. New endpoints get added, old ones linger, and the API surface keeps growing. New developers onboard and ask "which version do I use?" and the answer is always "it depends, let me check" followed by a Slack thread that goes nowhere.
 
 ## The Solution
 
-Use the **api-tester** skill to analyze endpoint usage patterns, the **coding-agent** to build deprecation tracking infrastructure, and **github** to manage the deprecation lifecycle through issues and PRs.
+Using the **api-tester**, **coding-agent**, and **github** skills, the workflow analyzes 90 days of access logs to identify who's calling what and how often, builds deprecation infrastructure with proper HTTP sunset headers and migration guides, tracks consumer migration through GitHub issues, and provides a clear dashboard of what's safe to remove and what's still in use. The process that caused a 4-hour outage becomes a systematic, zero-downtime removal cycle.
 
 ## Step-by-Step Walkthrough
 
-### 1. Identify deprecation candidates
+### Step 1: Identify Deprecation Candidates
 
-Tell the agent to analyze your API:
+Start by getting visibility into what's actually being used versus what the team assumes is being used:
 
 ```text
 Analyze our API endpoints and identify candidates for deprecation. Check for: endpoints with duplicate functionality (v1 vs v2), endpoints with fewer than 10 calls per day, and endpoints not referenced in our current client SDKs. Cross-reference with access logs from the past 90 days.
 ```
 
-### 2. The agent produces a deprecation report
+### Step 2: Review the Deprecation Report
 
-```text
-API Deprecation Analysis — 140 endpoints scanned:
+The analysis across 140 endpoints produces a clear picture:
 
-Immediate candidates (superseded + low traffic):
-- GET /v1/users/{id}         — 3 calls/day (v2 available, 2 consumers)
-- POST /v1/reports/generate  — 0 calls/day (v2 available, 0 consumers)
-- GET /v1/analytics/summary  — 8 calls/day (v2 available, 1 consumer)
+**Immediate candidates (superseded + low traffic):**
 
-Review candidates (low traffic, no replacement):
-- GET /internal/health-check-legacy — 12 calls/day (appears automated)
-- POST /v1/export/pdf               — 5 calls/day (3 consumers)
+| Endpoint | Daily Calls | Consumers | Replacement |
+|----------|-------------|-----------|-------------|
+| GET /v1/users/{id} | 3 | 2 | v2 available |
+| POST /v1/reports/generate | 0 | 0 | v2 available |
+| GET /v1/analytics/summary | 8 | 1 | v2 available |
 
-Consumer breakdown for top candidates:
-- GET /v1/users/{id}: Partner API key "acme-integration" (2 calls/day), internal monitoring (1 call/day)
-- GET /v1/analytics/summary: Mobile app v3.1 and below (8 calls/day)
-```
+**Review candidates (low traffic, no direct replacement):**
 
-### 3. Create deprecation timeline and notices
+| Endpoint | Daily Calls | Consumers | Notes |
+|----------|-------------|-----------|-------|
+| GET /internal/health-check-legacy | 12 | 1 | Appears to be automated monitoring |
+| POST /v1/export/pdf | 5 | 3 | No v2 equivalent yet |
+
+The consumer breakdown is what makes safe deprecation possible. `GET /v1/users/{id}` isn't just "3 calls per day" — it's specifically the `acme-integration` partner API key making 2 calls and internal monitoring making 1. With that specificity, the team can contact each consumer directly instead of hoping everyone reads a changelog.
+
+The reports endpoint has zero consumers and zero calls. It can be removed today — no sunset period needed, no migration guide, no email. It's been dead for months and nobody noticed.
+
+### Step 3: Create the Deprecation Plan
+
+Pick an endpoint with actual consumers and set up the full lifecycle:
 
 ```text
 Create a deprecation plan for the v1/users endpoint. Set a 90-day sunset period. Generate the deprecation headers, API response warnings, and consumer notification emails.
 ```
 
-The agent sets up the full deprecation lifecycle:
+The plan follows HTTP deprecation standards (RFC 8594) with a clear timeline:
 
-```text
-Deprecation plan created for GET /v1/users/{id}:
+| Day | Action | Impact |
+|-----|--------|--------|
+| 0 (today) | Add `Sunset` and `Deprecation` headers to all responses | Zero — headers are informational |
+| 0 | Email identified consumers with migration guide | Consumer awareness |
+| 30 | Add deprecation warning to JSON response body | Visible in consumer logs |
+| 60 | Return `299` warning header, log all remaining callers | Last chance to migrate |
+| 90 | Return `410 Gone` with migration guide URL | Endpoint removed |
 
-Timeline:
-- Day 0 (today): Add Sunset and Deprecation headers to responses
-- Day 0: Notify identified consumers via email
-- Day 30: Add deprecation warning to response body
-- Day 60: Return 299 warning header + log all remaining callers
-- Day 90: Return 410 Gone (with migration guide URL)
+Three files get generated:
 
-Files generated:
-- middleware/deprecation-headers.ts — Adds Sunset/Deprecation headers
-- docs/migration-guide-v1-users.md — Step-by-step migration to v2
-- emails/deprecation-notice-v1-users.md — Consumer notification template
-```
+- **`middleware/deprecation-headers.ts`** — adds `Sunset` and `Deprecation` headers per RFC 8594. The Sunset header includes the exact date, so automated tools can parse it.
+- **`docs/migration-guide-v1-users.md`** — step-by-step migration instructions with before/after code examples showing the v1 call and its v2 equivalent. Covers authentication changes, response format differences, and edge cases.
+- **`emails/deprecation-notice-v1-users.md`** — consumer notification template with the sunset date, migration guide link, support contact, and a clear call-to-action.
 
-### 4. Track migration progress
+The graduated approach means consumers who monitor HTTP headers catch the deprecation on day 0. Consumers who don't read emails see the warning in response bodies on day 30. The `299` header on day 60 triggers alerts in most API monitoring tools — tools like Datadog and Grafana flag 299 headers by default. By day 90, anyone still calling the endpoint has been warned through three different channels over three months.
 
-The agent creates a GitHub issue to track each deprecation:
+The migration guide is the piece that makes the difference between "we told them it's deprecated" and "we made it easy to migrate." It includes side-by-side code examples showing the v1 request/response and the exact v2 equivalent, plus notes on response format changes that would break client-side parsing.
 
-```text
-GitHub issue created: #892 "Deprecate GET /v1/users/{id} — Sunset: 2026-05-18"
+### Step 4: Track Migration with GitHub Issues
 
-Checklist:
+Each deprecation gets a tracking issue with an automated checklist:
+
+**GitHub issue #892: "Deprecate GET /v1/users/{id} — Sunset: 2026-05-18"**
+
 - [x] Deprecation headers added
-- [x] Consumer notification sent
+- [x] Consumer notification sent (2 consumers)
 - [x] Migration guide published
 - [ ] All consumers migrated (1/2 remaining)
-- [ ] 30-day warning activated
-- [ ] 60-day final warning activated
-- [ ] Endpoint removed
+- [ ] 30-day warning activated (Mar 18)
+- [ ] 60-day final warning activated (Apr 17)
+- [ ] Endpoint removed (May 18)
 
-Labels: api-deprecation, sunset/2026-05-18
+Labels: `api-deprecation`, `sunset/2026-05-18`
 Assigned: @platform-team
-```
 
-### 5. Monitor consumer migration
+The checklist makes progress visible to the whole team. Nobody has to ask "where are we on that deprecation?" — the issue tells them. The sunset date in the label makes it searchable, and the checklist items can be automated: when traffic from the last remaining consumer drops to zero, the "all consumers migrated" box checks itself.
+
+### Step 5: Monitor Consumer Migration
+
+As sunset dates approach, track who's migrated and who needs a nudge:
 
 ```text
 Show me migration progress for all active deprecations. Which consumers haven't migrated yet?
 ```
 
-```text
-Active Deprecations Dashboard:
+**Active Deprecations Dashboard:**
 
-GET /v1/users/{id} — Sunset: May 18, 2026
-  Progress: 1/2 consumers migrated
-  Remaining: "acme-integration" (2 calls/day, contacted Feb 17)
-  Days until sunset: 90
+| Endpoint | Sunset | Migrated | Remaining | Action Needed |
+|----------|--------|----------|-----------|---------------|
+| GET /v1/users/{id} | May 18 | 1/2 | acme-integration (2 calls/day) | Follow-up email sent Feb 17 |
+| POST /v1/reports/generate | Apr 15 | 0/0 | None | Ready for immediate removal |
+| GET /v1/analytics/summary | May 18 | 0/1 | Mobile app v3.1 and below | Force-update scheduled Mar 1 |
 
-POST /v1/reports/generate — Sunset: Apr 15, 2026
-  Progress: 0/0 consumers (no active callers)
-  Ready for removal now
+The reports endpoint can be removed immediately — no consumers, no traffic, no risk. The analytics endpoint is blocked on a mobile app force-update that has its own timeline. The users endpoint needs one more outreach to the Acme partner, and if they don't respond by day 60, the 299 warning header will trigger their monitoring.
 
-GET /v1/analytics/summary — Sunset: May 18, 2026
-  Progress: 0/1 consumers migrated
-  Remaining: Mobile app v3.1 (force-update scheduled Mar 1)
-  Days until sunset: 90
-```
+This dashboard replaces the fear-based approach ("don't touch it, someone might be using it") with data-driven confidence ("we know exactly who's using it and we've contacted them").
 
 ## Real-World Example
 
-Kenji is a platform engineer at a 30-person API-first company. The team wastes hours maintaining 23 deprecated endpoints because they're afraid to remove them.
+Kenji is a platform engineer at a 30-person API-first company. The team wastes hours maintaining 23 deprecated endpoints because the outage incident last year made everyone afraid to remove anything. The API documentation lists v1, v2, and sometimes v3 of the same endpoint, and new developers never know which one to use.
 
-1. He asks the agent to analyze all 140 endpoints against 90 days of access logs and identify deprecation candidates
-2. The agent finds 3 endpoints that are superseded and have fewer than 10 calls per day, with only 3 consumers total
-3. It generates deprecation headers, migration guides, and consumer notifications for each endpoint
-4. GitHub issues track the migration progress with automated checklists and sunset dates
-5. After the first 90-day cycle, 3 endpoints are safely removed. The team applies the same process quarterly, reducing their API surface by 15% and reclaiming 20% of maintenance time
+He runs the analysis against 90 days of access logs and finds that 3 endpoints are superseded with fewer than 10 calls per day from only 3 consumers total. One endpoint — `POST /v1/reports/generate` — has zero calls and zero consumers. It's been dead for at least 90 days.
+
+The agent generates deprecation headers, migration guides with code examples, and consumer notification emails for each endpoint. GitHub issues track the migration progress with automated checklists and sunset dates. The dead endpoint gets removed in the first week.
+
+After the first 90-day cycle, all 3 endpoints are safely removed with zero incidents. The team applies the same process quarterly. Within six months, the API surface shrinks by 15%, the maintenance burden on deprecated code drops from 20% of the team's time to near zero, and new developers stop asking "which version should I use?" because the answer is always "the one that's not deprecated."

@@ -11,101 +11,130 @@ tags: [hiring, interview, technical-assessment, codebase-analysis]
 
 ## The Problem
 
-A 25-person startup is hiring three backend engineers but their interview process uses generic LeetCode-style questions that don't reflect the actual work. Candidates who ace algorithm puzzles sometimes struggle with the real codebase — event-driven architecture, complex database queries, and third-party API integrations. Meanwhile, strong practical engineers who would thrive on the team fail the whiteboard rounds. The engineering manager spends 5 hours per role crafting take-home assignments from scratch, and they go stale as the codebase evolves. There's no systematic way to generate interview questions that match what the team actually builds.
+A 25-person startup is hiring three backend engineers, and their interview process is broken in a specific, measurable way. The technical interviews use generic LeetCode-style questions — reverse a linked list, find the shortest path in a graph — that have almost no correlation with the actual work. Candidates who ace algorithm puzzles sometimes struggle with the real codebase: event-driven architecture with RabbitMQ, complex multi-table SQL queries, and third-party webhook integrations with idempotency requirements.
+
+Meanwhile, strong practical engineers who would thrive on the team fail the whiteboard rounds because they have not practiced competitive programming recently. The team has already lost two excellent candidates to this mismatch.
+
+The engineering manager spends 5 hours per role crafting take-home assignments from scratch, and the questions go stale as the codebase evolves. By the time a question makes it through three hiring rounds, the code patterns it tests have been refactored out of existence. There is no systematic way to generate interview questions that reflect what the team actually builds every day.
 
 ## The Solution
 
-Use the **coding-agent** to analyze your codebase and identify representative patterns, **applicant-screening** to structure the assessment criteria, and **markdown-writer** to produce polished interview question documents with rubrics.
+Using the **coding-agent**, **applicant-screening**, and **markdown-writer** skills, the agent analyzes the codebase to identify the patterns that matter most (by commit frequency and architectural importance), structures questions at three difficulty tiers with scoring rubrics, and packages take-home assignments with automated test suites. The result is an interview process that tests what the job actually requires, not what a generic "backend engineer" job description says.
 
 ## Step-by-Step Walkthrough
 
-### 1. Analyze the codebase for interview-worthy patterns
+### Step 1: Analyze the Codebase for Interview-Worthy Patterns
 
-Tell the agent what role you're hiring for:
-
-> Analyze our codebase and generate technical interview questions for a mid-level backend engineer. Focus on patterns they'd actually encounter: our event-driven architecture, database query patterns, API design conventions, and error handling approach. Generate questions at easy, medium, and hard difficulty levels.
-
-### 2. The agent identifies key patterns
+Specifying the role and level matters — questions for a mid-level backend engineer should test different patterns than questions for a senior frontend engineer or a junior full-stack developer.
 
 ```text
-Codebase analysis complete — patterns identified:
+Analyze our codebase and generate technical interview questions for a
+mid-level backend engineer. Focus on patterns they'd actually encounter:
+our event-driven architecture, database query patterns, API design
+conventions, and error handling approach. Generate questions at easy,
+medium, and hard difficulty levels.
+```
 
-Architecture patterns:
-- Event-driven pub/sub with RabbitMQ (42 event handlers)
+### Step 2: Identify the Patterns That Define the Job
+
+The codebase analysis reveals what a backend engineer actually does all day — not what a textbook says they should know, but what the git log says they will work on:
+
+**Architecture patterns:**
+- Event-driven pub/sub with RabbitMQ (42 event handlers across the codebase)
 - Repository pattern for database access (18 repositories)
 - Middleware-based request validation (23 validators)
 
-Common tasks (by commit frequency):
-- Adding new API endpoints with validation
+**Most common tasks** (ranked by commit frequency):
+- Adding new API endpoints with input validation
 - Writing event handlers with retry logic
 - Complex SQL queries with joins across 3+ tables
 - Third-party webhook processing with idempotency
 
-Error handling conventions:
+**Error handling conventions:**
 - Custom error classes with error codes
-- Circuit breaker pattern for external APIs
+- Circuit breaker pattern for external API calls
 - Structured logging with correlation IDs
-```
 
-### 3. Review generated questions
+These patterns become the foundation for questions. A candidate who can write an event handler with retry logic and implement idempotent webhook processing will be productive from week one. A candidate who can reverse a linked list but has never used a message queue will need months of ramp-up.
 
-The agent produces tiered questions based on real code patterns:
+The analysis also flags what is not worth testing: the team uses a standard Express setup with no unusual middleware, and the deployment pipeline is handled by DevOps. Asking backend candidates about Docker or CI/CD configuration would test skills they will rarely use on this team.
+
+### Step 3: Generate Tiered Interview Questions
+
+The agent produces 9 questions based on real code patterns, organized by difficulty and time allocation:
+
+**Easy (warm-up, 15 minutes each):**
+
+1. "Given this API endpoint skeleton, add input validation for the user registration route using our middleware pattern" -- tests whether the candidate can read existing conventions and follow them.
+
+2. "This database query returns duplicate rows. Find and fix the join issue" -- tests basic SQL debugging, a skill used weekly.
+
+3. "Write a unit test for this event handler, mocking the message queue" -- tests testing practices and familiarity with async patterns.
+
+**Medium (core assessment, 30 minutes each):**
+
+4. "Implement a new webhook receiver that handles Stripe payment events with idempotency" -- tests the exact pattern the team implements most frequently.
+
+5. "Refactor this N+1 query into an efficient batch query using our repository pattern" -- tests performance awareness and pattern adherence.
+
+6. "Add circuit breaker logic to this third-party API client that currently fails silently" -- tests resilience thinking and error handling.
+
+**Hard (senior signal, 45 minutes each):**
+
+7. "Design an event-driven saga for our order fulfillment flow, handling partial failures" -- tests distributed systems thinking.
+
+8. "This event handler processes messages out of order under load. Implement ordering guarantees" -- tests deep understanding of message queue semantics.
+
+9. "Optimize this report query that times out on tables with 10M+ rows" -- tests database performance at scale.
+
+Every question uses real patterns from the codebase with proprietary business logic stripped out. The domain is changed (a fintech order system becomes a generic order system) but the technical challenges — retry logic, idempotency, query optimization — are preserved exactly as they exist in the real code.
+
+### Step 4: Generate Rubrics and Evaluation Guides
 
 ```text
-Generated 9 interview questions:
-
-Easy (warm-up, 15 min each):
-1. "Given this API endpoint skeleton, add input validation for the user registration route using our middleware pattern"
-2. "This database query returns duplicate rows. Find and fix the join issue"
-3. "Write a unit test for this event handler, mocking the message queue"
-
-Medium (core assessment, 30 min each):
-4. "Implement a new webhook receiver that handles Stripe payment events with idempotency"
-5. "Refactor this N+1 query into an efficient batch query using our repository pattern"
-6. "Add circuit breaker logic to this third-party API client that currently fails silently"
-
-Hard (senior signal, 45 min each):
-7. "Design an event-driven saga for our order fulfillment flow, handling partial failures"
-8. "This event handler processes messages out of order under load. Implement ordering guarantees"
-9. "Optimize this report query that times out on tables with 10M+ rows"
+Create scoring rubrics for each question. Include what a strong answer
+looks like, common mistakes, and follow-up questions to probe deeper.
 ```
 
-### 4. Generate rubrics and evaluation guides
+Each question gets a structured rubric so any interviewer on the team can evaluate consistently:
 
-> Create scoring rubrics for each question. Include what a strong answer looks like, common mistakes, and follow-up questions to probe deeper.
+- **Expected approach:** what a strong candidate does first (reads existing patterns before writing code, asks clarifying questions, considers edge cases)
+- **Key signals:** error handling, input validation, test coverage, idempotency awareness
+- **Red flags:** ignoring validation, no error handling, hardcoded values, skipping edge cases
+- **Follow-up questions:** 2-3 probing questions per problem to distinguish "memorized the pattern" from "understands the tradeoffs"
+- **Time expectations:** how long each difficulty level should take a qualified candidate
+
+The rubric transforms interviewing from "I liked this candidate's vibe" to "this candidate demonstrated 4 of 5 key competencies for the role." It also enables interviewers who are not experts in every area to evaluate effectively — a frontend-focused engineer can interview a backend candidate using the rubric because the expected answers and red flags are documented.
+
+### Step 5: Create a Take-Home Assignment
 
 ```text
-Rubrics generated: interview-questions/rubrics.md
-
-For each question:
-- Expected approach (what a strong candidate does first)
-- Key signals to watch for (error handling, edge cases, testing)
-- Red flags (ignoring validation, no error handling, hardcoded values)
-- Follow-up questions (2-3 probing questions per problem)
-- Time expectations (how long each difficulty level should take)
+Create a simplified take-home assignment based on question #4. Strip
+proprietary code, add a README with setup instructions, and include an
+automated test suite that validates the submission.
 ```
 
-### 5. Create a take-home option
+The take-home packages question #4 (webhook processing with idempotency) into a self-contained repository:
 
-> Create a simplified take-home assignment based on question #4. Strip proprietary code, add a README with setup instructions, and include an automated test suite that validates the submission.
+- A README with clear setup instructions (one `docker-compose up` command)
+- Boilerplate code with the webhook endpoint scaffolded
+- A Stripe webhook simulator that sends test events
+- An automated test suite (15 tests) that validates idempotency, error handling, and data consistency
+- A time estimate: 2-3 hours for a mid-level candidate
+- A `.env.example` with all required configuration pre-filled
 
-The agent packages a self-contained take-home repo with the problem, boilerplate, and test harness.
+The test suite runs with a single command and gives a clear pass/fail. Candidates who handle the happy path pass 8 tests. Candidates who also handle retries, duplicate events, and error recovery pass all 15. The score directly maps to the rubric.
+
+The take-home is designed to be respectful of candidates' time. The README states the expected time (2-3 hours) and explicitly says not to spend more. The automated tests mean the team can evaluate submissions quickly — no more spending an hour per submission manually testing edge cases.
 
 ## Real-World Example
 
-Aisha manages engineering at a 25-person fintech startup hiring three backend engineers. She's tired of candidates who ace LeetCode but can't work with event-driven systems.
+Aisha manages engineering at the startup and has been dreading the upcoming hiring round. Last time, she spent 15 hours writing interview materials that tested the wrong things. This time, she runs the agent against the codebase on a Monday and has a complete interview package by Tuesday: 9 questions, rubrics for every interviewer, and a take-home assignment with automated grading.
 
-1. She asks the agent to analyze the codebase and generate interview questions for mid-level backend engineers
-2. The agent identifies the team's core patterns — event-driven messaging, repository pattern, and webhook processing — and generates 9 tiered questions based on real code
-3. Each question comes with a rubric so any interviewer on the team can evaluate consistently
-4. She converts one medium question into a take-home assignment with automated tests
-5. In the next hiring round, two candidates who would have failed LeetCode-style interviews excel on the practical questions and get hired. Both are productive within their first week because the problems mirrored actual work
+In the next hiring round, two candidates who would have failed LeetCode-style interviews excel on the practical questions. One implements the webhook handler with idempotency handling that is cleaner than the team's current implementation. The other spots a subtle race condition in the event handler question that a senior team member had missed.
 
-### Tips for Better Results
+Both candidates are hired. Both are productive within their first week because the interview problems mirrored the actual work — they already understood the patterns, the conventions, and the types of bugs that show up in production. The onboarding experience is noticeably different from previous hires who aced algorithm interviews but needed weeks to learn the event-driven architecture from scratch.
 
-- Regenerate questions quarterly as the codebase evolves — stale questions test patterns the team no longer uses
-- Include context from real pull requests so questions reflect actual code review scenarios
-- Calibrate difficulty by having existing team members try the questions first
-- Create multiple variants of each question to prevent candidates from sharing answers
-- Pair take-home questions with a live discussion to assess the candidate's reasoning, not just their solution
-- Strip all proprietary business logic — use the patterns but anonymize the domain
+Aisha regenerates the questions quarterly as the codebase evolves — the team recently adopted a CQRS pattern for high-write endpoints, so the next batch of questions will include that pattern. She creates multiple variants of each question to prevent answer sharing between candidates, and calibrates difficulty by having existing team members time-test each question before using it in interviews.
+
+The hiring process now has a data-driven feedback loop: every quarter, Aisha compares the interview scores of hired engineers against their performance reviews. The correlation between practical question scores and on-the-job performance is significantly stronger than the old LeetCode scores ever were.

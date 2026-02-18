@@ -17,85 +17,282 @@ The rollback took 47 minutes. During that window, 340 invoices failed to generat
 
 This wasn't the first time. Three months earlier, a redesigned dashboard confused users so badly that support tickets tripled for a week. The team had no way to show the new UI to a small group first, measure the impact, and expand gradually. It was all-or-nothing.
 
-The deploy process: merge to main → CI builds → deploy to all servers → pray. No percentage rollouts. No user targeting. No kill switch that doesn't require a full redeploy. The team avoids shipping on Fridays, avoids shipping before holidays, and increasingly avoids shipping anything that touches core flows. Feature velocity has dropped 40% in six months because everyone is afraid of the blast radius.
+The deploy process: merge to main, CI builds, deploy to all servers, pray. No percentage rollouts. No user targeting. No kill switch that doesn't require a full redeploy. The team avoids shipping on Fridays, avoids shipping before holidays, and increasingly avoids shipping anything that touches core flows. Feature velocity has dropped 40% in six months because everyone is afraid of the blast radius.
 
 Meanwhile, the product team wants to run experiments — test a new pricing page, try a different onboarding flow, show a chatbot to free-tier users only. Without feature flags, every experiment requires a branch, a deploy, and a way to segment users that doesn't exist.
 
 ## The Solution
 
-Build a feature flag system with percentage-based rollouts, user targeting rules, real-time kill switches, and analytics integration to measure impact — so features ship to 1% first, then 10%, then 50%, then everyone, with data at every stage.
+Using the **feature-flag-manager**, **ab-test-setup**, and **analytics-tracking** skills, the system builds a self-hosted feature flag engine with percentage-based rollouts, user targeting rules, real-time kill switches, and analytics integration — so features ship to 1% first, then 10%, then 50%, then everyone, with data at every stage and an instant off-switch that doesn't require a deploy.
 
-### Prompt for Your AI Agent
+## Step-by-Step Walkthrough
 
-> I need to implement a feature flag system for our Node.js/React invoicing platform. Here's what we need:
->
-> **Current stack:**
-> - Backend: Node.js (Express), PostgreSQL, Redis
-> - Frontend: React (Next.js)
-> - 12,000 active accounts, ~45,000 monthly active users
-> - Deploy via GitHub Actions → Kubernetes
->
-> **Requirements:**
->
-> 1. **Flag types:**
->    - Boolean (on/off) — simple kill switches
->    - Percentage rollout — show to X% of users, deterministic (same user always gets same result)
->    - User targeting — enable for specific user IDs, account IDs, or email domains
->    - Rule-based — enable based on user attributes (plan tier, country, account age, etc.)
->
-> 2. **Flags we need right now:**
->    - `new-pdf-engine` — rollout new PDF export, starting at 5% of accounts
->    - `redesigned-dashboard` — A/B test: 50% see old, 50% see new
->    - `ai-chatbot` — enable only for free-tier accounts in US and UK
->    - `bulk-invoice-api` — enable for 3 specific enterprise account IDs
->    - `maintenance-mode` — global kill switch, off by default
->
-> 3. **SDK requirements:**
->    - Server-side evaluation (Node.js) — flags checked in API handlers
->    - Client-side SDK (React) — flags available via hook: `useFeatureFlag('new-pdf-engine')`
->    - Deterministic bucketing — user sees the same variant across sessions and devices
->    - Local evaluation with cached rules — no network call per flag check (latency budget: <1ms)
->
-> 4. **Rollout workflow:**
->    - Create flag with targeting rules
->    - Start at 5% → monitor error rates and latency for 24h
->    - If metrics are green, increase to 25% → 50% → 100%
->    - If metrics spike, kill switch to 0% instantly (no redeploy)
->    - After full rollout and 2 weeks stable, remove flag from code (flag hygiene)
->
-> 5. **Analytics integration:**
->    - Track which flag variant each user is in
->    - Send flag assignments to analytics (Mixpanel/Amplitude)
->    - Compare conversion rates, error rates, latency between flag-on and flag-off groups
->    - Dashboard showing: flag status, rollout %, users affected, key metrics per variant
->
-> 6. **Implementation options (pick the best fit):**
->    - Self-hosted with Redis/PostgreSQL (we control everything, no vendor)
->    - OR use LaunchDarkly/Unleash SDK (managed, less maintenance)
->    - Either way, build the evaluation logic, React hook, and rollout automation
->
-> Build the flag evaluation engine, targeting rules, React SDK hook, and the gradual rollout automation that monitors metrics and auto-progresses or auto-rolls-back.
+### Step 1: Design the Flag Data Model and Evaluation Engine
 
-### What Your Agent Will Do
+The core of any feature flag system is deterministic evaluation — the same user must see the same variant across sessions, devices, and servers, without storing assignments. MurmurHash on `userId + flagName` gives a stable number between 0 and 100 that determines bucketing:
 
-1. **Read the `feature-flag-manager` skill** for flag evaluation, deterministic bucketing, targeting rules, and lifecycle patterns
-2. **Design the flag data model** — flag name, type, rules (percentage, user list, attribute-based), enabled state, created/updated timestamps
-3. **Build the evaluation engine** — deterministic hashing (MurmurHash on userId + flagName), rule evaluation with priority ordering, local caching with Redis pub/sub invalidation
-4. **Implement targeting rules** — percentage rollout, user/account allowlists, attribute matchers (plan, country, age), boolean overrides
-5. **Create the server-side SDK** — `flagClient.isEnabled('new-pdf-engine', { userId, accountId, plan, country })` with <1ms evaluation from cached rules
-6. **Build the React hook** — `useFeatureFlag('redesigned-dashboard')` that bootstraps flags on page load and updates via SSE/WebSocket
-7. **Set up the 5 initial flags** — new-pdf-engine (5% rollout), redesigned-dashboard (50/50 A/B), ai-chatbot (rule-based), bulk-invoice-api (allowlist), maintenance-mode (kill switch)
-8. **Wire analytics integration** — send flag assignments as user properties to Mixpanel/Amplitude, track variant-level metrics
-9. **Build rollout automation** — monitor error rate and p95 latency per variant, auto-progress (5% → 25% → 50% → 100%) if metrics are within thresholds, auto-rollback if error rate exceeds baseline by 2x
-10. **Add flag hygiene tooling** — report flags that have been at 100% for >14 days as candidates for code removal, lint rule to flag stale feature flag checks
+```typescript
+// lib/flags/evaluator.ts
+import murmurhash from "murmurhash";
 
-### Expected Outcome
+interface FlagRule {
+  type: "boolean" | "percentage" | "user_list" | "attribute";
+  enabled: boolean;
+  percentage?: number;
+  userIds?: string[];
+  accountIds?: string[];
+  attribute?: { key: string; operator: "eq" | "in" | "gt" | "lt"; value: any };
+}
 
-- **Rollout safety**: New PDF engine ships to 5% first — the 200+ line item bug is caught when only 600 accounts are affected, not 12,000
-- **Kill switch speed**: Flag toggled to 0% in under 3 seconds via admin UI (no redeploy, no CI pipeline)
-- **Evaluation latency**: <0.5ms per flag check from local cache, Redis pub/sub syncs rule changes in <2 seconds
-- **A/B testing**: Dashboard redesign runs as 50/50 experiment — data shows new design increases invoice creation by 12% but decreases PDF exports by 8%, informing the decision with data
-- **Targeting precision**: AI chatbot shown only to free-tier US/UK users (2,100 accounts), enterprise features enabled for exactly 3 named accounts
-- **Feature velocity**: Teams ship 3x more frequently — small rollouts with instant rollback remove the fear of deploying
-- **Flag hygiene**: Automated alerts when flags are stale; codebase stays clean with 0 flags older than 30 days at 100%
-- **Incident reduction**: Zero full-blast-radius incidents in the 3 months after adoption (vs 2 in the prior 3 months)
+interface FlagDefinition {
+  name: string;
+  rules: FlagRule[];     // Evaluated in order — first match wins
+  defaultValue: boolean;
+  killSwitch: boolean;   // When true, overrides everything → returns false
+}
+
+function evaluateFlag(flag: FlagDefinition, context: UserContext): boolean {
+  // Kill switch is the nuclear option — overrides all rules
+  if (flag.killSwitch) return false;
+
+  for (const rule of flag.rules) {
+    if (!rule.enabled) continue;
+
+    switch (rule.type) {
+      case "boolean":
+        return rule.enabled;
+
+      case "percentage":
+        // Deterministic: same user + flag always produces same bucket
+        const hash = murmurhash.v3(`${context.userId}:${flag.name}`);
+        const bucket = hash % 100;
+        return bucket < (rule.percentage ?? 0);
+
+      case "user_list":
+        if (rule.userIds?.includes(context.userId)) return true;
+        if (rule.accountIds?.includes(context.accountId)) return true;
+        continue;  // No match — try next rule
+
+      case "attribute":
+        if (matchesAttribute(rule.attribute, context)) return true;
+        continue;
+    }
+  }
+  return flag.defaultValue;
+}
+```
+
+The `killSwitch` field is separate from the rules — it's a single boolean that trumps everything. When an incident happens, toggling it to `true` disables the flag in under 3 seconds via Redis pub/sub, no deploy needed. No more 47-minute rollbacks.
+
+### Step 2: Build the Server-Side SDK with Local Caching
+
+Flag checks happen in API handlers on every request. A network call per check would add unacceptable latency. Instead, rules are cached locally and kept in sync via Redis pub/sub — evaluation happens in-process in under 1ms:
+
+```typescript
+// lib/flags/client.ts
+import Redis from "ioredis";
+
+class FlagClient {
+  private rules: Map<string, FlagDefinition> = new Map();
+  private redis: Redis;
+
+  async initialize() {
+    // Load all flag definitions on startup
+    const flags = await db.query("SELECT * FROM feature_flags WHERE archived = false");
+    for (const flag of flags) {
+      this.rules.set(flag.name, flag);
+    }
+
+    // Subscribe to real-time updates — no polling, no stale cache
+    this.redis = new Redis(process.env.REDIS_URL);
+    this.redis.subscribe("flag-updates");
+    this.redis.on("message", (channel, message) => {
+      const updated = JSON.parse(message);
+      this.rules.set(updated.name, updated);
+      console.log(`[flags] Updated ${updated.name}: ${JSON.stringify(updated.rules)}`);
+    });
+  }
+
+  isEnabled(flagName: string, context: UserContext): boolean {
+    const flag = this.rules.get(flagName);
+    if (!flag) return false;  // Unknown flags default to off — safe
+    return evaluateFlag(flag, context);
+  }
+}
+
+// Singleton — initialized once at app startup
+export const flags = new FlagClient();
+```
+
+Usage in an API handler looks like this:
+
+```typescript
+// routes/invoices.ts
+router.post("/:id/export-pdf", async (req, res) => {
+  const context = { userId: req.user.id, accountId: req.user.accountId, plan: req.user.plan };
+
+  if (flags.isEnabled("new-pdf-engine", context)) {
+    return newPdfEngine.export(req.params.id, res);
+  }
+  return legacyPdfEngine.export(req.params.id, res);
+});
+```
+
+When the admin UI changes a flag, it writes to PostgreSQL and publishes to Redis. Every server picks up the change within 2 seconds. No redeploy, no restart, no CI pipeline.
+
+### Step 3: Create the React Hook for Client-Side Flags
+
+The frontend needs flags too — showing or hiding UI elements, rendering different components for A/B tests. A React hook bootstraps flag assignments on page load and updates in real time via Server-Sent Events:
+
+```typescript
+// hooks/useFeatureFlag.ts
+import { createContext, useContext, useEffect, useState } from "react";
+
+const FlagContext = createContext<Record<string, boolean>>({});
+
+export function FlagProvider({ children }: { children: React.ReactNode }) {
+  const [flags, setFlags] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetch("/api/flags/evaluate").then(r => r.json()).then(setFlags);
+
+    // Real-time updates via SSE — kill switches take effect immediately
+    const sse = new EventSource("/api/flags/stream");
+    sse.onmessage = (event) => {
+      const { name, value } = JSON.parse(event.data);
+      setFlags(prev => ({ ...prev, [name]: value }));
+    };
+    return () => sse.close();
+  }, []);
+
+  return <FlagContext.Provider value={flags}>{children}</FlagContext.Provider>;
+}
+
+export function useFeatureFlag(name: string): boolean {
+  return useContext(FlagContext)[name] ?? false;
+}
+```
+
+Usage is straightforward — `useFeatureFlag("redesigned-dashboard")` returns a boolean, and the SSE connection means a kill switch toggled in the admin UI propagates to the browser within seconds. No page refresh required.
+
+### Step 4: Configure the Five Initial Flags
+
+With the engine in place, set up the five flags that address Ravi's immediate pain points. Each uses a different targeting strategy:
+
+| Flag | Type | Targeting |
+|------|------|-----------|
+| `new-pdf-engine` | Percentage | 5% of accounts (600 of 12,000) |
+| `redesigned-dashboard` | Percentage | 50/50 A/B test |
+| `ai-chatbot` | Attribute | Free-tier accounts in US and UK (2,100) |
+| `bulk-invoice-api` | User list | 3 specific enterprise account IDs |
+| `maintenance-mode` | Boolean | Global kill switch, off by default |
+
+```typescript
+// scripts/seed-flags.ts — abbreviated
+const initialFlags: FlagDefinition[] = [
+  { name: "new-pdf-engine",
+    rules: [{ type: "percentage", enabled: true, percentage: 5 }],
+    defaultValue: false, killSwitch: false },
+  { name: "redesigned-dashboard",
+    rules: [{ type: "percentage", enabled: true, percentage: 50 }],
+    defaultValue: false, killSwitch: false },
+  { name: "ai-chatbot",
+    rules: [
+      { type: "attribute", enabled: true, attribute: { key: "plan", operator: "eq", value: "free" } },
+      { type: "attribute", enabled: true, attribute: { key: "country", operator: "in", value: ["US", "UK"] } },
+    ],
+    defaultValue: false, killSwitch: false },
+  { name: "bulk-invoice-api",
+    rules: [{ type: "user_list", enabled: true, accountIds: ["acct_3kF8j", "acct_9mN2p", "acct_7xQ4r"] }],
+    defaultValue: false, killSwitch: false },
+  { name: "maintenance-mode",
+    rules: [{ type: "boolean", enabled: false }],
+    defaultValue: false, killSwitch: false },
+];
+```
+
+The PDF engine at 5% means if the 200+ line item bug still exists, it affects 600 accounts instead of 12,000 — and the kill switch can stop it in 3 seconds instead of 47 minutes.
+
+### Step 5: Wire Analytics and Build Rollout Automation
+
+Flags without data are just guesses. Every flag evaluation gets sent to Mixpanel as a user property, so conversion rates and error rates can be compared between flag-on and flag-off groups:
+
+```typescript
+// lib/flags/analytics.ts
+import mixpanel from "mixpanel";
+
+function trackFlagAssignment(flagName: string, value: boolean, context: UserContext) {
+  mixpanel.people.set(context.userId, {
+    [`flag_${flagName}`]: value ? "treatment" : "control",
+  });
+  mixpanel.track("flag_evaluated", {
+    distinct_id: context.userId,
+    flag: flagName,
+    variant: value ? "treatment" : "control",
+    account_id: context.accountId,
+    plan: context.plan,
+  });
+}
+```
+
+The rollout automation monitors these metrics and auto-progresses or auto-rolls-back:
+
+```typescript
+// jobs/rollout-monitor.ts — runs every hour via cron
+async function checkRolloutHealth(flagName: string) {
+  const flag = await db.featureFlags.findOne({ name: flagName });
+  const metrics = await getMetricsForFlag(flagName);
+
+  const treatmentErrorRate = metrics.treatment.errorRate;
+  const controlErrorRate = metrics.control.errorRate;
+  const p95Treatment = metrics.treatment.p95Latency;
+  const p95Control = metrics.control.p95Latency;
+
+  // Auto-rollback: error rate 2x higher than control group
+  if (treatmentErrorRate > controlErrorRate * 2) {
+    await updateFlagPercentage(flagName, 0);
+    await notify(`ROLLBACK: ${flagName} — error rate ${treatmentErrorRate}% vs control ${controlErrorRate}%`);
+    return;
+  }
+
+  // Auto-progress: metrics within threshold for 24h
+  if (metrics.hoursAtCurrentPercentage >= 24 && treatmentErrorRate <= controlErrorRate * 1.1) {
+    const nextStep = { 5: 25, 25: 50, 50: 100 };
+    const current = flag.rules[0].percentage;
+    const next = nextStep[current];
+    if (next) {
+      await updateFlagPercentage(flagName, next);
+      await notify(`PROGRESS: ${flagName} — ${current}% → ${next}%`);
+    }
+  }
+}
+```
+
+The progression ladder — 5% to 25% to 50% to 100% — takes a minimum of 72 hours to reach full rollout. Each step requires 24 hours of clean metrics. If error rate doubles at any step, the flag drops to 0% immediately and a Slack alert fires.
+
+To prevent flags from becoming permanent tech debt, a daily hygiene job scans for flags at 100% for more than 14 days and sends reminders with the exact code references that need cleanup:
+
+```typescript
+// jobs/flag-hygiene.ts — daily at 9am
+async function checkStaleFlags() {
+  const staleFlags = await db.featureFlags.find({
+    "rules.percentage": 100,
+    updatedAt: { $lt: daysAgo(14) },
+    archived: false,
+  });
+  for (const flag of staleFlags) {
+    const refs = await searchCodebase(`flags.isEnabled\\(["']${flag.name}`);
+    await notify(`FLAG HYGIENE: \`${flag.name}\` at 100% for ${daysSince(flag.updatedAt)} days. ${refs.length} code references to remove.`);
+  }
+}
+```
+
+## Real-World Example
+
+Six weeks after rolling out the flag system, Ravi ships the PDF engine again — this time to 5% of accounts. On day two, the monitoring catches it: accounts with 200+ line items are hitting a memory limit, and the error rate in the treatment group is 4x higher than control. The automation drops the flag to 0% and fires a Slack alert. Total blast radius: 600 accounts. Total customer-facing impact: 23 failed PDFs, caught and retried automatically. Zero escalations to the VP of Sales.
+
+The fix takes two days. The flag goes back to 5%, clean for 24 hours, auto-progresses to 25%, then 50%, then 100% over the next week. The entire rollout happens without a single support ticket.
+
+The dashboard redesign runs as a 50/50 A/B test for three weeks. Mixpanel data shows the new design increases invoice creation by 12% but decreases PDF exports by 8%. The product team uses this data to iterate on the export flow before shipping to everyone — a decision that would have been impossible with the old deploy-and-pray approach.
+
+Feature velocity rebounds. Teams ship 3x more frequently because small rollouts with instant rollback remove the fear. Kill switch response time went from 47 minutes (full redeploy) to under 3 seconds (toggle in admin UI). In the three months after adoption, zero full-blast-radius incidents — compared to two in the three months before. The Friday deploy freeze is officially over.
