@@ -486,5 +486,3 @@ curl -X POST "https://api.clickup.com/api/v2/team/${TEAM_ID}/webhook" \
 
 The server handles all five automation workflows: auto-status transitions via GitHub events, hourly SLA enforcement with Slack escalation, biweekly sprint carryover with tagging, Friday time tracking audits, and Monday velocity reports. Deploy behind nginx with SSL and you're set.
 ```
-
-Skills used: `clickup`
