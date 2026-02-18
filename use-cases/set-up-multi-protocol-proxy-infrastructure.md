@@ -384,4 +384,3 @@ systemctl enable --now 3proxy
 That gives you the full stack: mesh between servers, split-tunnel VPN for 30 employees with QR provisioning, authenticated proxies with bandwidth caps for the SEO team, US-chained proxy from EU and Asia, and a monitoring script. The mesh ensures 3proxy chaining goes over encrypted WireGuard tunnels, not the open internet.
 ```
 
-Skills used: `wireguard`, `3proxy`

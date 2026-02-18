@@ -403,4 +403,3 @@ The WebSocket connection uses `role=dispatcher` and receives all driver position
 That's the complete system: WebSocket-based real-time tracking, OSRM-powered routing and ETAs (zero cost), geofence engine for automatic status updates, route optimization for multi-stop deliveries, customer tracking page, and dispatcher dashboard. All built on free/open-source tools — no Google Maps billing.
 ```
 
-Skills used: `maps-geolocation`, `websocket-builder`

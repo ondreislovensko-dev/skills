@@ -420,4 +420,3 @@ curl -x socks5://127.0.0.1:1080 https://ifconfig.me  # Should show server IP
 No port conflicts — OpenVPN on UDP 1194, Xray on TCP 443. Both run as separate systemd services. The provisioning script handles the full lifecycle: create → distribute → revoke.
 ```
 
-Skills used: `openvpn`, `xray`
