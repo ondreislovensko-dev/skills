@@ -765,5 +765,3 @@ That's the complete system. Drop the templates into _templates/, create the dash
 
 Start by creating a few notes in 00-inbox/ and running the weekly review template after a week — that's when the system really starts paying off.
 ```
-
-Skills used: `obsidian`

@@ -383,5 +383,3 @@ for (let p = 0; p <= 4; p++) {
 
 That gives you the full setup: 3 teams with custom states, shared labels, templates, webhook automation for triage and Slack notifications, GitHub PR linking, 2-week cycles with carryover, and reporting queries. Deploy the webhook server, register it in Linear settings, and the automation runs itself.
 ```
-
-Skills used: `linear`
