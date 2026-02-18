@@ -1,48 +1,43 @@
 ---
 title: Build a Podcast Production Pipeline
 slug: build-podcast-production-pipeline
-category: audio
+description: "Automate podcast post-production — audio cleanup, loudness normalization, intro/outro mixing, transcription with Whisper, waveform generation, and multi-format export — from a single command."
+skills: [ffmpeg-video-editing]
+category: content
 tags: [ffmpeg, sox, whisper, audiowaveform, yt-dlp, podcast, automation]
 ---
 
 # Build a Podcast Production Pipeline
 
+## The Problem
+
 Lena runs a weekly tech podcast with two hosts and occasional guests. She records raw audio via Zoom, spends hours manually editing — removing silence, normalizing volume, adding intro/outro music, generating transcripts, and creating waveform images for the website. She also pulls guest interview clips from YouTube. She wants to automate the entire post-production pipeline: drop in a raw recording and get back a production-ready episode with transcript, subtitles, waveform, and social media assets.
 
-## Prompt
+## The Solution
+
+Use the **ffmpeg-video-editing** skill along with sox, Whisper, and audiowaveform to build an end-to-end pipeline. A shell script orchestrates the tools, and a Python script handles transcription and chapter detection. One command produces a fully packaged episode.
+
+## Step-by-Step Walkthrough
+
+### 1. Define the requirements
 
 ```text
 I run a weekly podcast and want to automate post-production. Here's my current manual workflow that I want to turn into a single script:
 
-1. **Source audio**: Raw recording from Zoom (WAV, stereo, often 1-2 hours). Sometimes I also pull guest interviews from YouTube that I need to download as audio.
+1. Source audio: Raw recording from Zoom (WAV, stereo, often 1-2 hours). Sometimes I also pull guest interviews from YouTube that I need to download as audio.
+2. Audio cleanup: Remove silence at start/end, apply high-pass filter (remove rumble below 80Hz), noise reduction, normalize to podcast standard (-16 LUFS), compress dynamic range.
+3. Intro/outro: Prepend a 15-second intro jingle with 2-second crossfade. Append a 10-second outro with 2-second crossfade. Music ducks to 20% where it overlaps with speech.
+4. Transcript: Generate a full text transcript and SRT subtitle file using Whisper. Detect language automatically.
+5. Waveform: Generate a waveform PNG for the website player and a social media preview image. Also generate JSON peaks data for the web audio player.
+6. Chapters: Parse the transcript for topic changes and generate podcast chapter markers.
+7. Export: Final audio as both MP3 (192kbps, with embedded artwork and metadata) and FLAC (archival).
 
-2. **Audio cleanup**: Remove silence at start/end, apply high-pass filter (remove rumble below 80Hz), noise reduction, normalize to podcast standard (-16 LUFS), compress dynamic range so quiet and loud parts are more even.
-
-3. **Intro/outro**: Prepend a 15-second intro jingle (intro.wav) with 2-second crossfade into the episode. Append a 10-second outro with 2-second crossfade. The music should duck to 20% volume where it overlaps with speech.
-
-4. **Transcript**: Generate a full text transcript and SRT subtitle file using Whisper. Detect the language automatically. For episodes with guests, I'd love speaker labels if possible.
-
-5. **Waveform**: Generate a waveform PNG for the website player (1200x150, blue on white) and a social media preview image (1200x630, blue on dark background). Also generate JSON peaks data for the web audio player.
-
-6. **Chapters**: Parse the transcript for topic changes and generate podcast chapter markers.
-
-7. **Export**: Final audio as both MP3 (192kbps, with embedded artwork and metadata) and FLAC (archival). Generate all assets into an organized output folder.
-
-Build a single shell script + Python script that does all of this. I want to run: `./produce.sh raw_episode.wav "Episode 42: AI in Healthcare"` and get everything.
+Build a single shell script + Python script that does all of this.
 ```
 
-## Agent Response
+### 2. Set up the project structure
 
 ```text
-Here's the complete pipeline. A shell script orchestrates the tools, and a Python script handles transcription and chapter detection.
-
-## Prerequisites
-
-apt install -y sox libsox-fmt-all ffmpeg audiowaveform
-pip install faster-whisper
-
-## Directory structure
-
 podcast-pipeline/
 ├── produce.sh              # Main orchestration script
 ├── transcribe.py           # Whisper transcription + chapters
@@ -51,9 +46,18 @@ podcast-pipeline/
 │   ├── outro.wav           # 10s outro jingle
 │   └── artwork.jpg         # Podcast artwork (3000x3000)
 └── output/                 # Generated per episode
+```
 
-## produce.sh — Main Pipeline
+Prerequisites:
 
+```bash
+apt install -y sox libsox-fmt-all ffmpeg audiowaveform
+pip install faster-whisper
+```
+
+### 3. Build the main pipeline script
+
+```bash
 #!/bin/bash
 set -euo pipefail
 
@@ -71,7 +75,6 @@ mkdir -p "$OUTPUT_DIR"
 echo "🎙️ Podcast Production Pipeline"
 echo "   Input: $RAW_FILE"
 echo "   Title: $TITLE"
-echo "   Output: $OUTPUT_DIR"
 echo ""
 
 # ============================
@@ -99,11 +102,7 @@ sox "$WORK_DIR/mono.wav" "$WORK_DIR/trimmed.wav" \
 sox "$WORK_DIR/trimmed.wav" -n noiseprof "$WORK_DIR/noise.prof" trim 0 0.5
 
 # Apply full cleanup chain:
-# - Noise reduction
-# - High-pass filter (remove rumble below 80Hz)
-# - Compress dynamic range
-# - EQ boost voice presence (2-4kHz)
-# - Normalize to -1dB peak
+# - Noise reduction, high-pass filter, compression, EQ boost, normalize
 sox "$WORK_DIR/trimmed.wav" "$WORK_DIR/clean.wav" \
     noisered "$WORK_DIR/noise.prof" 0.2 \
     highpass 80 \
@@ -118,14 +117,12 @@ echo "   ✅ Cleaned: $(soxi -d "$WORK_DIR/clean.wav")"
 # ============================
 echo "📊 Step 2: Loudness normalization (-16 LUFS)..."
 
-# Measure current loudness
 CURRENT_LUFS=$(ffmpeg -i "$WORK_DIR/clean.wav" -af loudnorm=print_format=json -f null - 2>&1 | \
     grep -A1 '"input_i"' | tail -1 | tr -d ' ",' | cut -d: -f2)
 
 TARGET_LUFS=-16
 GAIN=$(echo "$TARGET_LUFS - $CURRENT_LUFS" | bc)
 
-# Apply gain adjustment
 sox "$WORK_DIR/clean.wav" "$WORK_DIR/normalized.wav" gain ${GAIN}
 echo "   ✅ Applied ${GAIN}dB gain (${CURRENT_LUFS} → ${TARGET_LUFS} LUFS)"
 
@@ -137,39 +134,24 @@ echo "🎵 Step 3: Adding intro/outro..."
 INTRO="$ASSETS_DIR/intro.wav"
 OUTRO="$ASSETS_DIR/outro.wav"
 EPISODE="$WORK_DIR/normalized.wav"
+CROSSFADE=2
 
+# Trim and duck intro music to 20% in the crossfade zone
 INTRO_DUR=$(soxi -D "$INTRO")
-OUTRO_DUR=$(soxi -D "$OUTRO")
-EP_DUR=$(soxi -D "$EPISODE")
-
-CROSSFADE=2  # seconds
-
-# Create intro with fade-out for crossfade zone
-sox "$INTRO" "$WORK_DIR/intro_fade.wav" fade t 0 0 $CROSSFADE
-
-# Create episode with fade-in at start
-sox "$EPISODE" "$WORK_DIR/ep_fade_in.wav" fade t $CROSSFADE 0 0
-
-# Overlap region: duck intro music to 20% where speech starts
-# Method: trim last 2s of intro at 20% vol, mix with first 2s of episode
 INTRO_MAIN_DUR=$(echo "$INTRO_DUR - $CROSSFADE" | bc)
 sox "$INTRO" "$WORK_DIR/intro_main.wav" trim 0 $INTRO_MAIN_DUR
 sox "$INTRO" "$WORK_DIR/intro_tail.wav" trim $INTRO_MAIN_DUR vol 0.2
 sox "$EPISODE" "$WORK_DIR/ep_head.wav" trim 0 $CROSSFADE
 sox -m "$WORK_DIR/intro_tail.wav" "$WORK_DIR/ep_head.wav" "$WORK_DIR/crossfade_in.wav"
 
-# Episode body (after crossfade)
+# Episode body and outro crossfade
 sox "$EPISODE" "$WORK_DIR/ep_body.wav" trim $CROSSFADE
-
-# Outro crossfade
 EP_BODY_DUR=$(soxi -D "$WORK_DIR/ep_body.wav")
 EP_TRIM_DUR=$(echo "$EP_BODY_DUR - $CROSSFADE" | bc)
 sox "$WORK_DIR/ep_body.wav" "$WORK_DIR/ep_main.wav" trim 0 $EP_TRIM_DUR
 sox "$WORK_DIR/ep_body.wav" "$WORK_DIR/ep_tail.wav" trim $EP_TRIM_DUR fade t 0 0 $CROSSFADE
 sox "$OUTRO" "$WORK_DIR/outro_ducked.wav" vol 0.2 fade t $CROSSFADE 0 0
 sox -m "$WORK_DIR/ep_tail.wav" "$WORK_DIR/outro_ducked.wav" "$WORK_DIR/crossfade_out.wav"
-
-# Outro main (after crossfade region)
 sox "$OUTRO" "$WORK_DIR/outro_main.wav" trim $CROSSFADE
 
 # Concatenate everything
@@ -187,12 +169,7 @@ echo "   ✅ Final duration: $FINAL_DUR"
 # STEP 5: Transcription & Chapters
 # ============================
 echo "📝 Step 4: Transcribing with Whisper..."
-
-python3 "$(dirname "$0")/transcribe.py" \
-    "$WORK_DIR/final.wav" \
-    "$OUTPUT_DIR" \
-    "$TITLE"
-
+python3 "$(dirname "$0")/transcribe.py" "$WORK_DIR/final.wav" "$OUTPUT_DIR" "$TITLE"
 echo "   ✅ Transcript and chapters generated"
 
 # ============================
@@ -200,70 +177,50 @@ echo "   ✅ Transcript and chapters generated"
 # ============================
 echo "🌊 Step 5: Generating waveforms..."
 
-# Website player waveform
 audiowaveform -i "$WORK_DIR/final.wav" -o "$OUTPUT_DIR/waveform.png" \
     --width 1200 --height 150 \
     --background-color ffffff --waveform-color 3b82f6
 
-# Social media preview
 audiowaveform -i "$WORK_DIR/final.wav" -o "$OUTPUT_DIR/social-preview.png" \
     --width 1200 --height 630 \
     --background-color 0f172a --waveform-color 38bdf8 --no-axis-labels
 
-# JSON peaks for web player
 audiowaveform -i "$WORK_DIR/final.wav" -o "$OUTPUT_DIR/peaks.json" \
     --pixels-per-second 20 --bits 8
-
-echo "   ✅ Waveforms generated"
 
 # ============================
 # STEP 7: Export (MP3 + FLAC)
 # ============================
 echo "📦 Step 6: Exporting final formats..."
-
 SAFE_TITLE=$(echo "$TITLE" | tr -cd '[:alnum:] ._-' | tr ' ' '_')
 
-# MP3 with metadata and artwork
 ffmpeg -y -i "$WORK_DIR/final.wav" -i "$ASSETS_DIR/artwork.jpg" \
     -map 0:a -map 1:v \
-    -codec:a libmp3lame -b:a 192k \
-    -codec:v copy \
+    -codec:a libmp3lame -b:a 192k -codec:v copy \
     -id3v2_version 3 \
-    -metadata title="$TITLE" \
-    -metadata artist="My Podcast" \
-    -metadata album="My Podcast" \
-    -metadata track="$EPISODE_NUM" \
-    -metadata genre="Podcast" \
-    -metadata date="$(date +%Y)" \
+    -metadata title="$TITLE" -metadata artist="My Podcast" \
+    -metadata album="My Podcast" -metadata track="$EPISODE_NUM" \
+    -metadata genre="Podcast" -metadata date="$(date +%Y)" \
     -disposition:v attached_pic \
     "$OUTPUT_DIR/${SAFE_TITLE}.mp3" 2>/dev/null
 
-# FLAC (archival)
-ffmpeg -y -i "$WORK_DIR/final.wav" \
-    -codec:a flac \
-    -metadata title="$TITLE" \
-    -metadata artist="My Podcast" \
+ffmpeg -y -i "$WORK_DIR/final.wav" -codec:a flac \
+    -metadata title="$TITLE" -metadata artist="My Podcast" \
     "$OUTPUT_DIR/${SAFE_TITLE}.flac" 2>/dev/null
 
-echo "   ✅ Exported MP3 and FLAC"
-
-# ============================
-# DONE
-# ============================
-echo ""
 echo "🎉 Production complete!"
-echo ""
 echo "Output directory: $OUTPUT_DIR/"
 ls -lh "$OUTPUT_DIR/"
+```
 
-## transcribe.py — Whisper Transcription + Chapter Detection
+### 4. Build the transcription script
 
+```python
 #!/usr/bin/env python3
 """Transcribe audio with faster-whisper and generate chapters."""
 
 import sys
 import json
-import re
 from pathlib import Path
 from faster_whisper import WhisperModel
 
@@ -278,11 +235,7 @@ segments = list(segments_iter)
 print(f"   Language: {info.language} ({info.language_probability:.0%})")
 
 # --- Full transcript ---
-transcript_lines = []
-for seg in segments:
-    transcript_lines.append(seg.text.strip())
-
-transcript = " ".join(transcript_lines)
+transcript = " ".join(seg.text.strip() for seg in segments)
 (output_dir / "transcript.txt").write_text(transcript)
 
 # --- SRT subtitles ---
@@ -306,7 +259,6 @@ with open(output_dir / "subtitles.vtt", "w") as f:
         f.write(f"{start} --> {end}\n{seg.text.strip()}\n\n")
 
 # --- Chapter detection ---
-# Simple heuristic: look for long pauses (>3s) between segments as topic boundaries
 chapters = []
 chapter_start = 0
 chapter_texts = []
@@ -314,14 +266,10 @@ MIN_CHAPTER_LENGTH = 300  # seconds (5 min minimum chapter)
 
 for i, seg in enumerate(segments):
     chapter_texts.append(seg.text.strip())
-    
-    # Check for long pause after this segment
     if i < len(segments) - 1:
         gap = segments[i + 1].start - seg.end
         elapsed = seg.end - chapter_start
-        
         if gap > 3.0 and elapsed > MIN_CHAPTER_LENGTH:
-            # Summarize chapter from first ~10 words
             chapter_summary = " ".join(" ".join(chapter_texts).split()[:10]) + "..."
             chapters.append({
                 "start": chapter_start,
@@ -344,12 +292,11 @@ if chapter_texts:
 with open(output_dir / "chapters.json", "w") as f:
     json.dump({"title": title, "chapters": chapters}, f, indent=2)
 
-# Chapters in podcast format (for ID3 tags)
 with open(output_dir / "chapters.txt", "w") as f:
     for ch in chapters:
         f.write(f"{ch['start_formatted']} {ch['title']}\n")
 
-# --- Segments JSON (for web player) ---
+# Segments JSON for web player
 with open(output_dir / "segments.json", "w") as f:
     json.dump({
         "language": info.language,
@@ -360,17 +307,23 @@ with open(output_dir / "segments.json", "w") as f:
     }, f, indent=2)
 
 print(f"   Segments: {len(segments)}, Chapters: {len(chapters)}")
+```
 
-## Usage
+### 5. Run the pipeline
 
+```bash
 chmod +x produce.sh
+
+# From a local recording:
 ./produce.sh raw_recording.wav "Episode 42: AI in Healthcare" 042
 
-# Or from a YouTube interview:
+# From a YouTube interview:
 ./produce.sh "https://youtube.com/watch?v=VIDEO_ID" "Episode 43: Guest Interview" 043
+```
 
-## Output structure
+### 6. Review the output
 
+```text
 output/ep042/
 ├── Episode_42_AI_in_Healthcare.mp3     # Final MP3 (192kbps, artwork, metadata)
 ├── Episode_42_AI_in_Healthcare.flac    # Archival FLAC
@@ -383,8 +336,10 @@ output/ep042/
 ├── waveform.png                         # Website player waveform (1200x150)
 ├── social-preview.png                   # Social media image (1200x630)
 └── peaks.json                           # Web player peaks data
-
-One command, full production. Drop in a raw WAV (or YouTube URL), get back everything you need to publish.
 ```
 
-Skills used: `sox`, `ffmpeg-video-editing`, `whisper`, `audiowaveform`, `yt-dlp`
+One command, full production. Drop in a raw WAV (or YouTube URL), get back everything you need to publish.
+
+## Related Skills
+
+- **ffmpeg-video-editing** — Core audio/video processing with FFmpeg

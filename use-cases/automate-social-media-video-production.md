@@ -1,43 +1,41 @@
 ---
 title: Automate Social Media Video Production
 slug: automate-social-media-video-production
-category: video
-tags: [moviepy, ffmpeg, davinci-resolve, after-effects, video, social-media, automation]
+description: "Build a Python pipeline that batch-produces branded short-form videos for Instagram, TikTok, YouTube Shorts, and Twitter from JSON templates and CSV data using MoviePy."
+skills: [ffmpeg-video-editing]
+category: content
+tags: [moviepy, ffmpeg, video, social-media, automation, batch-processing]
 ---
 
 # Automate Social Media Video Production
 
+## The Problem
+
 Sami runs a content agency that produces 50+ short videos per week for clients across Instagram, TikTok, YouTube Shorts, and Twitter. Each video follows a template — background clip, text overlays, branded intro/outro, music, and platform-specific sizing. The team manually edits each one in Premiere, which takes 30-45 minutes per video. Sami wants a Python pipeline that takes a JSON config (text, media assets, platform) and outputs a ready-to-post video in under a minute.
 
-## Prompt
+## The Solution
+
+Use the **ffmpeg-video-editing** skill with MoviePy to build a template-driven video renderer. Define templates in JSON, brand kits per client, and feed a CSV of content variations. The pipeline renders all combinations across all platform sizes with multiprocessing, then runs quality checks.
+
+## Step-by-Step Walkthrough
+
+### 1. Define the requirements
 
 ```text
 I need to automate short-form video production for our agency. We make 50+ videos per week, all following templates. Here's what I need:
 
-1. **Template system**: Define video templates in JSON — background clip or color, text layers with timing/position/animation, logo placement, music track, platform sizing. One template, many variations by swapping text and media.
-
-2. **Multi-platform export**: From one template, render for Instagram Reels (1080x1920), TikTok (1080x1920), YouTube Shorts (1080x1920), Twitter (1280x720), and Instagram post (1080x1080). Handle safe zones — text shouldn't overlap with platform UI elements.
-
-3. **Text animations**: Support fade-in, slide-up, typewriter, and scale-in effects for text. Each text layer has its own timing.
-
-4. **Branded elements**: Auto-add client's intro (first 2 seconds), outro with CTA (last 3 seconds), and watermark logo throughout. Each client has their own brand kit (colors, fonts, logo, intro/outro clips).
-
-5. **Music & audio**: Layer background music at 20% volume. If there's a voiceover file, duck the music further. Fade music in/out.
-
-6. **Batch production**: Feed it a CSV with 20 rows (each row = different text/media for same template), render all 20 videos in all 5 platform sizes = 100 videos total. Use multiprocessing.
-
-7. **Quality check**: After rendering, verify each video — correct duration, resolution, has audio, file size within platform limits.
-
-Give me the full Python pipeline using MoviePy, with the template system, batch renderer, and QC checker.
+1. Template system: Define video templates in JSON — background clip or color, text layers with timing/position/animation, logo placement, music track, platform sizing.
+2. Multi-platform export: Render for Instagram Reels, TikTok, YouTube Shorts, Twitter, and Instagram post. Handle safe zones.
+3. Text animations: Support fade-in, slide-up, typewriter, and scale-in effects.
+4. Branded elements: Auto-add client's intro, outro, and watermark. Each client has their own brand kit.
+5. Music & audio: Layer background music at 20% volume. Duck on voiceover. Fade in/out.
+6. Batch production: Feed a CSV, render all variations across all platform sizes with multiprocessing.
+7. Quality check: Verify duration, resolution, audio, and file size against platform limits.
 ```
 
-## Agent Response
+### 2. Set up the project structure
 
 ```text
-Here's the complete pipeline. Template-driven, multi-platform, batch-capable.
-
-## Project Structure
-
 video-pipeline/
 ├── pipeline.py            # Main entry point
 ├── renderer.py            # Core rendering engine
@@ -53,13 +51,17 @@ video-pipeline/
 ├── templates/             # Video templates
 │   └── quote-card.json
 └── batches/               # CSV batch files
+```
 
-## effects.py — Text Animations
+### 3. Build the text animation effects
 
+```python
 from moviepy import TextClip, CompositeVideoClip
+
 
 def fade_in_text(text_clip, duration=0.5):
     return text_clip.crossfadein(duration)
+
 
 def slide_up_text(text_clip, distance=100, duration=0.5):
     """Slide text up from below its final position."""
@@ -71,32 +73,35 @@ def slide_up_text(text_clip, distance=100, duration=0.5):
 
     def position_func(t):
         progress = min(t / duration, 1.0)
-        # Ease out cubic
-        progress = 1 - (1 - progress) ** 3
+        progress = 1 - (1 - progress) ** 3  # Ease out cubic
         x = final_pos[0] if isinstance(final_pos, tuple) else "center"
         y = final_y + distance * (1 - progress)
         return (x, y)
 
     return text_clip.with_position(position_func)
 
+
 def scale_in_text(text_clip, duration=0.5):
     """Scale from 0 to full size."""
     def resize_func(t):
         if t < duration:
             progress = t / duration
-            progress = 1 - (1 - progress) ** 3  # Ease out
+            progress = 1 - (1 - progress) ** 3
             return max(progress, 0.01)
         return 1.0
     return text_clip.resized(resize_func)
+
 
 EFFECTS = {
     "fade_in": fade_in_text,
     "slide_up": slide_up_text,
     "scale_in": scale_in_text,
 }
+```
 
-## templates.py — Template System
+### 4. Build the template system
 
+```python
 import json
 from pathlib import Path
 
@@ -117,9 +122,11 @@ SAFE_ZONES = {
     "instagram_post": (0, 100, 0, 0),
 }
 
+
 def load_template(path):
     with open(path) as f:
         return json.load(f)
+
 
 def load_brand(brand_name):
     brand_path = Path(f"brands/{brand_name}/brand.json")
@@ -127,9 +134,11 @@ def load_brand(brand_name):
         brand = json.load(f)
     brand["_dir"] = str(brand_path.parent)
     return brand
+```
 
-## Example template (templates/quote-card.json)
+### 5. Create a video template
 
+```json
 {
   "name": "Quote Card",
   "duration": 15,
@@ -186,9 +195,11 @@ def load_brand(brand_name):
     "margin": 20
   }
 }
+```
 
-## Example brand kit (brands/acme/brand.json)
+### 6. Create a brand kit
 
+```json
 {
   "name": "Acme Corp",
   "colors": {
@@ -207,14 +218,17 @@ def load_brand(brand_name):
   "outro_duration": 3,
   "music": "brand_music.mp3"
 }
+```
 
-## renderer.py — Core Engine
+### 7. Build the core rendering engine
 
+```python
 from moviepy import *
 from effects import EFFECTS
 from templates import PLATFORM_SIZES, SAFE_ZONES, load_template, load_brand
 from pathlib import Path
 import os
+
 
 def render_video(template, brand, data, platform, output_path,
                  voiceover_path=None, background_video=None):
@@ -243,10 +257,8 @@ def render_video(template, brand, data, platform, output_path,
         if not text:
             continue
 
-        # Calculate position with safe zones
         pos = text_cfg["position"]
         if isinstance(pos[1], float) and pos[1] <= 1.0:
-            # Relative position (0.0 - 1.0)
             usable_top = safe[0]
             usable_bottom = size[1] - safe[1]
             y = usable_top + (usable_bottom - usable_top) * pos[1]
@@ -267,7 +279,6 @@ def render_video(template, brand, data, platform, output_path,
                .with_start(text_cfg.get("start", 0))
                .with_position(pos))
 
-        # Apply effect
         effect_name = text_cfg.get("effect")
         if effect_name and effect_name in EFFECTS:
             txt = EFFECTS[effect_name](txt)
@@ -287,7 +298,8 @@ def render_video(template, brand, data, platform, output_path,
         pos_map = {
             "top_right": (size[0] - logo.size[0] - margin, margin + safe[0]),
             "top_left": (margin + safe[2], margin + safe[0]),
-            "bottom_right": (size[0] - logo.size[0] - margin, size[1] - logo.size[1] - margin - safe[1]),
+            "bottom_right": (size[0] - logo.size[0] - margin,
+                             size[1] - logo.size[1] - margin - safe[1]),
         }
         logo = logo.with_position(pos_map.get(wm_cfg["position"], (margin, margin)))
         layers.append(logo)
@@ -299,12 +311,12 @@ def render_video(template, brand, data, platform, output_path,
     music_cfg = template.get("music", {})
     audio_layers = []
 
-    music_path = os.path.join(brand_dir, brand.get("music", "")) if brand.get("music") else None
+    music_path = (os.path.join(brand_dir, brand.get("music", ""))
+                  if brand.get("music") else None)
     if music_path and os.path.exists(music_path):
         music_vol = music_cfg.get("volume", 0.2)
         if voiceover_path:
             music_vol = music_cfg.get("duck_on_voiceover", 0.08)
-
         music = (AudioFileClip(music_path)
                  .subclipped(0, duration)
                  .with_volume_scaled(music_vol))
@@ -343,28 +355,35 @@ def render_video(template, brand, data, platform, output_path,
         output_path, fps=30, codec="libx264",
         audio_codec="aac", bitrate="8000k",
         preset="fast", threads=4,
-        logger=None,  # Suppress progress bar
+        logger=None,
     )
 
-    # Cleanup
     for clip in clips + layers:
         try: clip.close()
         except: pass
 
     return output_path
+```
 
-## qc.py — Quality Check
+### 8. Build the quality checker
 
+```python
 from moviepy import VideoFileClip
 import os
 
 PLATFORM_LIMITS = {
-    "instagram_reel": {"max_duration": 90, "max_size_mb": 250, "resolution": (1080, 1920)},
-    "tiktok": {"max_duration": 180, "max_size_mb": 287, "resolution": (1080, 1920)},
-    "youtube_short": {"max_duration": 60, "max_size_mb": 500, "resolution": (1080, 1920)},
-    "twitter": {"max_duration": 140, "max_size_mb": 512, "resolution": (1280, 720)},
-    "instagram_post": {"max_duration": 60, "max_size_mb": 250, "resolution": (1080, 1080)},
+    "instagram_reel": {"max_duration": 90, "max_size_mb": 250,
+                       "resolution": (1080, 1920)},
+    "tiktok": {"max_duration": 180, "max_size_mb": 287,
+               "resolution": (1080, 1920)},
+    "youtube_short": {"max_duration": 60, "max_size_mb": 500,
+                      "resolution": (1080, 1920)},
+    "twitter": {"max_duration": 140, "max_size_mb": 512,
+                "resolution": (1280, 720)},
+    "instagram_post": {"max_duration": 60, "max_size_mb": 250,
+                       "resolution": (1080, 1080)},
 }
+
 
 def check_video(path, platform):
     issues = []
@@ -375,38 +394,39 @@ def check_video(path, platform):
     except Exception as e:
         return [f"Cannot open file: {e}"]
 
-    # Duration
     if clip.duration > limits["max_duration"]:
-        issues.append(f"Duration {clip.duration:.1f}s exceeds {limits['max_duration']}s limit")
+        issues.append(
+            f"Duration {clip.duration:.1f}s exceeds {limits['max_duration']}s limit"
+        )
 
-    # Resolution
     expected = limits["resolution"]
     if clip.size != list(expected):
         issues.append(f"Resolution {clip.size} != expected {expected}")
 
-    # Audio
     if clip.audio is None:
         issues.append("No audio track")
 
-    # File size
     size_mb = os.path.getsize(path) / (1024 * 1024)
     if size_mb > limits["max_size_mb"]:
-        issues.append(f"File size {size_mb:.1f}MB exceeds {limits['max_size_mb']}MB limit")
+        issues.append(
+            f"File size {size_mb:.1f}MB exceeds {limits['max_size_mb']}MB limit"
+        )
 
     clip.close()
+    return issues if issues else ["PASS"]
+```
 
-    return issues if issues else ["✅ PASS"]
+### 9. Build the batch pipeline
 
-## pipeline.py — Main Entry
-
+```python
 import csv
-import json
 import sys
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from renderer import render_video
 from templates import load_template, load_brand, PLATFORM_SIZES
 from qc import check_video
+
 
 def render_one(args):
     template, brand, data, platform, output_path, voiceover = args
@@ -417,17 +437,19 @@ def render_one(args):
     except Exception as e:
         return (output_path, platform, [f"RENDER ERROR: {e}"])
 
-def batch_produce(template_path, brand_name, csv_path, output_dir, platforms=None, workers=4):
+
+def batch_produce(template_path, brand_name, csv_path, output_dir,
+                  platforms=None, workers=4):
     template = load_template(template_path)
     brand = load_brand(brand_name)
     platforms = platforms or list(PLATFORM_SIZES.keys())
 
-    # Read CSV
     with open(csv_path) as f:
         reader = csv.DictReader(f)
         rows = list(reader)
 
-    print(f"📹 Batch: {len(rows)} variations × {len(platforms)} platforms = {len(rows) * len(platforms)} videos")
+    total = len(rows) * len(platforms)
+    print(f"Batch: {len(rows)} variations x {len(platforms)} platforms = {total} videos")
 
     jobs = []
     for i, row in enumerate(rows):
@@ -437,21 +459,19 @@ def batch_produce(template_path, brand_name, csv_path, output_dir, platforms=Non
             voiceover = row.get("voiceover", None)
             jobs.append((template, brand, row, platform, output_path, voiceover))
 
-    # Render with multiprocessing
     results = []
     with ProcessPoolExecutor(max_workers=workers) as pool:
         futures = {pool.submit(render_one, job): job for job in jobs}
         for future in as_completed(futures):
             path, platform, issues = future.result()
-            status = "✅" if issues == ["✅ PASS"] else "❌"
-            print(f"  {status} {platform}: {Path(path).name} — {', '.join(issues)}")
+            status = "PASS" if issues == ["PASS"] else "FAIL"
+            print(f"  [{status}] {platform}: {Path(path).name} - {', '.join(issues)}")
             results.append((path, platform, issues))
 
-    # Summary
-    passed = sum(1 for _, _, issues in results if issues == ["✅ PASS"])
-    print(f"\n🎬 Done: {passed}/{len(results)} passed QC")
-
+    passed = sum(1 for _, _, issues in results if issues == ["PASS"])
+    print(f"\nDone: {passed}/{len(results)} passed QC")
     return results
+
 
 if __name__ == "__main__":
     batch_produce(
@@ -461,20 +481,26 @@ if __name__ == "__main__":
         output_dir="output",
         workers=4,
     )
-
-## Example CSV (batches/facts.csv)
-
-name,headline,body,cta
-python-tip-1,Python Tip #1,"The walrus operator := lets you assign and test in one expression. Available since Python 3.8.",Follow for more →
-python-tip-2,Python Tip #2,"Use match/case for structural pattern matching. Way cleaner than if/elif chains.",Save this post 🔖
-python-tip-3,Python Tip #3,"f-strings support = for self-documenting prints: f'{x=}' outputs 'x=42'.",Share with a dev friend
-
-## Run it
-
-python pipeline.py batches/facts.csv
-# Renders 3 videos × 5 platforms = 15 videos with QC
-
-One template, infinite variations. The renderer handles platform sizing, safe zones, branded elements, text animation, audio mixing, and quality checks — all automated.
 ```
 
-Skills used: `moviepy`, `ffmpeg-video-editing`
+### 10. Run the batch
+
+Example CSV (`batches/facts.csv`):
+
+```csv
+name,headline,body,cta
+python-tip-1,Python Tip #1,"The walrus operator := lets you assign and test in one expression. Available since Python 3.8.",Follow for more →
+python-tip-2,Python Tip #2,"Use match/case for structural pattern matching. Way cleaner than if/elif chains.",Save this post
+python-tip-3,Python Tip #3,"f-strings support = for self-documenting prints: f'{x=}' outputs 'x=42'.",Share with a dev friend
+```
+
+```bash
+python pipeline.py batches/facts.csv
+# Renders 3 videos x 5 platforms = 15 videos with QC
+```
+
+One template, infinite variations. The renderer handles platform sizing, safe zones, branded elements, text animation, audio mixing, and quality checks — all automated.
+
+## Related Skills
+
+- **ffmpeg-video-editing** — Core video processing with FFmpeg
