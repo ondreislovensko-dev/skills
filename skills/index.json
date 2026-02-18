@@ -1,11 +1,36 @@
 {
   "skills": [
     {
+      "name": "a2a-protocol",
+      "slug": "a2a-protocol",
+      "description": "Builds Agent-to-Agent (A2A) servers and clients following Google's open protocol for agent interoperability. Use when the user wants to create an A2A-compliant agent, build an Agent Card, implement task management, connect agents across frameworks, set up agent discovery, handle streaming responses, implement push notifications, or orchestrate multi-agent workflows. Trigger words: a2a, agent to agent, agent2agent, a2a protocol, a2a server, a2a client, agent card, agent interoperability, agent collaboration, multi-agent, agent discovery, a2a sdk, a2a task.",
+      "category": "development",
+      "tags": [
+        "a2a",
+        "agents",
+        "interoperability",
+        "protocol"
+      ]
+    },
+    {
       "name": "ab-test-setup",
       "slug": "ab-test-setup",
       "description": "When the user wants to plan, design, or implement an A/B test or experiment. Also use when the user mentions \"A/B test,\" \"split test,\" \"experiment,\" \"test this change,\" \"variant copy,\" \"multivariate test,\" or \"hypothesis.\" For tracking implementation, see analytics-tracking.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "accessibility-auditor",
+      "slug": "accessibility-auditor",
+      "description": "Audit web pages and components for WCAG 2.2 accessibility compliance. Use when a user asks to check accessibility, find a11y issues, audit for WCAG compliance, fix screen reader problems, check color contrast, ensure keyboard navigation works, or prepare for accessibility regulations like the European Accessibility Act or ADA.",
+      "category": "development",
+      "tags": [
+        "accessibility",
+        "wcag",
+        "a11y",
+        "compliance",
+        "screen-reader"
+      ]
     },
     {
       "name": "ai-slides",
@@ -21,11 +46,61 @@
       ]
     },
     {
+      "name": "alert-optimizer",
+      "slug": "alert-optimizer",
+      "description": "Restructure and optimize alert rules for monitoring platforms (Sentry, PagerDuty, Datadog, OpsGenie). Use when someone asks to \"reduce alert noise\", \"fix alert fatigue\", \"create alert rules\", \"set up escalation policies\", \"tune alerting thresholds\", or \"create on-call runbooks\". Generates platform-specific alert configurations and tiered escalation policies.",
+      "category": "devops",
+      "tags": [
+        "alerting",
+        "on-call",
+        "pagerduty",
+        "incident-response",
+        "observability"
+      ]
+    },
+    {
       "name": "analytics-tracking",
       "slug": "analytics-tracking",
       "description": "When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions \"set up tracking,\" \"GA4,\" \"Google Analytics,\" \"conversion tracking,\" \"event tracking,\" \"UTM parameters,\" \"tag manager,\" \"GTM,\" \"analytics implementation,\" or \"tracking plan.\" For A/B test measurement, see ab-test-setup.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "ansible-automation",
+      "slug": "ansible-automation",
+      "description": "Automates server configuration and application deployment with Ansible. Use when the user wants to write Ansible playbooks, create roles, manage inventory, configure servers, deploy applications, set up infrastructure, manage users and permissions, handle secrets with Ansible Vault, or orchestrate multi-server deployments. Trigger words: ansible, playbook, ansible role, ansible galaxy, inventory, ansible vault, ansible task, ansible handler, ansible template, jinja2, ansible collection, ansible tower, awx, ansible lint, configuration management, server provisioning.",
+      "category": "devops",
+      "tags": [
+        "ansible",
+        "configuration-management",
+        "automation",
+        "devops"
+      ]
+    },
+    {
+      "name": "api-doc-generator",
+      "slug": "api-doc-generator",
+      "description": "Generate and validate API documentation from source code, route definitions, and existing endpoints. Use when a user asks to generate API docs, create OpenAPI specs, document endpoints, sync docs with code, detect documentation drift, or produce Swagger files from a codebase.",
+      "category": "development",
+      "tags": [
+        "api",
+        "documentation",
+        "openapi",
+        "swagger"
+      ]
+    },
+    {
+      "name": "api-load-tester",
+      "slug": "api-load-tester",
+      "description": "Generates and executes load test scripts for APIs using k6, wrk, or autocannon. Creates realistic test scenarios from OpenAPI specs, route files, or endpoint descriptions. Use when someone needs to load test, stress test, benchmark, or find the breaking point of their API. Trigger words: load test, stress test, benchmark, RPS, concurrent users, breaking point, performance test, k6, wrk.",
+      "category": "devops",
+      "tags": [
+        "load-testing",
+        "performance",
+        "api",
+        "k6",
+        "benchmarking"
+      ]
     },
     {
       "name": "api-tester",
@@ -54,6 +129,19 @@
       ]
     },
     {
+      "name": "auth-system-setup",
+      "slug": "auth-system-setup",
+      "description": "When the user wants to set up authentication and authorization for a web application. Use when the user mentions \"auth,\" \"login,\" \"OAuth,\" \"SSO,\" \"single sign-on,\" \"role-based access,\" \"RBAC,\" \"permissions,\" \"user roles,\" \"access control,\" \"authentication,\" or \"authorization.\" Covers OAuth 2.0 provider integration, session management, and role/permission architecture. For JWT-specific tasks, see jwt-handler. For security review, see security-audit.",
+      "category": "development",
+      "tags": [
+        "authentication",
+        "authorization",
+        "oauth",
+        "rbac",
+        "security"
+      ]
+    },
+    {
       "name": "batch-processor",
       "slug": "batch-processor",
       "description": "Process multiple documents in bulk with parallel execution. Use when a user asks to batch process files, convert many documents at once, run parallel file operations, bulk rename, bulk transform, or process a directory of files concurrently. Covers parallel execution, error handling, and progress tracking.",
@@ -63,6 +151,18 @@
         "parallel",
         "bulk",
         "processing",
+        "automation"
+      ]
+    },
+    {
+      "name": "billing-automation",
+      "slug": "billing-automation",
+      "description": "Automate invoice generation, billing workflows, payment tracking, and revenue recognition for SaaS and service businesses. Use when building billing pipelines, usage-based invoicing, subscription management, payment reminders, or financial reporting. Trigger words: invoice, billing, payment, subscription, usage billing, revenue recognition, accounts receivable, payment reminder, overdue invoice, billing cycle, proration, Stripe billing.",
+      "category": "business",
+      "tags": [
+        "billing",
+        "invoicing",
+        "payments",
         "automation"
       ]
     },
@@ -184,6 +284,19 @@
       ]
     },
     {
+      "name": "blog-article-design",
+      "slug": "blog-article-design",
+      "description": "Design and implement high-quality blog post and article page layouts with professional typography, spacing, and visual hierarchy. Use when building blog pages, article templates, technical documentation readers, use-case pages, or long-form content layouts. Covers dark and light themes.",
+      "category": "design",
+      "tags": [
+        "blog-design",
+        "typography",
+        "article-layout",
+        "content-design",
+        "tailwind"
+      ]
+    },
+    {
       "name": "brand-guidelines",
       "slug": "brand-guidelines",
       "description": "Create and maintain brand style guides for consistent visual identity. Use when a user asks to create brand guidelines, build a style guide, define a brand identity, create a design system document, establish brand colors and typography, or produce any brand standards documentation.",
@@ -194,6 +307,30 @@
         "visual-identity",
         "design-system",
         "typography"
+      ]
+    },
+    {
+      "name": "cache-strategy",
+      "slug": "cache-strategy",
+      "description": "Design and implement caching layers for APIs and web applications using Redis or Memcached. Use when you need to reduce database load, improve response times, or handle traffic spikes. Covers cache-aside, write-through, and write-behind patterns, TTL strategies, cache invalidation, and stampede prevention. Trigger words: cache, Redis, Memcached, TTL, cache invalidation, response time, throughput, rate limiting.",
+      "category": "development",
+      "tags": [
+        "caching",
+        "redis",
+        "performance",
+        "api-optimization"
+      ]
+    },
+    {
+      "name": "capacity-planner",
+      "slug": "capacity-planner",
+      "description": "Translates performance test results into infrastructure scaling recommendations with cost estimates. Use when someone has load test data and needs to know what infrastructure changes are required to handle target traffic. Trigger words: capacity planning, scaling plan, infrastructure sizing, how many pods, RDS sizing, handle more traffic, scale for launch.",
+      "category": "devops",
+      "tags": [
+        "capacity-planning",
+        "scaling",
+        "infrastructure",
+        "cost-estimation"
       ]
     },
     {
@@ -220,6 +357,69 @@
         "summarization",
         "document",
         "search"
+      ]
+    },
+    {
+      "name": "cicd-pipeline",
+      "slug": "cicd-pipeline",
+      "description": "Generate and optimize CI/CD pipelines for automated testing, building, and deployment. Use when a user asks to create a GitHub Actions workflow, set up GitLab CI, build a CI pipeline, automate deployments, add test automation, configure continuous integration, set up continuous deployment, create a release workflow, or optimize build times. Supports GitHub Actions, GitLab CI, and CircleCI.",
+      "category": "devops",
+      "tags": [
+        "cicd",
+        "github-actions",
+        "gitlab-ci",
+        "pipeline",
+        "deployment"
+      ]
+    },
+    {
+      "name": "cloud-resource-analyzer",
+      "slug": "cloud-resource-analyzer",
+      "description": "Finds orphaned, idle, and underutilized cloud resources across AWS, GCP, or Azure accounts. Use when someone needs to audit cloud spending, find unused EBS volumes, stale snapshots, unattached IPs, idle load balancers, or oversized RDS instances. Trigger words: cloud waste, orphaned resources, unused volumes, cloud audit, infrastructure cleanup, cloud bill analysis.",
+      "category": "devops",
+      "tags": [
+        "cloud",
+        "cost-optimization",
+        "aws",
+        "infrastructure-audit"
+      ]
+    },
+    {
+      "name": "code-complexity-scanner",
+      "slug": "code-complexity-scanner",
+      "description": "Measures cyclomatic complexity, cognitive complexity, and function length across codebases to identify maintenance hotspots. Use when someone asks about code complexity, function length analysis, maintainability metrics, or needs to find the most complex parts of their codebase. Trigger words: complexity, cyclomatic, cognitive complexity, long functions, hotspots, maintainability index, code metrics.",
+      "category": "development",
+      "tags": [
+        "code-quality",
+        "complexity",
+        "metrics",
+        "static-analysis"
+      ]
+    },
+    {
+      "name": "code-documenter",
+      "slug": "code-documenter",
+      "description": "Generate comprehensive documentation for undocumented or poorly documented codebases. Use when a user asks to document code, add JSDoc/docstrings, create README files, generate architecture docs, explain what a codebase does, produce onboarding guides, or document internal APIs. Works with any language.",
+      "category": "development",
+      "tags": [
+        "documentation",
+        "jsdoc",
+        "docstrings",
+        "architecture",
+        "onboarding"
+      ]
+    },
+    {
+      "name": "code-migration",
+      "slug": "code-migration",
+      "description": "Migrate codebases between frameworks, languages, and API versions. Use when a user asks to convert JavaScript to TypeScript, migrate React class components to hooks, upgrade Vue 2 to Vue 3, migrate Python 2 to 3, update deprecated APIs, switch ORMs, convert Express to Fastify, or modernize legacy code. Handles incremental migration with backward compatibility.",
+      "category": "development",
+      "tags": [
+        "migration",
+        "typescript",
+        "modernization",
+        "refactoring",
+        "upgrade"
       ]
     },
     {
@@ -368,6 +568,82 @@
       ]
     },
     {
+      "name": "data-migration",
+      "slug": "data-migration",
+      "description": "When the user needs to migrate data between databases, transform schemas, or consolidate data sources. Use when the user mentions \"data migration,\" \"database migration,\" \"migrate from MySQL to PostgreSQL,\" \"schema migration,\" \"ETL pipeline,\" \"data transfer,\" \"database consolidation,\" \"legacy migration,\" or \"move data between databases.\" Covers schema analysis, mapping, transformation, batch processing, validation, and cutover planning. For query optimization during migration, see sql-optimizer.",
+      "category": "development",
+      "tags": [
+        "migration",
+        "database",
+        "etl",
+        "data-pipeline",
+        "schema"
+      ]
+    },
+    {
+      "name": "data-validator",
+      "slug": "data-validator",
+      "description": "Validate data quality in CSV, JSON, and database exports by checking for missing values, type mismatches, duplicates, outliers, and schema violations. Use when building ETL pipelines, auditing data imports, checking data freshness, or ensuring data contracts between teams. Trigger words: data quality, validation, null values, duplicates, schema check, data contract, ETL, pipeline, data drift.",
+      "category": "data-ai",
+      "tags": [
+        "data-quality",
+        "validation",
+        "etl",
+        "data-pipeline"
+      ]
+    },
+    {
+      "name": "database-schema-designer",
+      "slug": "database-schema-designer",
+      "description": "Designs database schemas with proper normalization, indexing, constraints, and tenant isolation patterns. Use when someone needs to create a new database schema, add multi-tenant support, design row-level security policies, or optimize table structures. Trigger words: database schema, table design, RLS, row-level security, foreign keys, indexes, migrations, ERD, data model, normalization.",
+      "category": "development",
+      "tags": [
+        "database",
+        "schema-design",
+        "postgresql",
+        "data-modeling"
+      ]
+    },
+    {
+      "name": "db-backup",
+      "slug": "db-backup",
+      "description": "Set up automated database backup, restore, and disaster recovery procedures for PostgreSQL, MySQL, MongoDB, and Redis. Use when you need to implement backup schedules, point-in-time recovery, cross-region replication, backup verification, or disaster recovery runbooks. Trigger words: database backup, pg_dump, mysqldump, mongodump, disaster recovery, point-in-time recovery, WAL archiving, backup rotation, restore database, RTO, RPO, backup verification.",
+      "category": "devops",
+      "tags": [
+        "database",
+        "backup",
+        "disaster-recovery",
+        "postgresql",
+        "mysql"
+      ]
+    },
+    {
+      "name": "db-explain-analyzer",
+      "slug": "db-explain-analyzer",
+      "description": "Analyze database query execution plans (EXPLAIN/EXPLAIN ANALYZE) and provide actionable optimization recommendations. Use when a user asks to debug slow queries, understand query plans, find missing indexes, analyze table scans, or diagnose database performance issues. Supports PostgreSQL, MySQL, and SQLite.",
+      "category": "development",
+      "tags": [
+        "database",
+        "performance",
+        "explain",
+        "query-plan",
+        "indexing"
+      ]
+    },
+    {
+      "name": "dependency-updater",
+      "slug": "dependency-updater",
+      "description": "Audit project dependencies for outdated packages, security vulnerabilities, and breaking changes. Use when someone asks to \"check for outdated packages\", \"audit dependencies\", \"find vulnerable dependencies\", \"plan dependency upgrades\", \"detect breaking changes\", or \"update npm packages safely\". Analyzes package.json/lock files, cross-references changelogs, and produces ordered upgrade plans.",
+      "category": "development",
+      "tags": [
+        "dependencies",
+        "npm",
+        "security",
+        "upgrades",
+        "semver"
+      ]
+    },
+    {
       "name": "dev-slides",
       "slug": "dev-slides",
       "description": "Create developer-friendly presentations using Slidev. Build Vue-powered slides with live code execution, syntax highlighting, and diagrams. Use when a user asks to create a presentation, build slides, make a tech talk, create a slide deck, or prepare a developer presentation.",
@@ -378,6 +654,18 @@
         "slidev",
         "vue",
         "developer-tools"
+      ]
+    },
+    {
+      "name": "dns-record-analyzer",
+      "slug": "dns-record-analyzer",
+      "description": "Audits and troubleshoots DNS records for domains including A, AAAA, CNAME, MX, TXT, SPF, DKIM, DMARC, CAA, and NS records. Use when someone needs to verify DNS configuration, debug DNS propagation issues, check email authentication records, or audit domain security. Trigger words: DNS records, dig, nslookup, SPF, DKIM, DMARC, MX records, DNS propagation, nameservers, CAA, domain configuration.",
+      "category": "devops",
+      "tags": [
+        "dns",
+        "domain",
+        "email-authentication",
+        "infrastructure"
       ]
     },
     {
@@ -407,6 +695,17 @@
       ]
     },
     {
+      "name": "docker-optimizer",
+      "slug": "docker-optimizer",
+      "description": "Analyzes and optimizes Docker images for production. Use when you need to reduce image sizes, implement multi-stage builds, select minimal base images, optimize layer caching, create .dockerignore files, or audit Dockerfiles for bloat. Trigger words: Docker image size, optimize Dockerfile, multi-stage build, slim image, distroless, Alpine, reduce container size, layer caching, Docker bloat.",
+      "category": "devops",
+      "tags": [
+        "docker",
+        "optimization",
+        "containers"
+      ]
+    },
+    {
       "name": "doppler",
       "slug": "doppler",
       "description": "Manage secrets and environment variables using the Doppler CLI. Use when the user wants to set up Doppler, inject secrets into processes, manage projects and configs, upload or download secrets, create service tokens, use secret templates, or integrate Doppler with Docker, Kubernetes, or CI/CD pipelines. Trigger words: doppler, secrets manager, env vars, secret injection, doppler run, doppler setup, service token, secret rotation.",
@@ -417,6 +716,19 @@
         "environment-variables",
         "devops",
         "security"
+      ]
+    },
+    {
+      "name": "email-deliverability-debugger",
+      "slug": "email-deliverability-debugger",
+      "description": "Diagnoses email deliverability problems for transactional and marketing emails. Checks SPF/DKIM/DMARC alignment, sending IP reputation, email content spam triggers, and bounce patterns. Use when emails land in spam, go missing, or bounce unexpectedly. Trigger words: email spam, deliverability, emails not arriving, bounce rate, spam folder, email reputation, SPF fail, DKIM fail, DMARC, transactional email, SendGrid, Postmark, SES.",
+      "category": "devops",
+      "tags": [
+        "email",
+        "deliverability",
+        "spam",
+        "authentication",
+        "dns"
       ]
     },
     {
@@ -438,6 +750,32 @@
       "description": "When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. Also use when the user mentions \"email sequence,\" \"drip campaign,\" \"nurture sequence,\" \"onboarding emails,\" \"welcome sequence,\" \"re-engagement emails,\" \"email automation,\" or \"lifecycle emails.\" For in-app onboarding, see onboarding-cro.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "env-manager",
+      "slug": "env-manager",
+      "description": "Manage environment variables and secrets across development, staging, and production environments. Use when someone needs to audit env vars, sync secrets between environments, detect missing or mismatched variables, rotate credentials, or set up a new environment from an existing one. Trigger words: env vars, environment variables, secrets, .env file, dotenv, config management, secret rotation, missing variable, environment sync.",
+      "category": "devops",
+      "tags": [
+        "environment-variables",
+        "secrets",
+        "configuration",
+        "devops",
+        "security"
+      ]
+    },
+    {
+      "name": "error-monitoring",
+      "slug": "error-monitoring",
+      "description": "Analyze application error logs and monitoring platform exports (Sentry, Datadog, Rollbar) to identify error patterns, duplicates, and severity. Use when someone asks to \"audit errors\", \"analyze exceptions\", \"find noisy alerts\", \"deduplicate error groups\", or \"triage production errors\". Parses JSON/CSV error exports and produces categorized reports with root cause analysis.",
+      "category": "devops",
+      "tags": [
+        "error-monitoring",
+        "sentry",
+        "observability",
+        "debugging",
+        "triage"
+      ]
     },
     {
       "name": "excel-processor",
@@ -466,6 +804,18 @@
       ]
     },
     {
+      "name": "feature-flag-manager",
+      "slug": "feature-flag-manager",
+      "description": "When the user needs to implement feature flags, gradual rollouts, or experiment bucketing. Use when the user mentions \"feature flag,\" \"feature toggle,\" \"gradual rollout,\" \"canary release,\" \"percentage rollout,\" \"kill switch,\" \"user bucketing,\" \"experiment assignment,\" or \"dark launch.\" Covers flag evaluation, deterministic user assignment, targeting rules, and flag lifecycle management. For experiment design, see ab-test-setup. For event tracking, see analytics-tracking.",
+      "category": "development",
+      "tags": [
+        "feature-flags",
+        "rollout",
+        "experimentation",
+        "deployment"
+      ]
+    },
+    {
       "name": "ffmpeg-video-editing",
       "slug": "ffmpeg-video-editing",
       "description": "Edit, convert, trim, merge, and process video files using ffmpeg. Use when the user wants to cut video clips, change format, resize, add watermarks, create GIFs, extract audio, adjust speed, concatenate videos, or compress video files from the command line.",
@@ -479,6 +829,19 @@
       ]
     },
     {
+      "name": "figma-to-code",
+      "slug": "figma-to-code",
+      "description": "Convert Figma designs into production-ready frontend code. Use when someone shares a Figma URL, design screenshot, or exported design tokens and needs React/Vue/HTML components, responsive layouts, or design system code. Trigger words: Figma, design to code, mockup, wireframe, UI implementation, pixel perfect, design handoff, component from design.",
+      "category": "design",
+      "tags": [
+        "figma",
+        "frontend",
+        "design-to-code",
+        "react",
+        "css"
+      ]
+    },
+    {
       "name": "file-organizer",
       "slug": "file-organizer",
       "description": "Organize and rename files based on content analysis. Use when a user asks to sort files into folders, rename files by pattern, organize a messy directory, categorize documents by type or content, deduplicate files, or clean up a downloads folder. Handles smart renaming, content-based sorting, and duplicate detection.",
@@ -489,6 +852,18 @@
         "rename",
         "cleanup",
         "automation"
+      ]
+    },
+    {
+      "name": "file-upload-processor",
+      "slug": "file-upload-processor",
+      "description": "When the user needs to build file upload functionality for a web application. Use when the user mentions \"file upload,\" \"image upload,\" \"upload endpoint,\" \"multipart upload,\" \"presigned URL,\" \"S3 upload,\" \"file validation,\" \"upload to cloud storage,\" or \"accept user files.\" Handles upload endpoints, file validation (type, size, magic bytes), cloud storage integration, and upload status tracking. For image/video processing after upload, see media-transcoder.",
+      "category": "development",
+      "tags": [
+        "file-upload",
+        "cloud-storage",
+        "s3",
+        "validation"
       ]
     },
     {
@@ -516,6 +891,18 @@
         "landing-pages",
         "dashboards",
         "css"
+      ]
+    },
+    {
+      "name": "gdpr-compliance",
+      "slug": "gdpr-compliance",
+      "description": "Automate GDPR and privacy compliance for web applications. Use when someone asks to \"make the app GDPR compliant\", \"add cookie consent\", \"handle data deletion requests\", \"audit PII\", \"data subject access request\", or \"privacy policy generator\". Covers PII auditing, consent management, data subject request endpoints, retention policies, and privacy policy generation.",
+      "category": "development",
+      "tags": [
+        "gdpr",
+        "privacy",
+        "compliance",
+        "data-protection"
       ]
     },
     {
@@ -557,6 +944,34 @@
       ]
     },
     {
+      "name": "graphql",
+      "slug": "graphql",
+      "description": "Build and consume GraphQL APIs. Use when a user asks to create a GraphQL server, write GraphQL schemas, implement resolvers, set up subscriptions, build a GraphQL API, add authentication to GraphQL, optimize queries with DataLoader, implement pagination, handle file uploads, generate types from schema, consume a GraphQL endpoint, or migrate from REST to GraphQL. Covers Apollo Server, Apollo Client, schema design, resolvers, subscriptions, federation, and production patterns.",
+      "category": "development",
+      "tags": [
+        "graphql",
+        "api",
+        "apollo",
+        "schema",
+        "resolvers",
+        "federation"
+      ]
+    },
+    {
+      "name": "grpc",
+      "slug": "grpc",
+      "description": "Build high-performance RPC services with gRPC and Protocol Buffers. Use when a user asks to create gRPC services, define protobuf schemas, implement streaming RPCs, build microservice communication, set up service-to-service calls, implement bidirectional streaming, add interceptors/middleware to gRPC, generate client stubs, handle gRPC errors, implement health checks, configure load balancing, or build gRPC-Web for browser clients. Covers unary, server/client/bidirectional streaming, interceptors, deadlines, metadata, reflection, and production patterns.",
+      "category": "development",
+      "tags": [
+        "grpc",
+        "rpc",
+        "protobuf",
+        "microservices",
+        "streaming",
+        "protocol-buffers"
+      ]
+    },
+    {
       "name": "hetzner-cloud",
       "slug": "hetzner-cloud",
       "description": "Manage Hetzner Cloud infrastructure from the terminal. Use when a user asks to create a Hetzner server, manage VPS instances, set up firewalls, configure networks, manage volumes, create snapshots, handle SSH keys, or provision infrastructure on Hetzner. Covers the hcloud CLI for all resource types. For deploying applications on top of Hetzner servers, see coolify.",
@@ -583,6 +998,18 @@
       ]
     },
     {
+      "name": "jenkins-pipelines",
+      "slug": "jenkins-pipelines",
+      "description": "Builds and manages Jenkins CI/CD pipelines. Use when the user wants to write Jenkinsfiles, configure declarative or scripted pipelines, set up multibranch pipelines, manage Jenkins agents and nodes, configure shared libraries, integrate with Docker/Kubernetes/cloud providers, set up webhooks and triggers, manage credentials and secrets, or troubleshoot build failures. Trigger words: jenkins, jenkinsfile, jenkins pipeline, jenkins agent, jenkins node, jenkins shared library, jenkins docker, jenkins kubernetes, multibranch pipeline, jenkins credentials, jenkins webhook, jenkins groovy, jenkins blue ocean, jenkins job dsl.",
+      "category": "devops",
+      "tags": [
+        "jenkins",
+        "ci-cd",
+        "pipelines",
+        "automation"
+      ]
+    },
+    {
       "name": "job-description",
       "slug": "job-description",
       "description": "Create compelling job postings with requirements, responsibilities, and qualifications. Use when a user asks to write a job description, create a job posting, draft a job listing, build a role specification, define job requirements, or compose a hiring ad for a position.",
@@ -593,6 +1020,42 @@
         "recruitment",
         "hr",
         "writing"
+      ]
+    },
+    {
+      "name": "job-queue",
+      "slug": "job-queue",
+      "description": "Build job queues and background worker systems using BullMQ, Celery, or Sidekiq. Use when you need to offload slow tasks from request handlers — email sending, PDF generation, image processing, data exports, or any work that takes more than a few hundred milliseconds. Covers job priorities, concurrency control, scheduled jobs, progress tracking, and graceful shutdown. Trigger words: background job, worker, queue, async task, BullMQ, Celery, cron job, scheduled task, job retry.",
+      "category": "development",
+      "tags": [
+        "job-queue",
+        "background-workers",
+        "async",
+        "BullMQ"
+      ]
+    },
+    {
+      "name": "jwt-handler",
+      "slug": "jwt-handler",
+      "description": "When the user needs to generate, validate, refresh, or debug JSON Web Tokens. Use when the user mentions \"JWT,\" \"access token,\" \"refresh token,\" \"token rotation,\" \"token expiration,\" \"token validation,\" \"bearer token,\" or \"decode JWT.\" Handles secure token lifecycle including signing, verification, refresh rotation, and revocation. For full auth system design, see auth-system-setup.",
+      "category": "development",
+      "tags": [
+        "jwt",
+        "tokens",
+        "authentication",
+        "security"
+      ]
+    },
+    {
+      "name": "k8s-cost-optimizer",
+      "slug": "k8s-cost-optimizer",
+      "description": "Analyzes Kubernetes cluster resource allocation versus actual usage to find waste and generate right-sizing recommendations. Use when someone asks about Kubernetes costs, overprovisioned pods, resource requests/limits tuning, cluster efficiency, or cloud bill reduction for K8s workloads. Trigger words: k8s costs, pod resources, right-size, overprovisioned, resource waste, cluster optimization, CPU/memory requests.",
+      "category": "devops",
+      "tags": [
+        "kubernetes",
+        "cost-optimization",
+        "resource-management",
+        "finops"
       ]
     },
     {
@@ -608,6 +1071,59 @@
         "lora",
         "chatbot",
         "machine-learning"
+      ]
+    },
+    {
+      "name": "kubernetes-helm",
+      "slug": "kubernetes-helm",
+      "description": "Manages Kubernetes clusters and Helm charts. Use when the user wants to write Kubernetes manifests, create Helm charts, deploy applications, debug pods, configure networking (services, ingress), set up autoscaling, manage secrets and config maps, write operators, troubleshoot cluster issues, or implement GitOps workflows. Trigger words: kubernetes, k8s, kubectl, helm, helm chart, pod, deployment, service, ingress, namespace, configmap, secret, hpa, pvc, statefulset, daemonset, cronjob, operator, kustomize, argocd, flux, gitops, node pool, taint, toleration, affinity.",
+      "category": "devops",
+      "tags": [
+        "kubernetes",
+        "helm",
+        "containers",
+        "orchestration"
+      ]
+    },
+    {
+      "name": "langchain",
+      "slug": "langchain",
+      "description": "Build LLM-powered applications with LangChain. Use when a user asks to create AI chains, build RAG pipelines, implement agents with tools, set up document loaders, create vector stores, build conversational AI, implement prompt templates, chain LLM calls, add memory to chatbots, or orchestrate language model workflows. Covers LangChain v0.3+ with LCEL (LangChain Expression Language), structured output, tool calling, retrieval, and production deployment patterns.",
+      "category": "ai",
+      "tags": [
+        "langchain",
+        "llm",
+        "rag",
+        "agents",
+        "ai-chains",
+        "retrieval"
+      ]
+    },
+    {
+      "name": "langgraph",
+      "slug": "langgraph",
+      "description": "Build stateful, multi-step AI agents and workflows with LangGraph. Use when a user asks to create AI agents with complex logic, build multi-agent systems, implement human-in-the-loop workflows, create state machines for LLMs, build agentic RAG, implement tool-calling agents with branching logic, create planning agents, build supervisor/worker patterns, or orchestrate multi-step AI pipelines with cycles, persistence, and streaming.",
+      "category": "ai",
+      "tags": [
+        "langgraph",
+        "agents",
+        "state-machines",
+        "multi-agent",
+        "workflows",
+        "orchestration"
+      ]
+    },
+    {
+      "name": "langsmith",
+      "slug": "langsmith",
+      "description": "Monitor, trace, debug, and evaluate LLM applications with LangSmith. Use when a user asks to trace LLM calls, debug chain executions, evaluate AI output quality, set up LLM observability, monitor agent performance, run prompt experiments, compare model outputs, create evaluation datasets, track token usage and latency, or build LLM testing pipelines. Covers tracing, datasets, evaluators, annotation queues, prompt hub, and production monitoring.",
+      "category": "ai",
+      "tags": [
+        "langsmith",
+        "llm-observability",
+        "tracing",
+        "evaluation",
+        "monitoring"
       ]
     },
     {
@@ -644,6 +1160,18 @@
       ]
     },
     {
+      "name": "log-analyzer",
+      "slug": "log-analyzer",
+      "description": "Analyze application logs, server logs, and error traces to identify root causes, patterns, and anomalies. Use when debugging production incidents, investigating error spikes, parsing crash reports, or correlating events across multiple log sources. Trigger words: logs, errors, stack trace, crash, exception, debug, incident, 500 errors, timeout, latency spike.",
+      "category": "devops",
+      "tags": [
+        "logs",
+        "debugging",
+        "incident-response",
+        "observability"
+      ]
+    },
+    {
       "name": "markdown-writer",
       "slug": "markdown-writer",
       "description": "Generate well-structured technical documentation in Markdown. Use when a user asks to write docs, create a README, document an API, write a how-to guide, generate technical documentation, create a changelog, write a project wiki, or produce any structured Markdown content. Follows documentation best practices for clarity and completeness.",
@@ -671,6 +1199,32 @@
       "tags": []
     },
     {
+      "name": "mcp-server-builder",
+      "slug": "mcp-server-builder",
+      "description": "Build Model Context Protocol (MCP) servers that connect AI agents to external services and data sources. Use when a user asks to create an MCP server, build an MCP tool, connect an AI agent to an API, create a tool server for Claude, build MCP resources, or expose a database/service via MCP. Generates TypeScript or Python MCP servers with tools, resources, and prompts following the official MCP specification.",
+      "category": "data-ai",
+      "tags": [
+        "mcp",
+        "ai-agents",
+        "tools",
+        "integration",
+        "protocol"
+      ]
+    },
+    {
+      "name": "media-transcoder",
+      "slug": "media-transcoder",
+      "description": "When the user needs to process, resize, convert, or transcode images and videos programmatically. Use when the user mentions \"image resize,\" \"thumbnail generation,\" \"video transcode,\" \"image optimization,\" \"video compression,\" \"format conversion,\" \"strip EXIF,\" \"webp conversion,\" \"FFmpeg,\" or \"Sharp.\" Generates processing pipelines for images (Sharp) and videos (FFmpeg) with variant generation. For upload handling, see file-upload-processor. For manual video editing, see ffmpeg-video-editing.",
+      "category": "development",
+      "tags": [
+        "image-processing",
+        "video-transcoding",
+        "ffmpeg",
+        "sharp",
+        "media"
+      ]
+    },
+    {
       "name": "meeting-notes",
       "slug": "meeting-notes",
       "description": "Transform raw meeting notes or transcripts into structured, actionable summaries. Use when a user asks to summarize meeting notes, organize a transcript, extract action items from a meeting, create meeting minutes, format discussion notes, or turn a call recording transcript into a summary.",
@@ -694,6 +1248,18 @@
         "multi-model",
         "cost-optimization",
         "gateway"
+      ]
+    },
+    {
+      "name": "monorepo-manager",
+      "slug": "monorepo-manager",
+      "description": "Manage dependencies, workspace configurations, and cross-package relationships in monorepos using npm workspaces, pnpm, Yarn, Turborepo, or Nx. Use when syncing dependency versions across packages, resolving version conflicts, analyzing the dependency graph, or setting up build orchestration. Trigger words: monorepo, workspace, dependency sync, version conflict, turborepo, nx, pnpm workspace, cross-package, internal dependency.",
+      "category": "development",
+      "tags": [
+        "monorepo",
+        "dependencies",
+        "workspaces",
+        "turborepo"
       ]
     },
     {
@@ -733,6 +1299,30 @@
         "confidentiality",
         "agreement",
         "business"
+      ]
+    },
+    {
+      "name": "notification-system",
+      "slug": "notification-system",
+      "description": "Designs and implements multi-channel notification systems with email, push, and in-app delivery. Use when you need to build a notification service, set up user notification preferences, create delivery pipelines, implement retry logic for failed notifications, or route messages across channels. Trigger words: notification system, push notifications, email notifications, in-app notifications, notification preferences, delivery tracking, unsubscribe, notification routing.",
+      "category": "development",
+      "tags": [
+        "notifications",
+        "messaging",
+        "email"
+      ]
+    },
+    {
+      "name": "observability-setup",
+      "slug": "observability-setup",
+      "description": "Set up end-to-end observability for microservices. Use when someone asks to \"add tracing\", \"set up monitoring\", \"configure OpenTelemetry\", \"build Grafana dashboards\", \"distributed tracing\", \"structured logging\", \"metrics collection\", or \"debug production issues\". Covers OpenTelemetry instrumentation, collector configuration, Grafana LGTM stack deployment, dashboard provisioning, and alert rules.",
+      "category": "devops",
+      "tags": [
+        "observability",
+        "opentelemetry",
+        "grafana",
+        "tracing",
+        "monitoring"
       ]
     },
     {
@@ -855,6 +1445,18 @@
       ]
     },
     {
+      "name": "performance-reviewer",
+      "slug": "performance-reviewer",
+      "description": "Review code for performance issues and optimization opportunities. Use when someone needs to check for N+1 queries, unnecessary re-renders, memory leaks, inefficient algorithms, missing indexes, or bundle size regressions. Trigger words: performance review, slow query, N+1, memory leak, bundle size, latency, optimization, re-render, Big O.",
+      "category": "development",
+      "tags": [
+        "performance",
+        "optimization",
+        "code-review",
+        "profiling"
+      ]
+    },
+    {
       "name": "picoclaw",
       "slug": "picoclaw",
       "description": "Set up, configure, and manage PicoClaw — an ultra-lightweight personal AI assistant built in Go. Use when the user mentions \"picoclaw,\" \"pico claw,\" \"lightweight AI assistant,\" or wants to deploy a personal AI agent on low-resource hardware (Raspberry Pi, RISC-V boards). Covers installation, LLM provider configuration, messaging gateway setup (Telegram, Discord, Slack, LINE, DingTalk), scheduled tasks, heartbeat, workspace layout, security sandbox, and Docker deployment.",
@@ -909,6 +1511,18 @@
       "tags": []
     },
     {
+      "name": "prompt-tester",
+      "slug": "prompt-tester",
+      "description": "Design, test, and iterate on AI prompts systematically using structured evaluation criteria. Use when building AI features, optimizing agent instructions, comparing prompt variants, or evaluating output quality across edge cases. Trigger words: prompt engineering, prompt testing, eval, LLM evaluation, prompt comparison, A/B test prompts, prompt optimization, system prompt, instruction tuning.",
+      "category": "data-ai",
+      "tags": [
+        "prompt-engineering",
+        "llm",
+        "evaluation",
+        "ai-agents"
+      ]
+    },
+    {
       "name": "proposal-writer",
       "slug": "proposal-writer",
       "description": "Create compelling business proposals that win deals and partnerships. Use when a user asks to write a proposal, draft a business proposal, create a project proposal, prepare a bid, write a pitch document, or generate a partnership proposal. Produces structured, persuasive documents ready for client delivery.",
@@ -932,6 +1546,41 @@
         "cloud",
         "hosting",
         "paas"
+      ]
+    },
+    {
+      "name": "rate-limiter",
+      "slug": "rate-limiter",
+      "description": "Designs and implements API rate limiting middleware and abuse protection. Use when you need to add request throttling, per-user quotas, IP-based blocking, sliding window or token bucket algorithms, Redis-backed distributed counters, or 429 response handling. Trigger words: rate limit, throttle, API abuse, too many requests, request quota, DDoS protection, brute force prevention, credential stuffing defense.",
+      "category": "devops",
+      "tags": [
+        "rate-limiting",
+        "api-security",
+        "middleware"
+      ]
+    },
+    {
+      "name": "realtime-analytics",
+      "slug": "realtime-analytics",
+      "description": "Build real-time analytics pipelines from scratch. Use when someone asks to \"set up analytics\", \"build a dashboard\", \"track events in real time\", \"ClickHouse analytics\", \"event ingestion pipeline\", or \"live metrics\". Covers event schema design, ingestion services with batching, ClickHouse table optimization, aggregation queries, and dashboard wiring.",
+      "category": "data-ai",
+      "tags": [
+        "analytics",
+        "real-time",
+        "clickhouse",
+        "event-tracking"
+      ]
+    },
+    {
+      "name": "realtime-database",
+      "slug": "realtime-database",
+      "description": "When the user needs to design database schemas and queries optimized for real-time applications. Use when the user mentions \"chat database,\" \"message storage,\" \"real-time sync,\" \"message history,\" \"unread count,\" \"cursor pagination,\" \"event sourcing,\" or \"live data.\" Handles schema design for messaging, activity feeds, notifications, and collaborative apps with efficient pagination and sync. For WebSocket transport, see websocket-builder.",
+      "category": "development",
+      "tags": [
+        "database",
+        "real-time",
+        "messaging",
+        "schema-design"
       ]
     },
     {
@@ -968,6 +1617,18 @@
       "tags": []
     },
     {
+      "name": "regression-tester",
+      "slug": "regression-tester",
+      "description": "Generate and run regression tests after code refactoring to verify behavior is preserved. Use when someone has refactored code and needs to confirm nothing broke — especially when existing test coverage is insufficient. Trigger words: regression test, refactor validation, behavior preservation, before/after test, did I break anything, refactoring safety net, snapshot test.",
+      "category": "development",
+      "tags": [
+        "regression-testing",
+        "refactoring",
+        "testing",
+        "code-quality"
+      ]
+    },
+    {
       "name": "remotion-video-toolkit",
       "slug": "remotion-video-toolkit",
       "description": "Programmatic video creation with React using Remotion. Use when a user asks to create videos with code, generate personalized videos, build animated data visualizations, add TikTok-style captions, render video programmatically, or automate video production. Supports CLI rendering, AWS Lambda, and Google Cloud Run deployment.",
@@ -994,6 +1655,20 @@
       ]
     },
     {
+      "name": "rest-api",
+      "slug": "rest-api",
+      "description": "Design and build RESTful APIs. Use when a user asks to create a REST API, design API endpoints, implement CRUD operations, add authentication to an API, handle pagination and filtering, set up API versioning, generate OpenAPI/Swagger docs, implement rate limiting, build middleware, handle file uploads, add CORS, implement HATEOAS, or structure an Express/Fastify/Koa/Flask/FastAPI backend. Covers HTTP methods, status codes, resource modeling, error handling, validation, and production deployment patterns.",
+      "category": "development",
+      "tags": [
+        "rest",
+        "api",
+        "express",
+        "fastapi",
+        "openapi",
+        "crud"
+      ]
+    },
+    {
       "name": "resume-tailor",
       "slug": "resume-tailor",
       "description": "Optimize your resume for specific job applications by matching keywords and highlighting relevant experience. Use when a user asks to tailor a resume, optimize a CV for a job, match a resume to a job description, improve ATS compatibility, customize a resume for a specific role, or align experience with job requirements.",
@@ -1007,11 +1682,72 @@
       ]
     },
     {
+      "name": "s3-storage",
+      "slug": "s3-storage",
+      "description": "Manages S3-compatible object storage (AWS S3, MinIO, Cloudflare R2, DigitalOcean Spaces, Backblaze B2, Wasabi, Supabase Storage). Use when the user wants to create buckets, upload/download files, set up lifecycle policies, configure CORS, manage presigned URLs, implement multipart uploads, set up replication, handle versioning, configure access policies, or build file management features on top of S3-compatible APIs. Trigger words: s3, minio, r2, object storage, bucket, presigned url, multipart upload, lifecycle policy, s3 cors, storage backend, file storage, blob storage, spaces, backblaze, wasabi.",
+      "category": "devops",
+      "tags": [
+        "s3",
+        "object-storage",
+        "minio",
+        "cloud-storage"
+      ]
+    },
+    {
+      "name": "saas-architecture-advisor",
+      "slug": "saas-architecture-advisor",
+      "description": "Advises on multi-tenant SaaS architecture decisions including tenancy models, data isolation strategies, tenant routing, and scaling patterns. Use when someone is building a SaaS product, converting single-tenant to multi-tenant, or evaluating isolation strategies. Trigger words: multi-tenant, SaaS architecture, tenant isolation, shared database, per-tenant database, row-level security, tenant routing, SaaS patterns.",
+      "category": "development",
+      "tags": [
+        "saas",
+        "multi-tenant",
+        "architecture",
+        "database-design"
+      ]
+    },
+    {
       "name": "schema-markup",
       "slug": "schema-markup",
       "description": "When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions \"schema markup,\" \"structured data,\" \"JSON-LD,\" \"rich snippets,\" \"schema.org,\" \"FAQ schema,\" \"product schema,\" \"review schema,\" or \"breadcrumb schema.\" For broader SEO issues, see seo-audit.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "schema-versioning",
+      "slug": "schema-versioning",
+      "description": "Set up and manage database schema versioning with migration files, automated rollback capabilities, and CI/CD integration. Use when you need to version database changes, generate migration files from schema diffs, safely roll back failed deployments, or audit schema history. Trigger words: migration, schema change, rollback, database versioning, ALTER TABLE, Prisma migrate, Knex migrations, Flyway, Liquibase.",
+      "category": "development",
+      "tags": [
+        "database",
+        "migrations",
+        "schema",
+        "rollback"
+      ]
+    },
+    {
+      "name": "search-engine-setup",
+      "slug": "search-engine-setup",
+      "description": "Set up and optimize search engines for applications. Use when someone asks to \"add search to my app\", \"set up Elasticsearch\", \"configure Algolia\", \"fix search relevance\", \"add autocomplete\", \"fuzzy search\", or \"faceted filtering\". Covers index design, data sync, search API, autocomplete, relevance tuning, and query analysis.",
+      "category": "development",
+      "tags": [
+        "search",
+        "elasticsearch",
+        "algolia",
+        "full-text-search"
+      ]
+    },
+    {
+      "name": "security-audit",
+      "slug": "security-audit",
+      "description": "Scan code for security vulnerabilities, misconfigurations, and exposed secrets. Use when a user asks to audit security, find vulnerabilities, check for OWASP issues, scan for secrets, review dependencies for CVEs, detect SQL injection, find XSS vulnerabilities, or harden an application. Covers OWASP Top 10, dependency auditing, secrets detection, and generates fix recommendations with severity ratings.",
+      "category": "development",
+      "tags": [
+        "security",
+        "owasp",
+        "vulnerabilities",
+        "audit",
+        "secrets"
+      ]
     },
     {
       "name": "senior-computer-vision",
@@ -1034,11 +1770,36 @@
       "tags": []
     },
     {
+      "name": "serverless-debugger",
+      "slug": "serverless-debugger",
+      "description": "Debug and optimize serverless functions (AWS Lambda, Vercel Functions, Cloudflare Workers). Use when someone asks to \"debug Lambda\", \"trace serverless request\", \"fix cold starts\", \"analyze CloudWatch logs\", \"optimize Lambda performance\", \"reduce init duration\", or \"troubleshoot function timeout\". Correlates logs across invocations and generates fixes.",
+      "category": "devops",
+      "tags": [
+        "serverless",
+        "lambda",
+        "debugging",
+        "cold-start",
+        "cloudwatch"
+      ]
+    },
+    {
       "name": "signup-flow-cro",
       "slug": "signup-flow-cro",
       "description": "When the user wants to optimize signup, registration, account creation, or trial activation flows. Also use when the user mentions \"signup conversions,\" \"registration friction,\" \"signup form optimization,\" \"free trial signup,\" \"reduce signup dropoff,\" or \"account creation flow.\" For post-signup onboarding, see onboarding-cro. For lead capture forms (not account creation), see form-cro.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "slack-bot-builder",
+      "slug": "slack-bot-builder",
+      "description": "Builds Slack bots and integrations using the Slack API (Bolt framework). Use when the user wants to create a Slack bot, build slash commands, handle Slack events, send messages to channels, build interactive modals/blocks, create Slack workflows, or integrate services with Slack. Trigger words: slack bot, slack integration, slash command, slack app, slack webhook, slack blocks, slack modal, bolt framework, slack events, slack notification, slack automation.",
+      "category": "automation",
+      "tags": [
+        "slack",
+        "bot",
+        "messaging",
+        "integration"
+      ]
     },
     {
       "name": "social-content",
@@ -1061,6 +1822,32 @@
       ]
     },
     {
+      "name": "ssr-migration",
+      "slug": "ssr-migration",
+      "description": "Migrate client-side rendered (CSR) React/Vue applications to server-side rendering (SSR) or static site generation (SSG) using Next.js, Nuxt, or Astro. Use when you need to improve SEO, reduce time-to-first-byte, fix blank page issues for crawlers, or improve Core Web Vitals. Covers incremental adoption, data fetching patterns, hydration debugging, and deployment configuration. Trigger words: SSR, SSG, server-side rendering, static generation, Next.js migration, SEO, hydration, TTFB, Core Web Vitals.",
+      "category": "development",
+      "tags": [
+        "ssr",
+        "ssg",
+        "nextjs",
+        "performance",
+        "seo"
+      ]
+    },
+    {
+      "name": "stripe-testing",
+      "slug": "stripe-testing",
+      "description": "Test and debug Stripe payment integrations. Use when someone needs to verify webhook handling, simulate payment flows, debug failed charges, validate subscription lifecycle, or troubleshoot Stripe API errors. Trigger words: stripe, payment testing, webhook debugging, charge failed, subscription error, payment intent, checkout session.",
+      "category": "development",
+      "tags": [
+        "stripe",
+        "payments",
+        "webhooks",
+        "testing",
+        "debugging"
+      ]
+    },
+    {
       "name": "table-extractor",
       "slug": "table-extractor",
       "description": "Extract tables from PDFs with high accuracy using camelot. Handles complex table structures including merged cells, multi-line rows, and spanning headers. Use when a user asks to extract a table from a PDF, pull tabular data from a document, convert PDF tables to CSV or Excel, or parse structured tables from reports.",
@@ -1074,6 +1861,30 @@
       ]
     },
     {
+      "name": "tech-debt-analyzer",
+      "slug": "tech-debt-analyzer",
+      "description": "Scans codebases for technical debt signals and prioritizes them by business impact. Finds TODO/FIXME/HACK comments, outdated dependencies, code duplication, and correlates with git history to identify high-churn debt hotspots. Use when someone asks about technical debt, code quality audit, refactoring priorities, or maintainability assessment. Trigger words: tech debt, code quality, refactoring, TODOs, maintainability, code health.",
+      "category": "development",
+      "tags": [
+        "technical-debt",
+        "code-quality",
+        "refactoring",
+        "engineering"
+      ]
+    },
+    {
+      "name": "telegram-bot-builder",
+      "slug": "telegram-bot-builder",
+      "description": "Builds Telegram bots using the Bot API (grammy/telegraf/python-telegram-bot). Use when the user wants to create a Telegram bot, handle commands, build inline keyboards, process callbacks, send media, build conversational flows, handle payments, or create mini apps. Trigger words: telegram bot, telegram integration, telegram commands, inline keyboard, telegram webhook, telegram polling, telegram mini app, telegram payments, BotFather, grammy, telegraf.",
+      "category": "automation",
+      "tags": [
+        "telegram",
+        "bot",
+        "messaging",
+        "chatbot"
+      ]
+    },
+    {
       "name": "template-engine",
       "slug": "template-engine",
       "description": "Auto-fill document templates with data. Use when a user asks to create a mail merge, fill templates with data, generate documents from a template, populate placeholders, bulk generate letters or invoices, or auto-fill forms from a spreadsheet. Supports any document format including DOCX, PDF, HTML, and plain text.",
@@ -1084,6 +1895,31 @@
         "documents",
         "automation",
         "generation"
+      ]
+    },
+    {
+      "name": "terraform-iac",
+      "slug": "terraform-iac",
+      "description": "Manages cloud infrastructure using Terraform (and OpenTofu). Use when the user wants to write Terraform configurations, provision cloud resources, manage state, create modules, set up multi-environment deployments, import existing infrastructure, debug plan/apply errors, migrate between providers, or implement IaC best practices. Trigger words: terraform, opentofu, infrastructure as code, IaC, tf, hcl, terraform module, terraform state, terraform plan, terraform apply, terraform import, cloud provisioning, AWS terraform, GCP terraform, Azure terraform.",
+      "category": "devops",
+      "tags": [
+        "terraform",
+        "infrastructure-as-code",
+        "cloud",
+        "devops"
+      ]
+    },
+    {
+      "name": "test-generator",
+      "slug": "test-generator",
+      "description": "Generate unit, integration, and end-to-end tests for existing code. Use when a user asks to write tests, add test coverage, create unit tests, generate integration tests, build e2e tests, improve code coverage, write specs, or add testing to a project. Supports Jest, Vitest, Pytest, Playwright, React Testing Library, and Cypress. Analyzes code to produce meaningful assertions, edge cases, and mock setups.",
+      "category": "development",
+      "tags": [
+        "testing",
+        "unit-tests",
+        "e2e",
+        "jest",
+        "pytest"
       ]
     },
     {
@@ -1178,6 +2014,45 @@
       ]
     },
     {
+      "name": "web-vitals-analyzer",
+      "slug": "web-vitals-analyzer",
+      "description": "Analyze and optimize Core Web Vitals (LCP, CLS, INP) and frontend performance. Use when a user asks to improve page speed, fix layout shifts, reduce loading times, analyze Lighthouse reports, optimize bundle size, or improve Google PageSpeed scores. Covers image optimization, code splitting, font loading, render-blocking resources, and JavaScript execution costs.",
+      "category": "development",
+      "tags": [
+        "performance",
+        "web-vitals",
+        "lighthouse",
+        "frontend",
+        "lcp",
+        "cls",
+        "inp"
+      ]
+    },
+    {
+      "name": "webhook-processor",
+      "slug": "webhook-processor",
+      "description": "Build and configure webhook processing systems with retry logic, signature verification, and dead letter queues. Use when you need to receive, validate, and reliably process incoming webhooks from payment providers, version control platforms, or third-party APIs. Trigger words: webhook, callback URL, event handler, retry, idempotency, payload processing.",
+      "category": "development",
+      "tags": [
+        "webhooks",
+        "retry-logic",
+        "event-driven",
+        "idempotency"
+      ]
+    },
+    {
+      "name": "websocket-builder",
+      "slug": "websocket-builder",
+      "description": "When the user wants to build real-time features using WebSockets. Use when the user mentions \"WebSocket,\" \"real-time,\" \"live updates,\" \"socket,\" \"ws,\" \"push notifications,\" \"live chat,\" \"streaming data,\" or \"bidirectional communication.\" Covers server setup, room management, authentication, reconnection handling, and scaling with Redis pub/sub. For data persistence, see realtime-database.",
+      "category": "development",
+      "tags": [
+        "websocket",
+        "real-time",
+        "backend",
+        "chat"
+      ]
+    },
+    {
       "name": "weekly-report",
       "slug": "weekly-report",
       "description": "Generate consistent, professional weekly status reports for teams and stakeholders. Use when a user asks to write a weekly report, create a status update, generate a weekly summary, write a progress report, compile a week-in-review, or produce a team status report.",
@@ -1188,6 +2063,18 @@
         "status",
         "team-management",
         "productivity"
+      ]
+    },
+    {
+      "name": "whatsapp-bot-builder",
+      "slug": "whatsapp-bot-builder",
+      "description": "Builds WhatsApp bots and integrations using the WhatsApp Business API (Cloud API). Use when the user wants to create a WhatsApp bot, send template messages, handle incoming messages, build interactive lists and buttons, process media, or automate customer communication via WhatsApp. Trigger words: whatsapp bot, whatsapp business api, whatsapp integration, whatsapp cloud api, whatsapp template, whatsapp webhook, whatsapp automation, whatsapp chatbot, meta business, whatsapp flows.",
+      "category": "automation",
+      "tags": [
+        "whatsapp",
+        "bot",
+        "messaging",
+        "business"
       ]
     },
     {
@@ -1205,6 +2092,7 @@
     }
   ],
   "categories": [
+    "ai",
     "automation",
     "business",
     "content",
@@ -1217,5 +2105,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-15T22:18:04.011Z"
+  "updatedAt": "2026-02-18T10:18:11.176Z"
 }
