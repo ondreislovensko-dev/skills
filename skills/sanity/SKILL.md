@@ -1,73 +1,67 @@
-# Sanity — Structured Content Platform
+---
+name: sanity
+description: >-
+  Assists with building content platforms using Sanity's structured content and real-time
+  collaboration features. Use when defining schemas, writing GROQ queries, configuring Sanity
+  Studio, or integrating with Next.js for content-driven sites. Trigger words: sanity, groq,
+  sanity studio, structured content, portable text, content lake, sanity schema.
+license: Apache-2.0
+compatibility: "Sanity Studio requires Node.js 18+; Content Lake is fully managed"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: content
+  tags: ["sanity", "cms", "structured-content", "groq", "headless-cms"]
+---
 
-> Author: terminal-skills
+# Sanity
 
-You are an expert in Sanity for building content platforms with real-time collaboration, structured content modeling, and GROQ queries. You design schemas for maximum content reuse, configure Sanity Studio, and build content-driven applications with the Content Lake API.
+## Overview
 
-## Core Competencies
+Sanity is a structured content platform with real-time collaboration, GROQ querying, and a customizable React-based Studio. Content is stored in the Content Lake with CDN delivery, Portable Text for structured rich content, and visual editing capabilities for live frontend previews.
 
-### Schema Definition
-- Document types: `defineType({ name: "post", type: "document", fields: [...] })`
-- Field types: string, text, number, boolean, date, datetime, slug, url, email, image, file, reference, array, object, block (rich text)
-- Validation: `validation: (Rule) => Rule.required().min(5).max(200)`
-- Custom types: reusable object types for consistent structures (SEO, address, CTA)
-- Portable Text: structured rich text with custom block types and annotations
-- Image with hotspot: focal point selection for responsive cropping
+## Instructions
 
-### GROQ (Graph-Relational Object Queries)
-- `*[_type == "post"]`: select all documents of a type
-- `*[_type == "post" && slug.current == $slug][0]`: single document lookup
-- Projections: `{ title, "authorName": author->name, "imageUrl": image.asset->url }`
-- References: `->` dereference operator for joined data
-- Filters: `&& publishedAt < now() && !(_id in path("drafts.**"))`
-- Ordering: `| order(publishedAt desc)`
-- Slicing: `[0...10]` for pagination
-- Functions: `count()`, `length()`, `defined()`, `coalesce()`, `dateTime()`
-- Full-text search: `*[_type == "post" && [title, body[].children[].text] match "search term"]`
+- When defining schemas, use `defineType()` and `defineField()` with validation rules, model content for reuse by separating pages from content blocks, and use references over inline objects for shared content.
+- When querying data, write GROQ queries with projections to fetch only needed fields, use the `->` dereference operator for joined data, and set `useCdn: true` for production reads.
+- When customizing Sanity Studio, configure desk structure for sidebar navigation, add custom input components for specialized editing, and create custom publish workflows with actions.
+- When building rich content, use Portable Text which is structured data (not HTML) that renders on any platform, with customizable toolbar, custom blocks, and inline objects.
+- When integrating with Next.js, use `next-sanity` with ISR, preview mode, and visual editing, and `@sanity/visual-editing` for click-to-edit overlays in the frontend.
+- When managing environments, use datasets (production, staging, development) for content isolation, GROQ-powered webhooks for filtered build triggers, and set `apiVersion` to a specific date to avoid breaking changes.
+- When handling images, use Sanity's image with hotspot for focal point selection and `sanity-image-url` for generating responsive image URLs with transforms.
 
-### Sanity Studio (v3)
-- React-based, customizable admin interface
-- Desk structure: configure sidebar navigation and document lists
-- Form components: custom input components for specialized editing
-- Actions: custom publish workflows (approve → publish → distribute)
-- Tool plugins: add entirely new tools (analytics, media library, SEO audit)
-- Live preview: preview content in the frontend as editors type
-- Portable Text editor: customizable toolbar, custom blocks, inline objects
+## Examples
 
-### Content Lake
-- Real-time: changes sync instantly across all connected clients
-- CDN API: `apicdn.sanity.io` for cached, fast reads (free tier: 500K requests/day)
-- Mutations API: create, patch, delete documents programmatically
-- Listeners: `client.listen(groqQuery)` for real-time updates
-- Transactions: atomic multi-document operations
-- History: full revision history for every document
-- Datasets: isolated content environments (production, staging, development)
+### Example 1: Build a content-driven marketing site
 
-### Client SDK
-- `@sanity/client`: official JS/TS client
-- `createClient({ projectId, dataset, useCdn, apiVersion })`
-- `client.fetch(groqQuery, params)`: execute GROQ queries
-- `client.create()`, `client.patch()`, `client.delete()`: mutations
-- `next-sanity`: Next.js integration with ISR, preview mode, visual editing
-- `sanity-image-url`: generate responsive image URLs with transforms
+**User request:** "Set up Sanity with Next.js for a marketing site with modular page builder"
 
-### Visual Editing
-- `@sanity/visual-editing`: click-to-edit in the frontend preview
-- Overlays: highlight editable areas, click to open in Studio
-- Presentation tool: side-by-side editing and preview in Studio
-- Works with Next.js, Remix, Nuxt, Astro
+**Actions:**
+1. Define page, hero, feature, CTA, and testimonial schemas as reusable block types
+2. Configure Sanity Studio with desk structure and live preview
+3. Set up `next-sanity` with ISR and GROQ queries for each page type
+4. Enable visual editing with `@sanity/visual-editing` for click-to-edit overlays
 
-### Deployment
-- Sanity Studio: deploy with `sanity deploy` or self-host (static React app)
-- Content Lake: fully managed, no self-hosting option
-- Webhooks: trigger builds on content change (ISR, static rebuild)
-- GROQ-powered webhooks: filter which changes trigger the webhook
+**Output:** A modular marketing site where editors build pages from reusable content blocks with live preview.
 
-## Code Standards
-- Use `defineType()` and `defineField()` for schema definitions — they provide TypeScript types for the Studio
-- Model content for reuse: separate "page" from "content blocks" — blocks can appear on any page
-- Use references over inline objects for content that appears in multiple places
-- Query with GROQ projections to fetch only needed fields — `{ title, excerpt }` not `*[_type == "post"]`
-- Use the CDN API (`useCdn: true`) for production reads — it's free and fast
-- Set `apiVersion` to a specific date to avoid breaking changes: `apiVersion: "2024-01-01"`
-- Use Portable Text for rich content — it's structured data, not HTML, so it renders perfectly on any platform
+### Example 2: Implement real-time content preview
+
+**User request:** "Add live preview to our Sanity + Next.js site so editors see changes as they type"
+
+**Actions:**
+1. Configure Sanity Studio's Presentation tool for side-by-side editing
+2. Set up `@sanity/visual-editing` in the Next.js frontend for click-to-edit overlays
+3. Use `client.listen()` for real-time content updates in preview mode
+4. Configure draft content display with `!(_id in path("drafts.**"))` filtering
+
+**Output:** A live editing experience where content changes appear in the frontend as editors type.
+
+## Guidelines
+
+- Use `defineType()` and `defineField()` for schema definitions; they provide TypeScript types for the Studio.
+- Model content for reuse: separate pages from content blocks so blocks can appear on any page.
+- Use references over inline objects for content that appears in multiple places.
+- Query with GROQ projections to fetch only needed fields, not entire documents.
+- Use the CDN API (`useCdn: true`) for production reads; it is free and fast.
+- Set `apiVersion` to a specific date to avoid breaking changes.
+- Use Portable Text for rich content; it is structured data that renders on any platform.

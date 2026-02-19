@@ -1,66 +1,67 @@
-# Payload CMS — Code-First Headless CMS
+---
+name: payload-cms
+description: >-
+  Assists with building content management systems using Payload CMS with a code-first approach.
+  Use when defining collections in TypeScript, configuring access control, customizing the admin
+  panel, or integrating with Next.js. Trigger words: payload, payload cms, headless cms,
+  collections, admin panel, content management, payload fields.
+license: Apache-2.0
+compatibility: "Requires Node.js 18+ with PostgreSQL, MongoDB, or SQLite"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: content
+  tags: ["payload-cms", "cms", "headless-cms", "content-management", "nextjs"]
+---
 
-> Author: terminal-skills
+# Payload CMS
 
-You are an expert in Payload CMS for building content management systems with a code-first approach. You define collections and fields in TypeScript, leverage Payload's auto-generated admin panel and REST/GraphQL APIs, and build custom workflows for content-heavy applications.
+## Overview
 
-## Core Competencies
+Payload CMS is a code-first headless CMS where collections and fields are defined in TypeScript, auto-generating an admin panel, REST/GraphQL APIs, and TypeScript types. It supports PostgreSQL, MongoDB, and SQLite, and integrates directly into Next.js applications with the Local API.
 
-### Collections
-- Define in TypeScript: `{ slug: "posts", fields: [...], access: {...} }`
-- Field types: text, textarea, richText, number, email, date, select, relationship, upload, array, group, blocks, tabs, row, collapsible, json, code, point, radio, checkbox
-- Auto-generated: REST API, GraphQL API, admin panel CRUD, TypeScript types
-- Hooks: `beforeChange`, `afterChange`, `beforeRead`, `afterRead`, `beforeDelete`, `afterDelete`
-- Access control: per-collection, per-field, per-operation (create, read, update, delete)
-- Versions and drafts: built-in content versioning with draft/published states
-- Localization: field-level i18n with configurable locales
+## Instructions
 
-### Globals
-- Singleton documents: site settings, navigation, footer, SEO defaults
-- Same field types and access control as collections
-- `{ slug: "site-settings", fields: [...] }` — one instance, no list view
+- When defining collections, create TypeScript config objects with `slug`, `fields`, `access`, and `hooks`, using field types like text, richText, relationship, upload, array, group, and blocks.
+- When setting access control, use function-based permissions at the collection, field, and operation level (create, read, update, delete), and create reusable access functions like `isLoggedIn` and `isAdmin`.
+- When building flexible pages, use blocks field type so editors compose pages from predefined block types, and define reusable field groups as functions for DRY configuration across collections.
+- When managing content workflows, enable versions with `versions: { drafts: true }` for draft/published states and full revision history.
+- When integrating with Next.js, use `@payloadcms/next` to run Payload inside the Next.js app, and use the Local API (`payload.find()`, `payload.create()`) in Server Components for typed, fast access without HTTP.
+- When customizing the admin panel, replace specific components with custom React, add custom views for new pages, and configure live preview for real-time frontend content previewing.
+- When building reusable content structures, use relationships over manual ID references for auto-resolution and validation, and define singleton globals for site settings, navigation, and footer.
 
-### Rich Text Editor
-- Lexical editor (default in v3): extensible, headless-compatible
-- Slate editor (legacy): still supported
-- Custom elements: embed components, callouts, code blocks
-- Link handling: internal document links resolved automatically
-- Upload embeds: images and files within rich text
+## Examples
 
-### Access Control
-- Function-based: `access: { read: ({ req }) => req.user?.role === "admin" }`
-- Field-level: restrict specific fields based on user role
-- Document-level: filter which documents a user can see
-- Operation-level: separate permissions for create, read, update, delete
-- `isLoggedIn`, `isAdmin` reusable access functions
+### Example 1: Build a blog CMS with Next.js
 
-### Admin Panel
-- Auto-generated React admin UI from collection config
-- Custom components: replace any admin panel component with your own React
-- Custom views: add entirely new admin pages
-- Live preview: see content changes in the frontend as you edit
-- Dashboard customization: widgets, recent activity, quick actions
+**User request:** "Set up Payload CMS for a blog with categories, authors, and rich text"
 
-### Database
-- **PostgreSQL** (recommended for production): full relational support
-- **MongoDB**: document-based, flexible schema
-- **SQLite**: local development, small deployments
-- Drizzle ORM under the hood for SQL databases
-- Migrations: auto-generated from config changes
+**Actions:**
+1. Define `posts`, `authors`, and `categories` collections with relationships
+2. Configure rich text editor with custom blocks (code, callout, image)
+3. Enable drafts and versions on the posts collection
+4. Integrate with Next.js using the Local API for Server Component data fetching
 
-### Integration
-- Next.js: `@payloadcms/next` — Payload runs inside your Next.js app
-- REST API: auto-generated CRUD endpoints with filtering, pagination, sorting
-- GraphQL: auto-generated schema with queries and mutations
-- Local API: `payload.find()`, `payload.create()` — direct access without HTTP
-- Webhooks: trigger on any collection event
-- Plugins: SEO, form builder, redirects, nested docs, search
+**Output:** A fully featured blog CMS with typed API, auto-generated admin panel, and Next.js integration.
 
-## Code Standards
-- Define reusable field groups as functions: `const seoFields = (overrides) => [...]` — DRY across collections
-- Use access control functions, not middleware — Payload enforces them on all entry points (REST, GraphQL, Local API)
-- Enable versions on content collections — `versions: { drafts: true }` costs nothing and saves you from accidental publishes
-- Use relationships over manual ID references — Payload auto-resolves and validates them
-- Use the Local API (`payload.find()`) in Next.js Server Components — it's faster than HTTP and fully typed
-- Keep admin customizations minimal — the auto-generated panel covers 90% of needs
-- Use blocks for flexible page building — editors compose pages from predefined block types
+### Example 2: Create a multi-role content workflow
+
+**User request:** "Set up Payload with editor, reviewer, and admin roles with different permissions"
+
+**Actions:**
+1. Define user collection with role field (editor, reviewer, admin)
+2. Create access control functions for each role and operation
+3. Apply field-level access to restrict sensitive fields to admins
+4. Add custom publish workflow actions (submit -> review -> publish)
+
+**Output:** A role-based CMS where editors create, reviewers approve, and admins manage all content.
+
+## Guidelines
+
+- Define reusable field groups as functions for DRY configuration across collections.
+- Use access control functions, not middleware; Payload enforces them on all entry points (REST, GraphQL, Local API).
+- Enable versions on content collections; `versions: { drafts: true }` prevents accidental publishes.
+- Use relationships over manual ID references; Payload auto-resolves and validates them.
+- Use the Local API (`payload.find()`) in Next.js Server Components; it is faster than HTTP and fully typed.
+- Keep admin customizations minimal; the auto-generated panel covers most needs.
+- Use blocks for flexible page building so editors compose pages from predefined block types.

@@ -1,73 +1,67 @@
-# Convex — Reactive Backend Platform
+---
+name: convex
+description: >-
+  Assists with building real-time reactive backends using Convex. Use when creating databases
+  with automatic client sync, reactive queries, file storage, scheduled functions, or full-text
+  and vector search. Trigger words: convex, reactive backend, real-time database, useQuery,
+  useMutation, convex functions, convex schema.
+license: Apache-2.0
+compatibility: "Works with React, Next.js, Remix, React Native"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["convex", "real-time", "reactive", "backend", "database"]
+---
 
-> Author: terminal-skills
+# Convex
 
-You are an expert in Convex for building real-time, reactive backends. You define database schemas, queries, mutations, and actions in TypeScript, and Convex automatically syncs data to connected clients in real-time — no WebSocket code, no polling, no cache invalidation.
+## Overview
 
-## Core Competencies
+Convex is a reactive backend platform where database queries, mutations, and actions are defined in TypeScript and data automatically syncs to connected clients in real-time. It eliminates WebSocket code, polling, and cache invalidation, providing ACID transactions and optimistic updates out of the box.
 
-### Database
-- Document-based: schemaless by default, optional schema validation
-- `defineSchema()` with `defineTable()` and validators: `v.string()`, `v.number()`, `v.boolean()`, `v.id("users")`, `v.array()`, `v.object()`
-- Indexes: `defineTable({...}).index("by_email", ["email"])` for efficient queries
-- References: `v.id("tableName")` for typed foreign keys
-- Automatic: no migrations, no connection pooling, no database management
-- ACID transactions: every mutation runs in a transaction
+## Instructions
 
-### Functions
-- **Queries**: `query()` — read data, automatically reactive (clients re-render on change)
-- **Mutations**: `mutation()` — write data, transactional, triggers reactive updates
-- **Actions**: `action()` — call external APIs, non-transactional, can call queries/mutations
-- **HTTP Actions**: `httpAction()` — handle HTTP requests (webhooks, API endpoints)
-- All functions are TypeScript, validated at compile time
-- `ctx.db.get(id)`, `ctx.db.insert()`, `ctx.db.patch()`, `ctx.db.delete()`, `ctx.db.query()`
+- When defining schemas, use `defineSchema()` with `defineTable()` and typed validators (`v.string()`, `v.number()`, `v.id("tableName")`), and define indexes for all filtered and sorted queries.
+- When writing functions, use queries for reads (automatically reactive), mutations for writes (transactional, triggers reactive updates), and actions for external API calls (non-transactional).
+- When building React UIs, use `useQuery()` for reactive data subscriptions that auto-update, `useMutation()` for writes with optimistic updates, and `usePaginatedQuery()` for infinite scroll.
+- When handling authentication, use `convex-auth` for built-in auth or integrate Clerk/Auth0, and validate user identity at the start of every mutation with `ctx.auth.getUserIdentity()`.
+- When processing background work, use `ctx.scheduler.runAfter()` for delayed execution and cron jobs for recurring tasks instead of making mutations slow.
+- When storing files, use `ctx.storage.store()` for upload and `ctx.storage.getUrl()` for serving URLs without S3 or CDN configuration.
+- When implementing search, use full-text search indexes with `searchIndex()` or vector search with `vectorIndex()` for AI/RAG applications, with metadata filtering.
 
-### Real-Time
-- Queries are subscriptions: `useQuery(api.messages.list)` auto-updates when data changes
-- No polling, no WebSocket setup, no cache invalidation
-- Optimistic updates: mutations apply instantly on client, rollback on server rejection
-- Consistency: all clients see the same state — no stale data, no race conditions
-- Paginated queries: `usePaginatedQuery()` for infinite scroll with real-time updates
+## Examples
 
-### Authentication
-- Built-in auth: `convex-auth` package for email/password, OAuth2, magic link
-- Clerk integration: `@clerk/clerk-react` + Convex auth adapter
-- Auth0, NextAuth.js adapters
-- `ctx.auth.getUserIdentity()`: access authenticated user in any function
-- Identity-based access: `if (!identity) throw new Error("Unauthenticated")`
+### Example 1: Build a real-time chat application
 
-### File Storage
-- `ctx.storage.store(blob)`: upload files, get storage ID
-- `ctx.storage.getUrl(storageId)`: generate serving URL
-- `ctx.storage.delete(storageId)`: remove files
-- Images, documents, videos — any file type
-- Built-in serving: no S3 or CDN configuration
+**User request:** "Create a real-time chat app with Convex and React"
 
-### Scheduled Functions
-- `ctx.scheduler.runAfter(ms, api.tasks.process, args)`: delayed execution
-- `ctx.scheduler.runAt(timestamp, api.tasks.process, args)`: scheduled execution
-- Cron jobs: `crons.interval("cleanup", { minutes: 30 }, api.tasks.cleanup)`
-- Retry logic: scheduled functions retry on failure automatically
+**Actions:**
+1. Define `messages` table with schema, author reference, and timestamp index
+2. Create a query function that returns messages sorted by timestamp
+3. Create a mutation for sending messages with auth validation
+4. Use `useQuery()` in React to subscribe to messages with automatic real-time updates
 
-### Search
-- Full-text search: `defineTable({...}).searchIndex("search_body", { searchField: "body" })`
-- `ctx.db.query("posts").withSearchIndex("search_body", q => q.search("body", searchTerm))`
-- Vector search: `defineTable({...}).vectorIndex("embeddings", { vectorField: "embedding", dimensions: 1536 })`
-- Combined: filter by metadata + search by text or vector
+**Output:** A chat application where messages appear instantly for all connected users without WebSocket code.
 
-### React Integration
-- `useQuery()`: reactive data subscription
-- `useMutation()`: call mutations with optimistic updates
-- `useAction()`: call actions (external API calls)
-- `usePaginatedQuery()`: paginated lists with real-time updates
-- `ConvexProvider`: wrap app with Convex client
-- Works with Next.js, Remix, React Native, Expo
+### Example 2: Add full-text and vector search
 
-## Code Standards
-- Use schema validation in production: `defineSchema()` catches type errors at deploy time, not runtime
-- Define indexes for all filtered/sorted queries: `ctx.db.query("posts").withIndex("by_author", q => q.eq("authorId", userId))`
-- Use queries for reads, mutations for writes, actions for external APIs — never mix concerns
-- Keep mutations small and fast: they hold a database lock. Move heavy processing to actions
-- Use `ctx.scheduler.runAfter()` for background work instead of making mutations slow
-- Validate user identity at the start of every mutation: `const identity = await ctx.auth.getUserIdentity(); if (!identity) throw new Error("Unauthenticated")`
-- Use optimistic updates for interactive UIs: the client sees the change instantly while the server confirms
+**User request:** "Implement search across articles with both keyword and semantic search"
+
+**Actions:**
+1. Define search index on article body field with `searchIndex()`
+2. Define vector index on embedding field with `vectorIndex()`
+3. Create query functions for text search and vector similarity search
+4. Combine metadata filtering with search for scoped results
+
+**Output:** A dual search system supporting both keyword matching and semantic similarity queries.
+
+## Guidelines
+
+- Use schema validation in production: `defineSchema()` catches type errors at deploy time, not runtime.
+- Define indexes for all filtered/sorted queries to ensure efficient data access.
+- Use queries for reads, mutations for writes, actions for external APIs; never mix concerns.
+- Keep mutations small and fast since they hold a database lock; move heavy processing to actions.
+- Use `ctx.scheduler.runAfter()` for background work instead of making mutations slow.
+- Validate user identity at the start of every mutation to prevent unauthorized writes.
+- Use optimistic updates for interactive UIs; the client sees the change instantly while the server confirms.
