@@ -1,14 +1,17 @@
 ---
 name: kafka
-category: devops
-version: 1.0.0
 description: >-
   Build event-driven systems with Apache Kafka — producers, consumers, consumer
   groups, topics, partitions, schemas, and exactly-once semantics. Use when tasks
   involve real-time event streaming, microservice communication, log aggregation,
   change data capture, or building event sourcing pipelines.
-author: terminal-skills
-tags: [kafka, streaming, event-driven, messaging, microservices, pub-sub]
+license: Apache-2.0
+compatibility: "Requires Docker or Java 11+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["kafka", "streaming", "event-driven", "messaging", "microservices"]
 ---
 
 # Apache Kafka

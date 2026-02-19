@@ -1,14 +1,17 @@
 ---
 name: tailscale
-category: devops
-version: 1.0.0
 description: >-
   Build zero-trust networks with Tailscale — mesh VPN setup, ACLs, exit nodes,
   subnet routing, MagicDNS, Funnel, SSH, and API automation. Use when tasks
   involve connecting remote machines, securing internal services, replacing
   traditional VPNs, or exposing local services to the internet.
-author: terminal-skills
-tags: [tailscale, vpn, networking, wireguard, zero-trust, mesh]
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["tailscale", "vpn", "networking", "wireguard", "zero-trust"]
 ---
 
 # Tailscale
@@ -18,9 +21,21 @@ Build zero-trust mesh networks that connect servers, laptops, and cloud instance
 ## Setup
 
 ```bash
-# Linux
-curl -fsSL https://tailscale.com/install.sh | sh
+# Debian/Ubuntu
+sudo apt-get install -y apt-transport-https
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
+curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+sudo apt-get update && sudo apt-get install -y tailscale
 sudo tailscale up
+
+# Fedora/RHEL
+sudo dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+sudo dnf install -y tailscale
+sudo systemctl enable --now tailscaled
+sudo tailscale up
+
+# macOS
+brew install tailscale
 
 # Docker
 docker run -d --name tailscale \

@@ -1,85 +1,67 @@
-# Bun — All-in-One JavaScript Runtime
+---
+name: bun
+description: >-
+  Assists with using Bun as an all-in-one JavaScript/TypeScript runtime, package manager, bundler,
+  and test runner. Use when building HTTP servers, managing packages, running tests, or migrating
+  from Node.js. Trigger words: bun, bun serve, bun install, bun test, bun build, javascript
+  runtime, bun runtime.
+license: Apache-2.0
+compatibility: "Requires Bun installed (macOS, Linux, WSL)"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["bun", "javascript-runtime", "package-manager", "bundler", "typescript"]
+---
 
-> Author: terminal-skills
+# Bun
 
-You are an expert in Bun as a JavaScript/TypeScript runtime, package manager, bundler, and test runner. You leverage Bun's speed advantages for server applications, scripts, and tooling — replacing Node.js, npm, webpack, and Jest with a single binary.
+## Overview
 
-## Core Competencies
+Bun is an all-in-one JavaScript/TypeScript runtime that replaces Node.js, npm, webpack, and Jest with a single binary. It provides native TypeScript support, a high-performance HTTP server (`Bun.serve()`), a fast package manager, a bundler, and a Jest-compatible test runner with dramatically faster performance.
 
-### Runtime
-- Native TypeScript and JSX support — no transpilation step, no `ts-node`
-- Node.js API compatibility: `fs`, `path`, `crypto`, `http`, `net`, `child_process`, `stream`
-- Web API support: `fetch`, `Request`, `Response`, `WebSocket`, `FormData`, `Blob`, `URL`
-- Top-level `await` in any file
-- `.env` loading built-in — no `dotenv` package needed
-- Watch mode: `bun --watch` and `bun --hot` for auto-restart and hot reload
-- SQLite built-in: `bun:sqlite` for embedded databases without npm packages
+## Instructions
 
-### HTTP Server
-- `Bun.serve()`: high-performance HTTP server (handles 100K+ req/s)
-- WebSocket support built into the server: `server.upgrade(req)`
-- TLS/HTTPS: pass `tls: { cert, key }` to `Bun.serve()`
-- Static routes: `static` option for serving files without handler overhead
-- Request body: `.json()`, `.text()`, `.formData()`, `.arrayBuffer()` on Request
-- Streaming responses: return `new Response(readableStream)`
+- When creating HTTP servers, use `Bun.serve()` which handles 100K+ req/s with built-in WebSocket support, TLS, and streaming responses.
+- When managing packages, use `bun install` (10-30x faster than npm), `bun add`, `bun remove`, and prefer `bun.lock` (text format) for readable git diffs.
+- When bundling, use `Bun.build()` with appropriate target (`"browser"`, `"bun"`, `"node"`), enable code splitting with `splitting: true`, and configure tree shaking.
+- When writing tests, use `bun test` with Jest-compatible API (`describe`, `it`, `expect`), snapshot testing, mocking with `mock.module()`, and `--coverage` for code coverage.
+- When doing file I/O, prefer `Bun.file()` and `Bun.write()` over Node.js `fs` for significantly faster file operations, and use `Bun.Glob` for pattern matching.
+- When handling authentication, use `Bun.password.hash()` and `Bun.password.verify()` for bcrypt/argon2 instead of npm packages.
+- When migrating from Node.js, replace `node` with `bun` in scripts, keep `package.json` unchanged, and note that most npm packages work without modifications. Use `bun:sqlite` for embedded databases instead of SQLite npm packages.
 
-### Package Manager
-- `bun install`: 10-30x faster than npm, compatible with `package.json` and `node_modules`
-- Lockfile: `bun.lockb` (binary, fast) or `bun.lock` (text, git-friendly)
-- Workspaces: full monorepo support with workspace protocol
-- `bun add`, `bun remove`, `bun update`: drop-in npm replacements
-- `bunx`: equivalent to `npx` for running package binaries
-- Patch support: `bun patch <package>` for modifying node_modules packages
-- Overrides and resolutions for dependency version pinning
+## Examples
 
-### Bundler
-- `Bun.build()` or `bun build`: fast bundler for browser and server targets
-- Code splitting with `splitting: true` for dynamic imports
-- Tree shaking and dead code elimination
-- Loaders: `.ts`, `.tsx`, `.jsx`, `.css`, `.json`, `.toml`, `.txt`, `.file` (copy)
-- Plugins API: custom loaders and resolvers
-- Target: `"browser"`, `"bun"`, `"node"` for environment-specific bundles
-- Source maps: `"inline"`, `"external"`, `"linked"`
+### Example 1: Build a high-performance API server
 
-### Test Runner
-- `bun test`: Jest-compatible test runner (100x faster startup)
-- `expect()`, `describe()`, `it()`, `test()`, `beforeAll()`, `afterAll()`, `beforeEach()`, `afterEach()`
-- Snapshot testing: `.toMatchSnapshot()`, `.toMatchInlineSnapshot()`
-- Mocking: `mock.module()`, `spyOn()`, `jest.fn()` compatibility
-- Code coverage: `bun test --coverage`
-- Watch mode: `bun test --watch` for continuous testing
-- Lifecycle hooks: `preload` for global test setup
+**User request:** "Create a REST API using Bun's built-in HTTP server"
 
-### File I/O
-- `Bun.file(path)`: lazy file reference with `.text()`, `.json()`, `.stream()`, `.arrayBuffer()`
-- `Bun.write(path, data)`: write strings, Blobs, ArrayBuffers, Response bodies
-- `Bun.read()` / `Bun.write()`: 10x faster than Node.js `fs` equivalents
-- Glob: `new Bun.Glob("**/*.ts")` for file pattern matching
-- Shell: `Bun.$.raw` and tagged template literals for shell commands
+**Actions:**
+1. Create server with `Bun.serve()` and route handler
+2. Parse JSON bodies with `request.json()` and return `Response` objects
+3. Add WebSocket upgrade for real-time features
+4. Use `Bun.password` for auth and `bun:sqlite` for data storage
 
-### Built-in APIs
-- `Bun.password.hash()` / `.verify()`: bcrypt and argon2 built-in
-- `Bun.CryptoHasher`: streaming hash (SHA-256, SHA-512, MD5, etc.)
-- `Bun.Transpiler`: programmatic TypeScript/JSX transpilation
-- `Bun.sleep(ms)`: async sleep without `setTimeout` wrapper
-- `Bun.peek()`: check Promise state without awaiting
-- `Bun.deepEquals()`: deep object comparison
-- `Bun.ArrayBufferSink`: high-performance buffer building
-- `Bun.spawn()` / `Bun.spawnSync()`: subprocess execution
+**Output:** A fast API server using only Bun built-ins with no external dependencies.
 
-### Node.js Migration
-- Most npm packages work without changes
-- Replace `node` with `bun` in scripts: `bun run dev`, `bun start`
-- `package.json` scripts work unchanged
-- Express, Fastify, Koa, Hono all work on Bun
-- `node:` protocol imports supported: `import fs from "node:fs"`
-- Incompatibilities: some native addons (`.node` files) may need rebuilding
+### Example 2: Migrate a Node.js project to Bun
 
-## Code Standards
-- Use `Bun.serve()` for new HTTP servers — it's significantly faster than Express on Bun
-- Prefer `Bun.file()` and `Bun.write()` over Node.js `fs` for file operations
-- Use `bun:sqlite` for local data instead of adding SQLite npm packages
-- Use `Bun.password` for auth instead of `bcrypt`/`argon2` npm packages — zero native dependencies
-- Keep `bun.lock` (text format) in git for readable diffs; use `bun.lockb` for maximum install speed
-- Test with `bun test` instead of Jest — same API, dramatically faster
-- When targeting browsers, use `Bun.build()` with `target: "browser"` — no Webpack/Vite needed for simple projects
+**User request:** "Switch my Express project from Node.js to Bun"
+
+**Actions:**
+1. Replace `npm install` with `bun install` in CI and local setup
+2. Update `package.json` scripts to use `bun run` instead of `node`
+3. Replace `dotenv` with Bun's built-in `.env` loading
+4. Switch test runner from Jest to `bun test` with same test files
+
+**Output:** A Bun-powered project with faster installs, startup, and test execution.
+
+## Guidelines
+
+- Use `Bun.serve()` for new HTTP servers; it is significantly faster than Express on Bun.
+- Prefer `Bun.file()` and `Bun.write()` over Node.js `fs` for file operations.
+- Use `bun:sqlite` for local data instead of adding SQLite npm packages.
+- Use `Bun.password` for auth instead of `bcrypt`/`argon2` npm packages for zero native dependencies.
+- Keep `bun.lock` (text format) in git for readable diffs.
+- Test with `bun test` instead of Jest for the same API with dramatically faster execution.
+- When targeting browsers, use `Bun.build()` with `target: "browser"`.

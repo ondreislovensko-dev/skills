@@ -1,14 +1,17 @@
 ---
 name: rabbitmq
-category: devops
-version: 1.0.0
 description: >-
   Build messaging systems with RabbitMQ — queues, exchanges, routing, dead-letter
   queues, delayed messages, priority queues, and RPC patterns. Use when tasks
   involve task queues, background job processing, inter-service communication,
   request-reply patterns, or reliable message delivery with acknowledgments.
-author: terminal-skills
-tags: [rabbitmq, messaging, queues, amqp, microservices, background-jobs]
+license: Apache-2.0
+compatibility: "Requires Docker or Erlang runtime"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["rabbitmq", "messaging", "queues", "amqp", "microservices"]
 ---
 
 # RabbitMQ

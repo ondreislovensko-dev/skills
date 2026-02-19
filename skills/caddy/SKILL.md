@@ -1,15 +1,18 @@
 ---
 name: caddy
-category: devops
-version: 1.0.0
 description: >-
   Configure Caddy as a web server and reverse proxy — automatic HTTPS, reverse
   proxy, load balancing, file server, redirects, headers, rate limiting, and
   API configuration. Use when tasks involve serving websites, proxying to
   backend services, automatic TLS certificate management, or replacing Nginx
   with a simpler configuration.
-author: terminal-skills
-tags: [caddy, web-server, reverse-proxy, https, tls, load-balancer]
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["caddy", "web-server", "reverse-proxy", "https", "tls"]
 ---
 
 # Caddy
