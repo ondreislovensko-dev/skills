@@ -1,74 +1,66 @@
-# Docker Compose — Multi-Container Application Orchestration
+---
+name: docker-compose
+description: >-
+  Assists with defining and running multi-container applications using Docker Compose. Use
+  when configuring services, networking, volumes, health checks, development environments
+  with hot-reload, or production-ready compose files with resource limits. Trigger words:
+  docker compose, docker-compose, multi-container, services, compose file, depends_on.
+license: Apache-2.0
+compatibility: "Requires Docker Engine 20+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["docker-compose", "docker", "containers", "orchestration", "devops"]
+---
 
-> Author: terminal-skills
+# Docker Compose
 
-You are an expert in Docker Compose for defining and running multi-container applications. You design service configurations, manage networking and volumes, set up development environments with hot-reload, and prepare production-ready compose files with health checks, resource limits, and proper secret management.
+## Overview
 
-## Core Competencies
+Docker Compose is a tool for defining and running multi-container applications using a declarative YAML file. It manages service definitions, networking between containers, persistent volumes, health checks, environment variables, and secrets, supporting both development workflows with hot-reload and production deployments with resource limits and logging.
 
-### Service Definition
-- `services`: define containers with image, build, ports, volumes, environment
-- `build`: build from Dockerfile with context, target (multi-stage), args
-- `image`: use pre-built images from registries
-- `depends_on`: service startup order with condition (service_healthy, service_started)
-- `restart`: `no`, `always`, `on-failure`, `unless-stopped`
-- `deploy.replicas`: run multiple instances of a service
+## Instructions
 
-### Networking
-- Default bridge network: all services in same compose file can reach each other by service name
-- Custom networks: isolate groups of services (frontend, backend, database)
-- `ports`: expose to host (`"3000:3000"`, `"127.0.0.1:5432:5432"`)
-- `expose`: expose to other services only (no host binding)
-- Network aliases: multiple DNS names for one service
+- When defining services, specify `image` for pre-built containers or `build` for Dockerfiles, set `depends_on` with `condition: service_healthy` to prevent race conditions, and use `restart: unless-stopped` for production resilience.
+- When configuring networking, use the default bridge network for simple setups (services reach each other by name) or custom networks to isolate service groups (frontend, backend, database).
+- When managing data, use named volumes for persistent data (databases, uploads), bind mounts for development source code, and `tmpfs` for scratch data.
+- When handling secrets, use `secrets` or `env_file` with `.gitignore` rather than inline `environment` values, and use variable substitution with defaults (`${DB_HOST:-localhost}`).
+- When setting up development, use Compose Watch for file sync and auto-rebuild, `profiles` for optional services (monitoring, debug tools), and `compose.override.yml` for dev-specific customization.
+- When preparing for production, set `deploy.resources.limits` for CPU and memory caps, configure logging drivers with rotation, use multi-stage builds, and pin image tags to specific versions.
 
-### Volumes
-- Named volumes: `db-data:/var/lib/postgresql/data` — persistent, managed by Docker
-- Bind mounts: `./src:/app/src` — live code sync for development
-- `tmpfs`: in-memory filesystem for scratch data
-- Volume drivers: NFS, cloud storage for multi-host setups
-- Anonymous volumes: for ephemeral data that doesn't need persistence
+## Examples
 
-### Environment and Secrets
-- `environment`: inline key-value pairs
-- `env_file`: load from `.env` file
-- `secrets`: Docker secrets (file or external) — more secure than environment variables
-- Variable substitution: `${DB_HOST:-localhost}` with defaults
-- Multiple env files: `env_file: [.env, .env.local]`
+### Example 1: Set up a full-stack development environment
 
-### Health Checks
-- `healthcheck.test`: command to verify service health
-- `healthcheck.interval`: how often to check (default 30s)
-- `healthcheck.timeout`: max time for check to complete
-- `healthcheck.retries`: failures before marking unhealthy
-- `depends_on.condition: service_healthy`: wait for dependency health before starting
+**User request:** "Create a Docker Compose setup for a Node.js app with PostgreSQL and Redis"
 
-### Development Features
-- `watch`: file sync and rebuild triggers (Compose Watch)
-  - `sync`: hot-reload file changes into container
-  - `rebuild`: rebuild image on dependency file changes
-- `profiles`: optional services (`debug`, `monitoring`) activated with `--profile`
-- `override`: `compose.override.yml` auto-loaded for dev customization
+**Actions:**
+1. Define `app`, `postgres`, and `redis` services with health checks
+2. Configure bind mounts for source code and named volumes for database data
+3. Set up Compose Watch for hot-reload on file changes
+4. Add `.env` file for database credentials with `env_file` reference
 
-### Production Patterns
-- `deploy.resources.limits`: CPU and memory caps
-- `deploy.resources.reservations`: guaranteed resources
-- `logging`: driver and options (json-file with max-size rotation, syslog, fluentd)
-- Multi-stage builds: separate dev (with tools) and prod (minimal) images
-- `read_only: true`: immutable filesystem for security
+**Output:** A development environment where all services start with `docker compose up`, code changes hot-reload, and database data persists.
 
-### CLI
-- `docker compose up -d`: start all services detached
-- `docker compose down -v`: stop and remove volumes
-- `docker compose logs -f service`: follow service logs
-- `docker compose exec service bash`: shell into running container
-- `docker compose build --no-cache`: rebuild images from scratch
-- `docker compose ps`: list running services with status
+### Example 2: Configure a production-ready multi-service deployment
 
-## Code Standards
-- Use health checks on every database and message queue service — `depends_on: condition: service_healthy` prevents race conditions
-- Use named volumes for persistent data, bind mounts only for development source code
-- Never put secrets in `environment` — use `secrets` or `env_file` with `.gitignore`
-- Set `restart: unless-stopped` in production — services recover from crashes without manual intervention
-- Use `profiles` for optional services (monitoring, debug tools) — don't bloat the default stack
-- Pin image tags: `postgres:16.2-alpine`, never `postgres:latest` — reproducible builds
-- Set resource limits: `deploy.resources.limits` prevents one service from starving others
+**User request:** "Prepare a Docker Compose file for production with Nginx, API, and database"
+
+**Actions:**
+1. Define services with pinned image tags, health checks, and `restart: unless-stopped`
+2. Set `deploy.resources.limits` for CPU and memory on each service
+3. Configure Nginx as reverse proxy with TLS termination and upstream load balancing
+4. Use Docker secrets for database passwords and API keys
+
+**Output:** A production compose file with resource limits, health checks, TLS, secrets management, and automatic restart.
+
+## Guidelines
+
+- Use health checks on every database and message queue service to prevent race conditions with `depends_on`.
+- Use named volumes for persistent data and bind mounts only for development source code.
+- Never put secrets in `environment`; use `secrets` or `env_file` with `.gitignore`.
+- Set `restart: unless-stopped` in production so services recover from crashes automatically.
+- Use `profiles` for optional services like monitoring and debug tools to avoid bloating the default stack.
+- Pin image tags (`postgres:16.2-alpine`, never `postgres:latest`) for reproducible builds.
+- Set resource limits with `deploy.resources.limits` to prevent one service from starving others.

@@ -1,85 +1,66 @@
-# PostgreSQL — Advanced Relational Database
+---
+name: postgresql
+description: >-
+  Assists with designing schemas, writing performant queries, managing indexes, and operating
+  PostgreSQL databases. Use when working with JSONB, full-text search, window functions,
+  CTEs, row-level security, replication, or performance tuning. Trigger words: postgresql,
+  postgres, sql, database, jsonb, rls, window functions, cte.
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["postgresql", "database", "sql", "relational", "jsonb"]
+---
 
-> Author: terminal-skills
+# PostgreSQL
 
-You are an expert in PostgreSQL for designing schemas, writing performant queries, managing indexes, configuring replication, and operating production databases. You leverage PostgreSQL's advanced features — JSONB, full-text search, CTEs, window functions, row-level security — to solve problems that other databases require separate tools for.
+## Overview
 
-## Core Competencies
+PostgreSQL is an advanced relational database with features that often eliminate the need for separate tools: JSONB for semi-structured data, built-in full-text search, window functions for analytics, recursive CTEs for hierarchical queries, row-level security for multi-tenant isolation, and streaming replication for high availability. It supports partitioning, multiple index types (B-tree, GIN, GiST, BRIN), and connection pooling via PgBouncer.
 
-### Schema Design
-- Data types: `TEXT`, `INTEGER`, `BIGINT`, `NUMERIC`, `BOOLEAN`, `TIMESTAMP WITH TIME ZONE`, `UUID`, `JSONB`, `ARRAY`, `INET`, `CIDR`, `TSRANGE`
-- Primary keys: `id UUID DEFAULT gen_random_uuid()` (preferred) or `BIGINT GENERATED ALWAYS AS IDENTITY`
-- Foreign keys: `REFERENCES table(id) ON DELETE CASCADE`
-- Constraints: `CHECK`, `UNIQUE`, `NOT NULL`, `EXCLUDE` (range exclusion)
-- Partitioning: `PARTITION BY RANGE (created_at)` for time-series data
-- Enums: `CREATE TYPE status AS ENUM ('active', 'inactive', 'archived')`
+## Instructions
 
-### JSONB
-- Store semi-structured data: `metadata JSONB DEFAULT '{}'`
-- Query: `metadata->>'key'` (text), `metadata->'nested'->'key'` (json)
-- Containment: `metadata @> '{"type": "premium"}'` (uses GIN index)
-- Path queries: `metadata #>> '{address,city}'`
-- Update: `jsonb_set(metadata, '{key}', '"value"')`, `metadata || '{"new": true}'`
-- Index: `CREATE INDEX ON table USING GIN (metadata)` for containment queries
+- When designing schemas, use `UUID` primary keys with `gen_random_uuid()`, `TIMESTAMP WITH TIME ZONE` for all timestamps, appropriate constraints (CHECK, UNIQUE, foreign keys with ON DELETE), and partitioning for time-series data.
+- When working with JSON, use `JSONB` for truly dynamic data with GIN indexes for containment queries, but prefer proper columns for known fields since they provide better validation and performance.
+- When optimizing queries, add indexes based on `EXPLAIN ANALYZE` output rather than guesswork, use partial indexes for filtered queries, expression indexes for computed values, and covering indexes with `INCLUDE` for index-only scans.
+- When building full-text search, create `tsvector` generated columns with GIN indexes, use `ts_rank()` for relevance scoring, and choose the appropriate language configuration for stemming.
+- When implementing multi-tenancy, use row-level security (RLS) policies for database-level isolation rather than application-level checks, setting the user context via `current_setting()`.
+- When managing production databases, use PgBouncer for connection pooling, monitor with `pg_stat_statements`, run `VACUUM ANALYZE` after bulk operations, and set up streaming replication with Patroni for high availability.
 
-### Indexing
-- B-tree (default): equality and range queries on scalar values
-- GIN: JSONB containment, full-text search, array operations
-- GiST: geometric data, range types, full-text search (phrase proximity)
-- BRIN: block range indexes for naturally ordered data (timestamps, sequences)
-- Partial indexes: `CREATE INDEX ON orders (status) WHERE status = 'pending'`
-- Expression indexes: `CREATE INDEX ON users (LOWER(email))`
-- Covering indexes: `INCLUDE (name, email)` — index-only scans
+## Examples
 
-### Full-Text Search
-- `tsvector`: preprocessed document text (stemmed, stop words removed)
-- `tsquery`: search expression (`'web & developer'`, `'python | rust'`)
-- `@@` operator: match tsvector against tsquery
-- `ts_rank()`: relevance scoring
-- Generated column: `search_vector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', title || ' ' || body)) STORED`
-- GIN index on search vector for fast lookups
+### Example 1: Design a multi-tenant SaaS database with RLS
 
-### Window Functions
-- `ROW_NUMBER() OVER (ORDER BY created_at)`: sequential numbering
-- `RANK()`, `DENSE_RANK()`: ranking with ties
-- `LAG(value, 1) OVER (ORDER BY date)`: access previous row
-- `LEAD(value, 1) OVER (ORDER BY date)`: access next row
-- `SUM(amount) OVER (PARTITION BY user_id ORDER BY date)`: running total
-- `NTILE(4) OVER (ORDER BY score)`: divide into quartiles
+**User request:** "Set up a PostgreSQL database with row-level security for multi-tenant isolation"
 
-### CTEs (Common Table Expressions)
-- `WITH cte AS (SELECT ...) SELECT * FROM cte`: readable subqueries
-- Recursive CTEs: tree/graph traversal, hierarchical data
-- `WITH RECURSIVE tree AS (SELECT ... UNION ALL SELECT ... FROM tree JOIN ...)`
-- Materialized CTEs: `WITH cte AS MATERIALIZED (...)` — force evaluation
+**Actions:**
+1. Create tables with a `tenant_id` column and `UUID` primary keys
+2. Enable RLS with `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
+3. Create policies using `current_setting('app.tenant_id')` for per-request isolation
+4. Set up connection pooling with PgBouncer and configure `app.tenant_id` per connection
 
-### Row-Level Security (RLS)
-- `ALTER TABLE posts ENABLE ROW LEVEL SECURITY`
-- `CREATE POLICY user_posts ON posts FOR ALL USING (user_id = current_setting('app.user_id')::UUID)`
-- Enforce per-user data isolation at the database level (used by Supabase)
-- Policies: `FOR SELECT`, `FOR INSERT`, `FOR UPDATE`, `FOR DELETE`
+**Output:** A multi-tenant database where tenant data is isolated at the database level, preventing cross-tenant data leaks.
 
-### Performance
-- `EXPLAIN ANALYZE`: show actual execution plan with timing
-- Connection pooling: PgBouncer for managing connection limits
-- `VACUUM ANALYZE`: reclaim space, update statistics
-- `pg_stat_statements`: track slow queries
-- `work_mem`, `shared_buffers`, `effective_cache_size`: memory tuning
-- `max_connections`: typically 100-200 (use pooling for more)
+### Example 2: Add full-text search to a content platform
 
-### Replication and Backup
-- Streaming replication: real-time binary replication to read replicas
-- Logical replication: selective table replication, cross-version upgrades
-- `pg_dump` / `pg_restore`: logical backup/restore
-- `pg_basebackup`: physical backup for point-in-time recovery
-- WAL archiving: continuous archiving for disaster recovery
-- Patroni, Stolon: high-availability cluster management
+**User request:** "Implement search across articles with relevance ranking and highlighting"
 
-## Code Standards
-- Use `UUID` for primary keys: `gen_random_uuid()` — avoids sequential ID enumeration and merge conflicts
-- Use `TIMESTAMP WITH TIME ZONE` for all timestamps — never `TIMESTAMP` (loses timezone context)
-- Add indexes based on `EXPLAIN ANALYZE`, not guesswork — measure before optimizing
-- Use connection pooling (PgBouncer) for applications with >20 connections — PostgreSQL forks a process per connection
-- Use RLS for multi-tenant applications — database-level isolation is more reliable than application-level checks
-- Use `JSONB` for truly dynamic data, not as a replacement for proper columns — schema gives you validation and performance
-- Run `VACUUM ANALYZE` after bulk operations — stale statistics lead to bad query plans
+**Actions:**
+1. Add a `search_vector` generated column using `to_tsvector('english', title || ' ' || body)`
+2. Create a GIN index on the search vector column
+3. Build a search query using `@@` with `plainto_tsquery()` and rank results with `ts_rank()`
+4. Add `ts_headline()` for highlighting matched terms in results
+
+**Output:** A fast full-text search with relevance ranking, highlighting, and GIN index-backed performance.
+
+## Guidelines
+
+- Use `UUID` primary keys to avoid sequential ID enumeration and merge conflicts.
+- Use `TIMESTAMP WITH TIME ZONE` for all timestamps; never use `TIMESTAMP` which loses timezone context.
+- Add indexes based on `EXPLAIN ANALYZE` output, not guesswork; measure before optimizing.
+- Use connection pooling (PgBouncer) for applications with more than 20 connections since PostgreSQL forks a process per connection.
+- Use RLS for multi-tenant applications since database-level isolation is more reliable than application-level checks.
+- Use `JSONB` for truly dynamic data, not as a replacement for proper columns.
+- Run `VACUUM ANALYZE` after bulk operations since stale statistics lead to bad query plans.

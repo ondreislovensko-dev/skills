@@ -1,91 +1,66 @@
-# MongoDB — Document Database
+---
+name: mongodb
+description: >-
+  Assists with designing document schemas, building aggregation pipelines, managing indexes,
+  and operating MongoDB clusters. Use when working with flexible schemas, nested documents,
+  horizontal scaling, Atlas Search, or vector search for AI applications. Trigger words:
+  mongodb, mongo, document database, aggregation, atlas, nosql.
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["mongodb", "nosql", "document-database", "aggregation", "atlas"]
+---
 
-> Author: terminal-skills
+# MongoDB
 
-You are an expert in MongoDB for designing document schemas, building aggregation pipelines, managing indexes, and operating production clusters. You use MongoDB for applications where flexible schemas, nested documents, and horizontal scaling are advantages over relational databases.
+## Overview
 
-## Core Competencies
+MongoDB is a document database that stores JSON-like (BSON) documents with flexible schemas, nested objects, and arrays. It provides a rich query language, aggregation pipelines for data transformation, multiple index types (text, TTL, wildcard, geospatial), ACID transactions, and horizontal scaling via sharding. MongoDB Atlas adds managed cloud hosting with full-text search and vector search.
 
-### Document Model
-- Documents: JSON-like (BSON) with nested objects and arrays
-- Collections: groups of documents (analogous to tables)
-- Schema-flexible: documents in the same collection can have different fields
-- `_id`: unique identifier (auto-generated ObjectId or custom)
-- Embedded documents: denormalize related data into a single document
-- References: store `ObjectId` for relationships (like foreign keys)
+## Instructions
 
-### CRUD Operations
-- `insertOne()`, `insertMany()`: create documents
-- `find({ status: "active" })`: query with filters
-- `find({ "address.city": "Berlin" })`: dot notation for nested fields
-- `find({ tags: { $in: ["node", "react"] } })`: array queries
-- `updateOne({ _id }, { $set: { name: "new" } })`: partial update
-- `$push`, `$pull`, `$addToSet`: array modification operators
-- `$inc`, `$mul`, `$min`, `$max`: numeric update operators
-- `deleteOne()`, `deleteMany()`: remove documents
-- `findOneAndUpdate()`: atomic find + modify
+- When designing schemas, embed data that is read together and reference data that is shared across documents, optimizing for read patterns rather than normalization since MongoDB penalizes joins (`$lookup`).
+- When querying, use dot notation for nested fields, array operators (`$in`, `$elemMatch`, `$all`) for array queries, and projection to return only needed fields.
+- When transforming data, use aggregation pipelines with stages like `$match`, `$group`, `$project`, `$lookup`, and `$unwind` rather than pulling data to application code for processing.
+- When creating indexes, add indexes for every production query pattern, use `explain("executionStats")` to verify usage, and choose TTL indexes for auto-expiring data like sessions and logs.
+- When enforcing data integrity, use JSON Schema validation on collections, set `writeConcern: "majority"` for critical writes, and use multi-document transactions only when atomicity across documents is required.
+- When scaling, choose shard keys with high cardinality and even distribution, set up replica sets for high availability, and configure read preferences based on consistency requirements.
 
-### Query Operators
-- Comparison: `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in`, `$nin`
-- Logical: `$and`, `$or`, `$not`, `$nor`
-- Element: `$exists`, `$type`
-- Array: `$all`, `$elemMatch`, `$size`
-- Text search: `$text: { $search: "query" }` with text index
-- Regex: `{ name: { $regex: /^john/i } }`
-- Projection: `{ name: 1, email: 1, _id: 0 }` — include/exclude fields
+## Examples
 
-### Aggregation Pipeline
-- `$match`: filter documents (like `WHERE`)
-- `$group`: group and aggregate (`$sum`, `$avg`, `$max`, `$min`, `$push`)
-- `$project`: reshape documents (include, exclude, compute fields)
-- `$lookup`: join with another collection (left outer join)
-- `$unwind`: deconstruct arrays into separate documents
-- `$sort`, `$limit`, `$skip`: ordering and pagination
-- `$facet`: run multiple pipelines in parallel on the same input
-- `$bucket`, `$bucketAuto`: histogram-style grouping
-- `$merge`, `$out`: write pipeline results to a collection
+### Example 1: Build an e-commerce product catalog
 
-### Indexing
-- Single field: `db.collection.createIndex({ email: 1 })` — ascending
-- Compound: `createIndex({ status: 1, created_at: -1 })` — multi-field
-- Text index: `createIndex({ title: "text", body: "text" })` for full-text search
-- TTL index: `createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })` — auto-delete documents
-- Unique: `createIndex({ email: 1 }, { unique: true })`
-- Partial: `createIndex({ score: 1 }, { partialFilterExpression: { score: { $gt: 50 } } })`
-- Wildcard: `createIndex({ "metadata.$**": 1 })` — index all fields in a subdocument
-- `explain("executionStats")`: analyze query performance
+**User request:** "Design a MongoDB schema for products with variants, reviews, and categories"
 
-### Schema Validation
-- JSON Schema validation: `db.createCollection("users", { validator: { $jsonSchema: {...} } })`
-- Validation levels: `strict` (reject invalid) or `moderate` (validate only on update)
-- Validation actions: `error` (reject) or `warn` (log)
+**Actions:**
+1. Embed variants and pricing as arrays within the product document for single-query reads
+2. Reference categories as ObjectIds for shared data and embed review summaries
+3. Create compound indexes for filtering by category, price range, and rating
+4. Build aggregation pipeline for faceted search with `$facet` and `$bucket`
 
-### Replication and Sharding
-- Replica set: primary + secondaries for high availability and read scaling
-- Automatic failover: secondaries elect a new primary if current fails
-- Read preferences: `primary`, `secondary`, `nearest` for read distribution
-- Sharding: horizontal scaling across multiple servers
-- Shard key: field that determines document distribution (choose carefully)
-- Zones: route data to specific shards by range (geo-partitioning)
+**Output:** A product catalog with embedded variants, referenced categories, faceted search, and optimized indexes.
 
-### Transactions
-- Multi-document ACID transactions (since MongoDB 4.0)
-- `session.withTransaction(async () => { ... })`: automatic retry on transient errors
-- Best for operations that must be atomic across multiple documents/collections
-- Performance cost: use only when atomicity is required
+### Example 2: Set up full-text search with Atlas Search
 
-### Atlas (Cloud)
-- MongoDB Atlas: managed cloud database (AWS, GCP, Azure)
-- Atlas Search: Lucene-based full-text search (replaces Elasticsearch for many use cases)
-- Atlas Vector Search: vector similarity for AI/ML applications
-- Atlas Charts: built-in data visualization
-- Serverless instances: auto-scaling, pay-per-operation
+**User request:** "Add search functionality to my app using MongoDB Atlas Search"
 
-## Code Standards
-- Embed when data is read together, reference when data is shared across documents — optimize for read patterns
-- Design schemas for your queries, not for normalization — MongoDB penalizes joins (`$lookup`), rewards denormalization
-- Create indexes for every query pattern used in production — use `explain()` to verify index usage
-- Use TTL indexes for session data, logs, and temporary documents — automatic cleanup without cron jobs
-- Use aggregation pipelines instead of pulling data to application code — the database is faster at filtering and transforming
-- Set `writeConcern: "majority"` for critical writes — guarantees data survives replica set failover
-- Choose shard keys carefully: high cardinality, even distribution, and query isolation — bad shard keys are nearly impossible to change
+**Actions:**
+1. Create an Atlas Search index with analyzers for the title, description, and tags fields
+2. Build a `$search` aggregation stage with fuzzy matching and highlighting
+3. Add autocomplete search with the `autocomplete` data type
+4. Implement relevance scoring and boosting for title matches
+
+**Output:** A search feature with fuzzy matching, autocomplete, relevance ranking, and highlighting.
+
+## Guidelines
+
+- Embed when data is read together; reference when data is shared across documents.
+- Design schemas for your query patterns, not for normalization.
+- Create indexes for every production query pattern and verify with `explain()`.
+- Use TTL indexes for session data, logs, and temporary documents for automatic cleanup.
+- Use aggregation pipelines instead of pulling data to application code for transformation.
+- Set `writeConcern: "majority"` for critical writes to guarantee data survives failover.
+- Choose shard keys carefully since bad shard keys are nearly impossible to change.

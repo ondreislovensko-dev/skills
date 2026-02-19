@@ -1,86 +1,66 @@
-# Nginx — Web Server and Reverse Proxy
+---
+name: nginx
+description: >-
+  Assists with configuring Nginx as a web server, reverse proxy, and load balancer. Use
+  when serving static files, proxying to application servers, setting up TLS termination,
+  configuring caching, rate limiting, or writing security headers. Trigger words: nginx,
+  reverse proxy, load balancer, tls, ssl, server block, location block.
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["nginx", "reverse-proxy", "load-balancer", "tls", "web-server"]
+---
 
-> Author: terminal-skills
+# Nginx
 
-You are an expert in Nginx for serving static files, reverse proxying to application servers, load balancing, TLS termination, and HTTP caching. You write efficient configurations that handle thousands of concurrent connections with minimal resource usage.
+## Overview
 
-## Core Competencies
+Nginx is a high-performance web server and reverse proxy that serves static files, proxies requests to application servers, load balances across backends, terminates TLS, and caches responses. It handles thousands of concurrent connections with minimal resource usage through an event-driven, non-blocking architecture.
 
-### Server Blocks
-- `server`: virtual host — match requests by `server_name` and `listen` port
-- `listen 80`: HTTP, `listen 443 ssl http2`: HTTPS with HTTP/2
-- `server_name`: domain matching (exact, wildcard `*.example.com`, regex)
-- `root`: document root for static files
-- `index`: default files (index.html, index.php)
+## Instructions
 
-### Location Blocks
-- `location /`: prefix match (most general)
-- `location = /health`: exact match (highest priority)
-- `location ~* \.(jpg|css|js)$`: regex match (case-insensitive)
-- `location ^~ /static/`: prefix match, skip regex evaluation
-- Priority: exact (`=`) → prefix with `^~` → regex (`~`/`~*`) → longest prefix
+- When configuring server blocks, define virtual hosts with `server_name` for domain matching and `listen` for ports, using separate blocks for HTTP (port 80, redirect to HTTPS) and HTTPS (port 443 with SSL and HTTP/2).
+- When setting up reverse proxying, use `proxy_pass` to forward to upstream servers and set `proxy_set_header` for Host, X-Real-IP, X-Forwarded-For, and X-Forwarded-Proto to preserve client information.
+- When load balancing, define `upstream` blocks with multiple servers and choose the strategy: round-robin (default), `least_conn`, `ip_hash` for sticky sessions, or weighted distribution.
+- When configuring TLS, set modern protocols (`TLSv1.2 TLSv1.3`), enable `ssl_stapling` and session caching, and integrate with Let's Encrypt via certbot for automatic certificate renewal.
+- When serving static files, enable `gzip` compression for text-based content, set `expires 1y` for hashed assets, use `sendfile on` for efficient transfer, and `try_files` for SPA fallback routing.
+- When adding security, set headers (X-Frame-Options, X-Content-Type-Options, HSTS, CSP) and configure rate limiting with `limit_req_zone` to prevent abuse.
 
-### Reverse Proxy
-- `proxy_pass http://backend:3000`: forward requests to upstream
-- `proxy_set_header Host $host`: pass original Host header
-- `proxy_set_header X-Real-IP $remote_addr`: pass client IP
-- `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for`
-- `proxy_set_header X-Forwarded-Proto $scheme`: pass HTTP/HTTPS
-- WebSocket: `proxy_set_header Upgrade $http_upgrade`, `proxy_set_header Connection "upgrade"`
-- Timeouts: `proxy_connect_timeout`, `proxy_read_timeout`, `proxy_send_timeout`
+## Examples
 
-### Load Balancing
-- `upstream backend { server app1:3000; server app2:3000; }`: round-robin (default)
-- `least_conn`: route to server with fewest connections
-- `ip_hash`: sticky sessions by client IP
-- `server app1:3000 weight=3`: weighted distribution
-- `server app1:3000 backup`: only used when primary servers are down
-- Health checks: `max_fails=3 fail_timeout=30s`
+### Example 1: Set up Nginx as reverse proxy with TLS for a Node.js app
 
-### TLS / SSL
-- `ssl_certificate /path/to/cert.pem`: certificate chain
-- `ssl_certificate_key /path/to/key.pem`: private key
-- `ssl_protocols TLSv1.2 TLSv1.3`: modern protocols only
-- `ssl_ciphers`: cipher suite selection
-- `ssl_session_cache shared:SSL:10m`: session resumption for performance
-- `ssl_stapling on`: OCSP stapling
-- Let's Encrypt integration via certbot or ACME
+**User request:** "Configure Nginx with HTTPS to proxy to my Node.js API on port 3000"
 
-### Caching
-- `proxy_cache_path /tmp/cache levels=1:2 keys_zone=app:10m max_size=1g`
-- `proxy_cache app`: enable caching for location
-- `proxy_cache_valid 200 1h`: cache successful responses for 1 hour
-- `proxy_cache_bypass $http_cache_control`: respect client Cache-Control
-- `add_header X-Cache-Status $upstream_cache_status`: expose cache hit/miss
+**Actions:**
+1. Create a server block listening on port 443 with SSL certificate paths and HTTP/2
+2. Configure `proxy_pass http://localhost:3000` with proper header forwarding
+3. Add a port 80 server block that redirects all HTTP to HTTPS
+4. Enable ssl_stapling, session caching, and modern cipher suites
 
-### Static File Serving
-- `expires 1y`: set far-future Cache-Control for hashed assets
-- `gzip on`: compress text-based responses
-- `gzip_types text/css application/javascript application/json`
-- `try_files $uri $uri/ /index.html`: SPA fallback routing
-- `sendfile on`: efficient file transfer (zero-copy)
-- `tcp_nopush on`: optimize packet sizes
+**Output:** An Nginx configuration with TLS termination, HTTP-to-HTTPS redirect, and reverse proxy to the Node.js app.
 
-### Security Headers
-- `add_header X-Frame-Options DENY`
-- `add_header X-Content-Type-Options nosniff`
-- `add_header X-XSS-Protection "1; mode=block"`
-- `add_header Strict-Transport-Security "max-age=31536000; includeSubDomains"`
-- `add_header Content-Security-Policy "default-src 'self'"`
-- Rate limiting: `limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s`
+### Example 2: Configure load balancing with health checks
 
-### Performance Tuning
-- `worker_processes auto`: one worker per CPU core
-- `worker_connections 1024`: connections per worker
-- `keepalive_timeout 65`: reuse connections
-- `client_max_body_size 10m`: upload size limit
-- `access_log off`: disable access log for high-traffic static assets
+**User request:** "Load balance across three API servers with failover"
 
-## Code Standards
-- Use `server_name` with specific domains — avoid `_` catch-all in production (security risk)
-- Always redirect HTTP to HTTPS: `return 301 https://$host$request_uri` in port 80 server block
-- Set security headers on every server block — use an `include /etc/nginx/snippets/security.conf` pattern
-- Use `try_files` for SPA routing instead of `rewrite` — it's faster and more explicit
-- Rate-limit API endpoints: `limit_req zone=api burst=20 nodelay` prevents abuse without affecting normal traffic
-- Cache static assets aggressively: `expires 1y` for hashed filenames, `expires 1h` for HTML
-- Test config before reload: `nginx -t && nginx -s reload` — a syntax error in config takes down the server
+**Actions:**
+1. Define an `upstream` block with three backend servers and `least_conn` strategy
+2. Set `max_fails=3 fail_timeout=30s` for automatic health checking
+3. Add a `backup` server that activates only when primary servers are down
+4. Configure proxy caching for GET requests to reduce backend load
+
+**Output:** A load-balanced setup with automatic failover, health checks, and response caching.
+
+## Guidelines
+
+- Use `server_name` with specific domains; avoid the `_` catch-all in production for security.
+- Always redirect HTTP to HTTPS with `return 301 https://$host$request_uri` on the port 80 block.
+- Set security headers on every server block using an included snippet file for consistency.
+- Use `try_files` for SPA routing instead of `rewrite` since it is faster and more explicit.
+- Rate-limit API endpoints with `limit_req zone=api burst=20 nodelay` to prevent abuse without affecting normal traffic.
+- Cache static assets aggressively: `expires 1y` for hashed filenames and `expires 1h` for HTML.
+- Always test config before reload: `nginx -t && nginx -s reload` to prevent downtime from syntax errors.
