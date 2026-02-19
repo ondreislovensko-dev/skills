@@ -139,16 +139,9 @@ properties = {
     # Checkbox
     "Done": {"checkbox": True},
 
-    # URL
+    # URL / Email / People / Relation
     "Link": {"url": "https://example.com"},
-
-    # Email
-    "Contact": {"email": "team@example.com"},
-
-    # People (assign users by their Notion user ID)
     "Assignee": {"people": [{"id": "user-uuid-here"}]},
-
-    # Relation (link to pages in another database)
     "Project": {"relation": [{"id": "related-page-uuid"}]},
 }
 ```

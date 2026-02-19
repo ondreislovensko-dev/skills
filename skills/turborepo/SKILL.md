@@ -1,55 +1,65 @@
-# Turborepo — High-Performance Monorepo Build System
+---
+name: turborepo
+description: >-
+  Assists with managing JavaScript/TypeScript monorepos using Turborepo. Use when configuring
+  build pipelines, setting up caching, pruning workspaces for Docker, or optimizing CI/CD
+  for monorepo projects. Trigger words: turborepo, turbo, monorepo, pipeline, workspace,
+  remote cache, turbo.json.
+license: Apache-2.0
+compatibility: "Requires Node.js 16+ with npm, yarn, or pnpm"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["turborepo", "monorepo", "build-system", "caching", "ci-cd"]
+---
 
-> Author: terminal-skills
+# Turborepo
 
-You are an expert in Turborepo for managing JavaScript/TypeScript monorepos. You configure intelligent build pipelines that cache aggressively, parallelize tasks, and ensure teams only rebuild what changed.
+## Overview
 
-## Core Competencies
+Turborepo is a high-performance build system for JavaScript/TypeScript monorepos that intelligently caches task outputs, parallelizes execution across CPU cores, and ensures teams only rebuild what has changed. It integrates with npm, yarn, and pnpm workspaces.
 
-### Pipeline Configuration
-- Task definitions in `turbo.json`: `build`, `test`, `lint`, `dev`, `typecheck`
-- Dependency graph: `dependsOn` for task ordering (`"build": { "dependsOn": ["^build"] }`)
-- Topological ordering: `^` prefix means "run this task in dependencies first"
-- Parallel execution: independent tasks run concurrently across CPU cores
-- Persistent tasks: `"persistent": true` for long-running dev servers
-- Interactive tasks: `"interactive": true` for tasks requiring stdin
+## Instructions
 
-### Caching
-- Local cache: `.turbo/` directory stores task outputs (build artifacts, test results)
-- Remote cache: Vercel Remote Cache or self-hosted (Turborepo Remote Cache API)
-- Cache inputs: `inputs` array to specify which files affect a task's cache key
-- Cache outputs: `outputs` array defines what to store (`["dist/**", ".next/**"]`)
-- Environment variable inputs: `env` and `globalEnv` for cache key computation
-- Cache hit ratio monitoring: `--summarize` flag for pipeline analytics
+- When setting up a monorepo, define tasks in `turbo.json` with `dependsOn` for ordering, use `^` prefix for topological dependencies (e.g., `"dependsOn": ["^build"]`), and specify `outputs` for cacheable artifacts.
+- When configuring caching, define `outputs` arrays for each task (`["dist/**", ".next/**"]`), list all build-affecting environment variables in `env` or `globalEnv`, and set up Remote Cache for cross-developer sharing.
+- When filtering workspaces, use `--filter=@app/web` to target specific packages, `--filter=...[HEAD~1]` for changed packages, and `turbo run build --graph` to visualize the dependency graph.
+- When optimizing Docker builds, use `turbo prune --scope=@app/web` to generate a minimal Docker context containing only the targeted package and its dependencies.
+- When setting up CI/CD, enable Remote Cache for cross-PR cache sharing, use `--dry-run=json` for pipeline analysis, and leverage incremental builds that only rebuild packages affected by PR changes.
+- When organizing shared packages, create focused internal packages (`@repo/ui`, `@repo/db`, `@repo/auth`) with shared `tsconfig` and ESLint configs.
 
-### Workspace Management
-- Package manager support: npm, yarn, pnpm workspaces
-- Workspace filtering: `--filter=@app/web`, `--filter=...[HEAD~1]` (changed packages)
-- Pruning: `turbo prune --scope=@app/web` for Docker-optimized monorepo subsets
-- Internal packages: shared `tsconfig`, `eslint-config`, `ui` component libraries
-- Dependency graph visualization: `turbo run build --graph`
+## Examples
 
-### CI/CD Integration
-- GitHub Actions: cache artifacts between runs with Remote Cache
-- Docker: `turbo prune` generates minimal Docker context for each service
-- Incremental builds: only rebuild packages affected by the PR's changed files
-- Dry run: `--dry-run=json` for CI pipeline analysis without execution
+### Example 1: Set up a new Turborepo monorepo
 
-### Configuration Patterns
-- Root `turbo.json`: global pipeline definitions and environment variables
-- Package-level `turbo.json`: per-package task overrides and extensions
-- Shared `tsconfig.json`: base config in `packages/tsconfig/` extended by all packages
-- Shared ESLint config: `packages/eslint-config/` with framework-specific presets
+**User request:** "Initialize a monorepo with a Next.js app and shared UI library"
 
-### Migration
-- From Lerna: replace `lerna run` with `turbo run`, add `turbo.json` pipeline
-- From Nx: map `nx.json` targets to `turbo.json` tasks, adjust cache config
-- Incremental adoption: add Turborepo to existing workspace without restructuring
+**Actions:**
+1. Set up pnpm workspace with `apps/web` and `packages/ui` directories
+2. Configure `turbo.json` with `build`, `dev`, `lint`, and `typecheck` tasks
+3. Define task dependencies and cache outputs for each task
+4. Create shared `tsconfig` base in `packages/tsconfig`
 
-## Code Standards
-- Always define `outputs` for cacheable tasks — empty `outputs: []` for side-effect-only tasks like `lint`
-- List all environment variables in `env` or `globalEnv` that affect build output
-- Use `^` prefix in `dependsOn` for tasks that consume dependency outputs (build, typecheck)
-- Keep internal packages small and focused: `@repo/ui`, `@repo/db`, `@repo/auth`
-- Use `turbo prune` for Docker builds — never COPY the entire monorepo into a container
-- Set up Remote Cache in CI for cross-developer and cross-PR cache sharing
+**Output:** A monorepo with parallel builds, intelligent caching, and shared configuration.
+
+### Example 2: Optimize Docker builds for deployment
+
+**User request:** "Create a Dockerfile for deploying one service from our Turborepo monorepo"
+
+**Actions:**
+1. Run `turbo prune --scope=@app/api` to generate minimal context
+2. Create multi-stage Dockerfile using the pruned output
+3. Install dependencies and build only the targeted package
+4. Configure cache mounts for faster rebuilds
+
+**Output:** A lean Docker image containing only the service and its dependencies, not the full monorepo.
+
+## Guidelines
+
+- Always define `outputs` for cacheable tasks; use empty `outputs: []` for side-effect-only tasks like `lint`.
+- List all environment variables in `env` or `globalEnv` that affect build output.
+- Use `^` prefix in `dependsOn` for tasks that consume dependency outputs (build, typecheck).
+- Keep internal packages small and focused: `@repo/ui`, `@repo/db`, `@repo/auth`.
+- Use `turbo prune` for Docker builds; never copy the entire monorepo into a container.
+- Set up Remote Cache in CI for cross-developer and cross-PR cache sharing.

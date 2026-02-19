@@ -61,8 +61,6 @@ model User {
   // Relations
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
-  posts          Post[]
-  comments       Comment[]
 
   @@index([organizationId])
   @@index([email])
@@ -75,70 +73,9 @@ model Organization {
   plan      Plan     @default(FREE)
   createdAt DateTime @default(now())
 
-  users    User[]
-  projects Project[]
+  users User[]
 
   @@index([slug])
-}
-
-model Project {
-  id             String       @id @default(cuid())
-  name           String
-  description    String?
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  tasks          Task[]
-  createdAt      DateTime     @default(now())
-
-  @@unique([organizationId, name])  // No duplicate project names per org
-}
-
-model Task {
-  id        String     @id @default(cuid())
-  title     String
-  status    TaskStatus @default(TODO)
-  priority  Int        @default(0)  // 0=low, 1=medium, 2=high, 3=urgent
-  projectId String
-  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assigneeId String?
-  dueDate   DateTime?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  @@index([projectId, status])
-  @@index([assigneeId])
-}
-
-model Post {
-  id        String    @id @default(cuid())
-  title     String
-  content   String
-  published Boolean   @default(false)
-  authorId  String
-  author    User      @relation(fields: [authorId], references: [id])
-  comments  Comment[]
-  tags      Tag[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([authorId])
-  @@fulltext([title, content])  // Full-text search (PostgreSQL/MySQL)
-}
-
-model Comment {
-  id       String   @id @default(cuid())
-  text     String
-  postId   String
-  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  authorId String
-  author   User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-}
-
-model Tag {
-  id    String @id @default(cuid())
-  name  String @unique
-  posts Post[]
 }
 
 enum Role {
@@ -151,13 +88,6 @@ enum Plan {
   FREE
   PRO
   ENTERPRISE
-}
-
-enum TaskStatus {
-  TODO
-  IN_PROGRESS
-  IN_REVIEW
-  DONE
 }
 ```
 
@@ -343,75 +273,7 @@ async function searchPosts(query: string) {
 
 ## Seeding
 
-```typescript
-// prisma/seed.ts — Database seeding for development
-
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
-
-async function main() {
-  const org = await prisma.organization.create({
-    data: {
-      name: 'Acme Corp',
-      slug: 'acme',
-      plan: 'PRO',
-      users: {
-        create: [
-          { email: 'admin@acme.com', name: 'Admin User', role: 'ADMIN' },
-          { email: 'dev@acme.com', name: 'Developer', role: 'MEMBER' },
-        ],
-      },
-    },
-  });
-  console.log(`Seeded org: ${org.id}`);
-}
-
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
-```
-
-Add to `package.json`:
-
-```json
-{
-  "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
-  }
-}
-```
-
-## Middleware and Extensions
-
-```typescript
-// Soft delete middleware — intercept delete, set deletedAt instead
-prisma.$use(async (params, next) => {
-  if (params.action === 'delete' && params.model === 'User') {
-    params.action = 'update';
-    params.args.data = { deletedAt: new Date() };
-  }
-  if (params.action === 'findMany' && params.model === 'User') {
-    params.args.where = { ...params.args.where, deletedAt: null };
-  }
-  return next(params);
-});
-
-// Query logging extension
-const prismaWithLogging = prisma.$extends({
-  query: {
-    $allOperations({ operation, model, args, query }) {
-      const start = performance.now();
-      return query(args).then(result => {
-        const duration = performance.now() - start;
-        if (duration > 100) {  // Log slow queries (>100ms)
-          console.warn(`Slow query: ${model}.${operation} took ${duration.toFixed(0)}ms`);
-        }
-        return result;
-      });
-    },
-  },
-});
-```
+Run `npx prisma db seed` with a seed script configured in `package.json` (`"prisma": { "seed": "npx tsx prisma/seed.ts" }`). Use `prisma.model.create` with nested `create` to seed related data in one call.
 
 ## Guidelines
 

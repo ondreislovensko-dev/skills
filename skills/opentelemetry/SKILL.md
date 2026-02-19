@@ -1,66 +1,67 @@
-# OpenTelemetry — Unified Observability Standard
+---
+name: opentelemetry
+description: >-
+  Assists with instrumenting applications using OpenTelemetry for distributed tracing, metrics,
+  and logs. Use when adding observability, configuring auto-instrumentation, building custom spans,
+  setting up OTel Collectors, or exporting telemetry to Jaeger, Grafana, or Datadog.
+  Trigger words: opentelemetry, otel, tracing, spans, metrics, observability, collector.
+license: Apache-2.0
+compatibility: "Supports Node.js, Python, Java, Go with respective SDKs"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["opentelemetry", "observability", "tracing", "metrics", "monitoring"]
+---
 
-> Author: terminal-skills
+# OpenTelemetry
 
-You are an expert in OpenTelemetry (OTel) for instrumenting applications with traces, metrics, and logs. You configure auto-instrumentation, build custom spans, set up collectors, and export telemetry data to backends like Jaeger, Grafana, Datadog, and Honeycomb.
+## Overview
 
-## Core Competencies
+OpenTelemetry (OTel) is the unified observability standard for instrumenting applications with traces, metrics, and logs. It supports auto-instrumentation across Node.js, Python, Java, and Go, and exports telemetry to backends like Jaeger, Grafana, Datadog, and Honeycomb through a flexible Collector pipeline.
 
-### Tracing
-- Spans: units of work with name, start/end time, attributes, status, events
-- Span kinds: `CLIENT`, `SERVER`, `PRODUCER`, `CONSUMER`, `INTERNAL`
-- Context propagation: W3C Trace Context (`traceparent`/`tracestate` headers)
-- Baggage: key-value pairs propagated across service boundaries
-- Span links: connect causally related traces (batch processing, fan-out)
-- Nested spans: parent-child relationships for call-tree visualization
-- Sampling: head-based (`TraceIdRatioBased`), tail-based (in Collector), `AlwaysOn`, `AlwaysOff`
+## Instructions
 
-### Metrics
-- Counter: monotonically increasing values (requests, errors, bytes sent)
-- UpDownCounter: values that increase and decrease (active connections, queue depth)
-- Histogram: distribution of values (request duration, response size)
-- Gauge: point-in-time measurements (CPU usage, temperature)
-- Exemplars: link metrics to traces for drill-down from dashboard to trace
-- Views: configure aggregation, rename metrics, drop unused attributes
+- When adding tracing, create spans with meaningful names, set span kinds (`CLIENT`, `SERVER`, `PRODUCER`, `CONSUMER`), add business-relevant attributes, and use W3C Trace Context for propagation.
+- When adding metrics, choose the right instrument type: Counter for monotonic values, Histogram for distributions like latency, UpDownCounter for fluctuating values, and Gauge for point-in-time readings.
+- When setting up auto-instrumentation, use the language-specific packages (`@opentelemetry/auto-instrumentations-node`, `opentelemetry-instrumentation` for Python, etc.) to capture HTTP, database, and messaging spans without code changes.
+- When configuring the OTel Collector, define pipelines with receivers (OTLP, Prometheus), processors (batch, memory_limiter, tail_sampling), and exporters (OTLP, Jaeger, Datadog) in the collector config.
+- When deploying Collectors, choose sidecar mode for per-pod collection, agent mode for per-node, or gateway mode for centralized processing.
+- When setting resource attributes, always include `service.name`, `service.version`, and `deployment.environment`, and use cloud/container resource detectors for infrastructure metadata.
+- When naming attributes, follow OTel semantic conventions (`http.request.method`, `db.system`, `messaging.system`) instead of inventing custom names.
 
-### Logs
-- Log records with severity, body, attributes, trace/span context
-- Bridge API: connect existing loggers (Winston, Pino, log4j) to OTel pipeline
-- Correlation: logs automatically linked to active trace via context
-- Structured logging: key-value attributes for filtering and searching
+## Examples
 
-### Auto-Instrumentation
-- **Node.js**: `@opentelemetry/auto-instrumentations-node` — HTTP, Express, Fastify, gRPC, MongoDB, PostgreSQL, Redis, MySQL
-- **Python**: `opentelemetry-instrumentation` — Django, Flask, FastAPI, SQLAlchemy, requests, aiohttp
-- **Java**: `opentelemetry-javaagent.jar` — Spring Boot, JDBC, Kafka, gRPC
-- **Go**: `go.opentelemetry.io/contrib/instrumentation` — net/http, gRPC, database/sql
-- Zero-code instrumentation: attach agent/SDK without modifying application code
+### Example 1: Add distributed tracing to a Node.js microservice
 
-### OTel Collector
-- Receivers: OTLP (gRPC/HTTP), Jaeger, Zipkin, Prometheus, hostmetrics, filelog
-- Processors: batch, memory_limiter, attributes, filter, tail_sampling, transform
-- Exporters: OTLP, Jaeger, Prometheus, Loki, Datadog, New Relic, Honeycomb
-- Pipeline configuration: traces, metrics, logs pipelines with independent receiver/processor/exporter chains
-- Deployment modes: sidecar (per-pod), agent (per-node), gateway (centralized)
+**User request:** "Instrument my Express API with OpenTelemetry tracing"
 
-### Resource Detection
-- Service metadata: `service.name`, `service.version`, `deployment.environment`
-- Cloud providers: AWS, GCP, Azure resource detectors for instance metadata
-- Container: Docker, Kubernetes resource detectors for pod/node/namespace
-- Host: hostname, OS, architecture detection
+**Actions:**
+1. Install `@opentelemetry/auto-instrumentations-node` and OTLP exporter
+2. Configure SDK with service name, version, and `BatchSpanProcessor`
+3. Set up OTLP exporter pointing to the Collector endpoint
+4. Add custom spans with business attributes for key operations
 
-### Semantic Conventions
-- HTTP: `http.request.method`, `http.response.status_code`, `url.full`, `server.address`
-- Database: `db.system`, `db.statement`, `db.operation`, `db.name`
-- Messaging: `messaging.system`, `messaging.destination.name`, `messaging.operation`
-- RPC: `rpc.system`, `rpc.service`, `rpc.method`
-- Exception: `exception.type`, `exception.message`, `exception.stacktrace`
+**Output:** An auto-instrumented Express API sending traces to the OTel Collector with correlated spans across services.
 
-## Code Standards
-- Always set `service.name` and `service.version` as resource attributes
-- Use semantic conventions for attribute names — never invent custom names when a standard exists
-- Configure `BatchSpanProcessor` in production (not `SimpleSpanProcessor`) to avoid blocking the application
-- Set memory limits on the Collector: `memory_limiter` processor prevents OOM
-- Sample in production: `TraceIdRatioBased(0.1)` captures 10% of traces, sufficient for most services
-- Add custom attributes to spans for business context: `user.tier`, `feature.flag`, `order.total`
-- Never log sensitive data in span attributes (PII, secrets, tokens)
+### Example 2: Set up an OTel Collector pipeline
+
+**User request:** "Configure an OTel Collector to receive traces and export to Grafana Tempo"
+
+**Actions:**
+1. Define OTLP gRPC receiver in the Collector config
+2. Add batch processor and memory_limiter for production safety
+3. Configure Tempo exporter with endpoint and authentication
+4. Wire the traces pipeline: receiver -> processor -> exporter
+
+**Output:** A Collector config file routing traces from applications to Grafana Tempo with batching and memory protection.
+
+## Guidelines
+
+- Always set `service.name` and `service.version` as resource attributes.
+- Use semantic conventions for attribute names; never invent custom names when a standard exists.
+- Configure `BatchSpanProcessor` in production, not `SimpleSpanProcessor`, to avoid blocking the application.
+- Set `memory_limiter` processor on the Collector to prevent OOM crashes.
+- Sample in production: `TraceIdRatioBased(0.1)` captures 10% of traces, sufficient for most services.
+- Add custom attributes to spans for business context (`user.tier`, `feature.flag`, `order.total`).
+- Never log sensitive data in span attributes (PII, secrets, tokens).
