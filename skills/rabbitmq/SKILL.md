@@ -182,49 +182,7 @@ startWorker('email-queue', async (task) => {
 });
 ```
 
-### Python (pika)
-
-```python
-"""consumer.py — Python consumer with auto-reconnect."""
-import json, time, pika
-
-def connect():
-    """Establish connection with retry logic."""
-    credentials = pika.PlainCredentials('admin', 'secret')
-    params = pika.ConnectionParameters('localhost', 5672, '/', credentials,
-                                        heartbeat=600)
-    for attempt in range(5):
-        try:
-            return pika.BlockingConnection(params)
-        except pika.exceptions.AMQPConnectionError:
-            time.sleep(2 ** attempt)
-    raise Exception("Failed to connect after 5 attempts")
-
-connection = connect()
-channel = connection.channel()
-channel.queue_declare(queue='image-processing', durable=True)
-channel.basic_qos(prefetch_count=5)
-
-def process_image(ch, method, properties, body):
-    """Process an image resize task.
-
-    Args:
-        ch: Channel.
-        method: Delivery info (delivery_tag for ack/nack).
-        properties: Message properties.
-        body: Message body (JSON bytes).
-    """
-    task = json.loads(body)
-    try:
-        resize_image(task['path'], task['sizes'])
-        ch.basic_ack(delivery_tag=method.delivery_tag)
-    except Exception as e:
-        print(f"Failed: {e}")
-        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-
-channel.basic_consume(queue='image-processing', on_message_callback=process_image)
-channel.start_consuming()
-```
+For Python, use `pika` with `BlockingConnection`, `basic_qos(prefetch_count=N)`, and `basic_consume` with `basic_ack`/`basic_nack` for message handling.
 
 ## Exchange Patterns
 
@@ -319,87 +277,11 @@ ch.consume('dead-letters', (msg) => {
 
 ## Delayed Messages
 
-```typescript
-// delayed.ts — Schedule a message for future delivery using the delayed message plugin
-
-const ch = await getChannel();
-
-// Requires rabbitmq_delayed_message_exchange plugin
-await ch.assertExchange('delayed', 'x-delayed-message', {
-  durable: true,
-  arguments: { 'x-delayed-type': 'direct' },
-});
-
-await ch.assertQueue('scheduled-tasks', { durable: true });
-await ch.bindQueue('scheduled-tasks', 'delayed', 'task');
-
-/** Schedule a task for future execution.
- *
- * @param task - Task payload.
- * @param delayMs - Delay in milliseconds before delivery.
- */
-function scheduleTask(task: object, delayMs: number) {
-  ch.publish('delayed', 'task', Buffer.from(JSON.stringify(task)), {
-    persistent: true,
-    headers: { 'x-delay': delayMs },
-  });
-}
-
-// Send a reminder email in 24 hours
-scheduleTask({ type: 'reminder-email', userId: 'usr-123' }, 86400000);
-
-// Retry a failed webhook in 5 minutes
-scheduleTask({ type: 'webhook-retry', url: 'https://...', attempt: 2 }, 300000);
-```
+Use the `rabbitmq_delayed_message_exchange` plugin. Assert an exchange with type `x-delayed-message`, then publish messages with `headers: { 'x-delay': delayMs }` to schedule future delivery.
 
 ## RPC (Request-Reply)
 
-```typescript
-// rpc-client.ts — Synchronous-style RPC over RabbitMQ
-
-import { v4 as uuid } from 'uuid';
-
-async function rpcCall(queue: string, request: object, timeoutMs = 5000): Promise<any> {
-  const ch = await getChannel();
-  const replyQueue = await ch.assertQueue('', { exclusive: true, autoDelete: true });
-  const correlationId = uuid();
-
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('RPC timeout')), timeoutMs);
-
-    ch.consume(replyQueue.queue, (msg) => {
-      if (msg?.properties.correlationId === correlationId) {
-        clearTimeout(timer);
-        ch.ack(msg);
-        resolve(JSON.parse(msg.content.toString()));
-      }
-    });
-
-    ch.sendToQueue(queue, Buffer.from(JSON.stringify(request)), {
-      correlationId,
-      replyTo: replyQueue.queue,
-    });
-  });
-}
-
-// Example: call a pricing service
-const price = await rpcCall('pricing-service', { sku: 'WIDGET-A', quantity: 5 });
-```
-
-## Kafka vs RabbitMQ
-
-| | Kafka | RabbitMQ |
-|---|---|---|
-| **Model** | Append-only log | Message broker with queues |
-| **Best for** | Event streaming, replay, high throughput | Task queues, routing, RPC |
-| **Ordering** | Per-partition | Per-queue |
-| **Message retention** | Configurable (days/forever) | Until consumed + acked |
-| **Routing** | Topic-based only | Exchanges: direct, fanout, topic, headers |
-| **Priority queues** | No | Yes |
-| **Delayed messages** | No (workarounds exist) | Yes (with plugin) |
-| **Throughput** | Millions/sec | Tens of thousands/sec |
-
-Use Kafka for event logs and stream processing. Use RabbitMQ for task distribution and complex routing.
+For request-reply, create an exclusive auto-delete reply queue, send with `correlationId` and `replyTo`, and consume the reply queue filtering by `correlationId`.
 
 ## Guidelines
 

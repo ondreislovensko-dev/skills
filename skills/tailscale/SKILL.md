@@ -258,8 +258,8 @@ AUTH_KEY=$(curl -s -X POST "https://api.tailscale.com/api/v2/tailnet/$TAILNET/ke
   | jq -r '.key')
 
 for server in "${SERVERS[@]}"; do
-  ssh "$server" "curl -fsSL https://tailscale.com/install.sh | sh && \
-    sudo tailscale up --authkey=$AUTH_KEY --hostname=api-$(hostname -s)" &
+  ssh "$server" "sudo apt-get update && sudo apt-get install -y tailscale && \
+    sudo tailscale up --authkey=$AUTH_KEY --hostname=api-\$(hostname -s)" &
 done
 wait
 
