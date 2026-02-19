@@ -1,72 +1,65 @@
-# Lemon Squeezy — Merchant of Record for Digital Products
+---
+name: lemon-squeezy
+description: >-
+  Assists with selling digital products, SaaS subscriptions, and software licenses using
+  Lemon Squeezy as a Merchant of Record. Use when setting up checkout flows, webhook handling,
+  license key validation, or subscription management with automatic global tax compliance.
+  Trigger words: lemon squeezy, merchant of record, digital sales, license keys, subscriptions.
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: business
+  tags: ["lemon-squeezy", "payments", "subscriptions", "merchant-of-record", "licensing"]
+---
 
-> Author: terminal-skills
+# Lemon Squeezy
 
-You are an expert in Lemon Squeezy for selling digital products, SaaS subscriptions, and software licenses. You leverage Lemon Squeezy as a Merchant of Record — they handle global tax compliance, payment processing, fraud prevention, and invoicing — so you focus on building the product.
+## Overview
 
-## Core Competencies
+Lemon Squeezy is a Merchant of Record platform for selling digital products, SaaS subscriptions, and software licenses. It handles global tax compliance (VAT, GST, sales tax), payment processing, fraud prevention, and invoicing, allowing developers to focus on building the product rather than managing billing infrastructure.
 
-### Merchant of Record
-- Lemon Squeezy is the seller: they handle VAT/GST, sales tax, invoicing, and refunds
-- No tax registration needed: sell globally from day one
-- Payment methods: cards, PayPal, Apple Pay, Google Pay
-- Currencies: 30+ currencies with automatic conversion
-- EU VAT, US sales tax, UK VAT, Australian GST — all handled automatically
+## Instructions
 
-### Products and Variants
-- Products: digital goods, SaaS subscriptions, software licenses
-- Variants: different tiers/plans within a product (Starter, Pro, Enterprise)
-- Pricing models: one-time, subscription (monthly/yearly), usage-based, pay-what-you-want
-- Free trials: configurable trial periods for subscriptions
-- Custom pricing: volume discounts, early-bird pricing
+- When setting up a product, create products and variants (tiers/plans) in the Lemon Squeezy dashboard with the appropriate pricing model: one-time, subscription, usage-based, or pay-what-you-want.
+- When integrating checkout, use the hosted checkout URL or embed Lemon.js for an in-app checkout overlay, passing `checkout[custom][user_id]` to link purchases to your internal user model.
+- When handling webhooks, verify signatures using `crypto.timingSafeEqual()` with HMAC-SHA256, then process events like `order_created`, `subscription_created`, and `subscription_payment_failed`.
+- When managing subscriptions, use the REST API to check status (`GET /v1/subscriptions/{id}`), update plans, or pause/cancel, and direct customers to the hosted portal for self-service billing management.
+- When implementing license keys, use the validation endpoint (`POST /v1/licenses/validate`) to verify keys, enforce activation limits, and handle expiry for subscription-based software.
+- When tracking affiliate sales, configure the built-in affiliate program with custom commission rates and attribution windows instead of adding a third-party affiliate tool.
 
-### Checkout
-- Hosted checkout: `https://yourstore.lemonsqueezy.com/buy/variant-id`
-- Checkout overlay: embed Lemon.js for in-app checkout without redirect
-- Custom data: pass `checkout[custom][user_id]` for linking to your database
-- Discount codes: percentage or fixed amount, expiry dates, usage limits
-- Prefill customer info: email, name, tax ID
+## Examples
 
-### API
-- REST API: manage products, orders, subscriptions, customers, license keys
-- `GET /v1/subscriptions/{id}`: check subscription status
-- `PATCH /v1/subscriptions/{id}`: update, pause, unpause, cancel
-- `POST /v1/checkouts`: create checkout programmatically
-- `GET /v1/customers`: list and filter customers
-- SDK: `@lemonsqueezy/lemonsqueezy.js` for TypeScript
+### Example 1: Add subscription billing to a SaaS app
 
-### Webhooks
-- Events: `order_created`, `subscription_created`, `subscription_updated`, `subscription_payment_success`, `subscription_payment_failed`, `license_key_created`
-- Signature verification: HMAC-SHA256 with webhook secret
-- Retry: failed webhooks retry for up to 72 hours
-- Custom data: access `meta.custom_data` for your internal IDs
+**User request:** "Set up Lemon Squeezy subscriptions for my SaaS with free trial"
 
-### License Keys
-- Auto-generated on purchase: unique license key per order
-- Activation: `POST /v1/licenses/validate` to verify key
-- Activation limits: restrict number of devices/instances
-- Deactivation: `POST /v1/licenses/deactivate` to free up slots
-- Expiry: time-limited licenses for subscription-based software
+**Actions:**
+1. Create product with Starter and Pro variants in the dashboard, each with monthly/yearly pricing and a 14-day trial
+2. Generate checkout links and integrate Lemon.js overlay in the app
+3. Set up webhook endpoint to handle `subscription_created` and `subscription_payment_failed` events
+4. Store `customer_id` and `subscription_id` in the database linked to the user
 
-### Subscription Management
-- Customer portal: hosted page for customers to manage billing
-- Plan changes: upgrade/downgrade with proration
-- Pause/resume: customers can pause subscriptions
-- Cancellation: immediate or at period end
-- Grace period: configurable access after payment failure
-- Usage records: report usage for metered billing
+**Output:** A SaaS app with tiered subscription billing, free trials, and automated webhook-driven entitlement management.
 
-### Affiliate Program
-- Built-in affiliate management: no third-party tool needed
-- Custom commission rates per affiliate
-- Cookie duration: configurable attribution window
-- Automatic payouts via PayPal or bank transfer
+### Example 2: Sell desktop software with license keys
 
-## Code Standards
-- Always verify webhook signatures: `crypto.timingSafeEqual()` with the HMAC-SHA256 hash
-- Store `customer_id` and `subscription_id` in your database — link to your user model
-- Use `checkout[custom][user_id]` to pass your internal user ID during checkout — retrieve it from webhooks
-- Handle `subscription_payment_failed` gracefully: notify the user, don't immediately revoke access
-- Use the customer portal for billing management — don't build your own plan switching UI
-- Check subscription status server-side on every protected request — don't trust client-side state
-- Use license keys for desktop/CLI software, webhook-based entitlements for web SaaS
+**User request:** "Add license key validation for my Electron app sold through Lemon Squeezy"
+
+**Actions:**
+1. Configure the product with license key generation enabled and activation limits
+2. Build an activation flow in the app that calls `POST /v1/licenses/validate`
+3. Handle activation, deactivation, and expiry states in the app UI
+4. Set up webhooks to track new purchases and subscription renewals
+
+**Output:** A desktop app with license key activation, device limits, and automatic renewal handling.
+
+## Guidelines
+
+- Always verify webhook signatures with `crypto.timingSafeEqual()` to prevent forged payloads.
+- Store `customer_id` and `subscription_id` in your database and link them to your user model.
+- Use `checkout[custom][user_id]` to pass your internal user ID during checkout for easy reconciliation from webhooks.
+- Handle `subscription_payment_failed` gracefully by notifying users rather than immediately revoking access.
+- Check subscription status server-side on every protected request; do not trust client-side state.
+- Use license keys for desktop and CLI software; use webhook-based entitlements for web SaaS.
