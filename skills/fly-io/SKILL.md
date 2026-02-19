@@ -1,71 +1,67 @@
-# Fly.io — Deploy Apps Close to Users
+---
+name: fly-io
+description: >-
+  Assists with deploying applications globally on Fly.io edge infrastructure. Use when deploying
+  Docker-based apps, configuring multi-region machines, setting up persistent storage, or managing
+  global databases. Trigger words: fly.io, fly deploy, fly machines, fly launch, multi-region,
+  edge deployment, flyctl.
+license: Apache-2.0
+compatibility: "Requires flyctl CLI and a Fly.io account"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: devops
+  tags: ["fly-io", "deployment", "edge", "multi-region", "infrastructure"]
+---
 
-> Author: terminal-skills
+# Fly.io
 
-You are an expert in Fly.io for deploying applications to edge regions worldwide. You configure Fly Machines, volumes, private networking, and multi-region databases to build globally distributed applications that run close to users with sub-50ms latency.
+## Overview
 
-## Core Competencies
+Fly.io deploys applications to Firecracker microVMs across 30+ edge regions worldwide, providing sub-50ms latency to users. It supports scale-to-zero machines, persistent NVMe volumes, LiteFS for multi-region SQLite replication, and private WireGuard networking between services.
 
-### Deployment
-- `fly launch`: detect framework, generate Dockerfile, create app
-- `fly deploy`: build and deploy to Fly Machines
-- Dockerfile-based: any language, any framework, any runtime
-- Buildpacks: auto-detect Node.js, Python, Go, Ruby, Elixir, Rust
-- Zero-downtime deploys: rolling updates with health checks
-- Immediate rollback: `fly releases rollback`
+## Instructions
 
-### Fly Machines
-- Firecracker microVMs: start in ~300ms, not containers
-- Scale to zero: machines stop when idle, start on first request
-- Auto-start/stop: `fly.toml` `auto_stop_machines` and `auto_start_machines`
-- Machine sizing: `shared-cpu-1x` (256MB) to `performance-16x` (32GB)
-- GPU machines: Nvidia A10G and L40S for ML inference
-- Process groups: run web, worker, and scheduler in the same app
+- When deploying applications, use `fly launch` to auto-detect the framework and generate a Dockerfile, then `fly deploy` for zero-downtime rolling updates with health checks.
+- When configuring scaling, use `auto_stop_machines` and `auto_start_machines` in `fly.toml` to scale to zero when idle and wake on incoming requests, and set machine sizing appropriate to the workload.
+- When managing multi-region deployments, use `fly scale count --region` to distribute machines, `fly-replay` header to route writes to the primary region, and LiteFS for SQLite read replicas.
+- When handling persistent data, attach volumes for durable storage (machines are ephemeral), use LiteFS for multi-region SQLite, or Tigris for S3-compatible object storage.
+- When connecting services, use `.internal` DNS for private service-to-service communication over the WireGuard mesh and never expose internal services to the public internet.
+- When managing secrets, use `fly secrets set KEY=value` for encrypted secret storage accessible as environment variables.
+- When troubleshooting, use `fly logs` for real-time streaming, `fly ssh console` to access running machines, and `fly proxy` to tunnel to internal services.
 
-### Networking
-- Anycast IP: single IP routes to nearest region automatically
-- Private networking: WireGuard mesh between all apps in an organization
-- `.internal` DNS: `myapp.internal:8080` for service-to-service communication
-- Fly Proxy: TLS termination, HTTP/2, WebSocket support
-- Custom domains: `fly certs add example.com`
-- Fly-Replay header: forward requests to specific regions
+## Examples
 
-### Storage
-- **Volumes**: persistent NVMe storage attached to machines (single-region)
-- **LiteFS**: SQLite replication across regions (read replicas everywhere)
-- **Tigris**: S3-compatible object storage (globally distributed)
-- **Supabase/Neon on Fly**: managed PostgreSQL with private networking
+### Example 1: Deploy a multi-region web application
 
-### Multi-Region
-- Deploy machines in 30+ regions: `fly scale count 2 --region iad,cdg,nrt`
-- Read replicas: `fly-replay` header to route writes to primary region
-- LiteFS for SQLite: write to primary, read from nearest replica
-- PostgreSQL: primary in one region, read replicas via `fly pg create --region`
-- Consul for distributed locking and leader election
+**User request:** "Deploy my app globally with Fly.io in US, Europe, and Asia"
 
-### Configuration (`fly.toml`)
-- Services: HTTP, TCP, UDP port mapping
-- Health checks: HTTP, TCP, or script-based
-- Processes: define multiple process types (web, worker, cron)
-- Mounts: attach volumes to specific paths
-- Environment variables and secrets
-- Deploy strategy: rolling, canary, bluegreen
-- Auto-scaling: min/max machines per region
+**Actions:**
+1. Initialize with `fly launch` and configure Dockerfile
+2. Deploy machines to three regions: `fly scale count 2 --region iad,cdg,nrt`
+3. Set up LiteFS for SQLite replication across regions
+4. Configure `fly-replay` header for write routing to the primary region
 
-### CLI (`flyctl`)
-- `fly status`: app overview (machines, regions, IPs)
-- `fly logs`: real-time log streaming
-- `fly ssh console`: SSH into a running machine
-- `fly proxy 5432:5432`: tunnel to internal services (databases)
-- `fly scale`: adjust machine count and sizing
-- `fly secrets set KEY=value`: encrypted secret management
-- `fly postgres`: managed PostgreSQL operations
+**Output:** A globally distributed app with read replicas in three regions and automatic write routing.
 
-## Code Standards
-- Use `auto_stop_machines = "stop"` for dev/staging to save costs — machines stop after idle timeout
-- Keep `auto_start_machines = true` so machines wake on incoming requests (sub-second cold start)
-- Use `.internal` DNS for service-to-service calls — never expose internal services to the public internet
-- Store persistent data on volumes, not the machine filesystem (machines are ephemeral)
-- Use LiteFS for SQLite apps that need multi-region reads — it's simpler than PostgreSQL replication
-- Set health checks with realistic timeouts — Fly Proxy uses them for routing, not just monitoring
-- Use `fly-replay` header for write operations in multi-region setups: route writes to the primary region
+### Example 2: Configure a cost-efficient staging environment
+
+**User request:** "Set up a Fly.io staging environment that scales to zero when not in use"
+
+**Actions:**
+1. Create a staging app with `fly launch`
+2. Configure `auto_stop_machines = "stop"` and `auto_start_machines = true` in `fly.toml`
+3. Attach a volume for persistent database storage
+4. Set health checks with appropriate timeouts for routing
+
+**Output:** A staging environment that stops idle machines and wakes in sub-second on the next request.
+
+## Guidelines
+
+- Use `auto_stop_machines = "stop"` for dev/staging to save costs; machines stop after idle timeout.
+- Keep `auto_start_machines = true` so machines wake on incoming requests with sub-second cold start.
+- Use `.internal` DNS for service-to-service calls; never expose internal services publicly.
+- Store persistent data on volumes, not the machine filesystem, since machines are ephemeral.
+- Use LiteFS for SQLite apps needing multi-region reads; it is simpler than PostgreSQL replication.
+- Set health checks with realistic timeouts; Fly Proxy uses them for routing, not just monitoring.
+- Use `fly-replay` header for write operations in multi-region setups to route to the primary region.
