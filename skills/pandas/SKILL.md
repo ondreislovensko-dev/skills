@@ -1,84 +1,66 @@
-# Pandas — Data Analysis and Manipulation
+---
+name: pandas
+description: >-
+  Assists with loading, cleaning, transforming, and analyzing tabular data using pandas.
+  Use when importing CSV/Excel/SQL data, handling missing values, performing groupby
+  aggregations, merging datasets, working with time series, or building analysis-ready
+  datasets. Trigger words: pandas, dataframe, csv, groupby, merge, time series, data cleaning.
+license: Apache-2.0
+compatibility: "Requires Python 3.8+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["pandas", "data-analysis", "dataframe", "python", "tabular-data"]
+---
 
-> Author: terminal-skills
+# Pandas
 
-You are an expert in pandas for loading, cleaning, transforming, and analyzing tabular data in Python. You handle CSV/Excel/SQL imports, missing data, merges, groupby aggregations, time series, and produce analysis-ready datasets from messy real-world sources.
+## Overview
 
-## Core Competencies
+Pandas is a Python library for loading, cleaning, transforming, and analyzing tabular data. It provides DataFrames for structured data manipulation, supports CSV, Excel, SQL, JSON, and Parquet formats, and offers powerful groupby aggregation, merge/join operations, time series resampling, and method chaining for building analysis pipelines.
 
-### Data Loading
-- `pd.read_csv()`: CSV with encoding, delimiter, dtype, parse_dates, usecols
-- `pd.read_excel()`: Excel with sheet_name, header, skiprows
-- `pd.read_sql()`: SQL query or table into DataFrame
-- `pd.read_json()`: JSON (records, columns, split orientations)
-- `pd.read_parquet()`: columnar format (fast, compressed — preferred for large datasets)
-- `pd.read_clipboard()`: paste from spreadsheet directly
+## Instructions
 
-### Selection and Filtering
-- `df["col"]`, `df[["col1", "col2"]]`: column selection
-- `df.loc[row_label, col_label]`: label-based indexing
-- `df.iloc[row_idx, col_idx]`: integer position indexing
-- `df[df["age"] > 30]`: boolean filtering
-- `df.query("age > 30 and city == 'Berlin'")`: SQL-like query syntax
-- `df["col"].isin(["a", "b"])`: membership filtering
-- `df.nlargest(10, "revenue")`, `df.nsmallest(5, "price")`: top/bottom N
+- When loading data, use `pd.read_parquet()` for large datasets (faster, smaller, type-preserving), `pd.read_csv()` with explicit `dtype` for CSVs, and `pd.read_sql()` for database queries.
+- When cleaning data, handle missing values with `fillna()` or `dropna()`, deduplicate with `drop_duplicates()`, use string methods (`.str.strip()`, `.str.lower()`) for text cleaning, and convert types explicitly with `astype()` and `pd.to_datetime()`.
+- When transforming data, use `assign()` for computed columns, `pipe()` for method chaining, `melt()` and `pivot_table()` for reshaping, and `pd.cut()`/`pd.qcut()` for binning.
+- When aggregating, use `groupby().agg()` with named aggregation for readable column names, `transform()` to broadcast results back to original shape, and `resample()` for time-based grouping.
+- When merging, use `pd.merge()` with explicit `how` and `validate` parameters to catch data quality issues at merge time, and `pd.concat()` for stacking DataFrames.
+- When optimizing performance, use `category` dtype for low-cardinality strings, vectorized operations over `.apply()`, and Parquet for storage; for datasets over 10GB, consider Polars or DuckDB.
 
-### Data Cleaning
-- `df.isna()`, `df.fillna(0)`, `df.dropna(subset=["email"])`: missing data
-- `df.duplicated()`, `df.drop_duplicates(subset=["email"])`: deduplication
-- `df["col"].str.strip()`, `.str.lower()`, `.str.replace()`: string cleaning
-- `df["col"].astype("int64")`, `pd.to_datetime()`, `pd.to_numeric()`: type conversion
-- `df.rename(columns={"old": "new"})`: rename columns
-- `df.clip(lower=0, upper=100)`: cap outliers
+## Examples
 
-### Transformations
-- `df.assign(profit=lambda x: x.revenue - x.cost)`: add computed columns
-- `df.apply(func, axis=1)`: row-wise function application
-- `df["col"].map({"a": 1, "b": 2})`: value mapping
-- `pd.cut()`, `pd.qcut()`: binning into categories
-- `df.melt()`: wide to long format (unpivot)
-- `df.pivot_table()`: long to wide with aggregation
-- `df.explode("tags")`: expand list column into rows
-- `df.pipe(clean).pipe(transform).pipe(validate)`: method chaining
+### Example 1: Clean and analyze a sales dataset
 
-### Groupby and Aggregation
-- `df.groupby("category").agg({"revenue": "sum", "orders": "count"})`
-- Named aggregation: `.agg(total_rev=("revenue", "sum"), avg_price=("price", "mean"))`
-- `transform()`: broadcast aggregation back to original shape (e.g., percent of group total)
-- `filter()`: keep groups meeting a condition
-- Multiple group keys: `df.groupby(["year", "category"])`
-- `resample("M").sum()`: time-based grouping
+**User request:** "Load a messy CSV of sales data, clean it, and generate monthly revenue summaries"
 
-### Merging and Joining
-- `pd.merge(left, right, on="id", how="left")`: SQL-style joins
-- `how`: `inner`, `left`, `right`, `outer`, `cross`
-- `pd.concat([df1, df2], axis=0)`: vertical stacking
-- `pd.concat([df1, df2], axis=1)`: horizontal concatenation
-- Merge indicators: `indicator=True` adds `_merge` column showing match status
-- `validate="one_to_many"`: catch unexpected duplicates during merge
+**Actions:**
+1. Load with `pd.read_csv()` specifying `dtype` and `parse_dates` for key columns
+2. Clean missing values, deduplicate by order ID, and standardize text fields
+3. Add computed columns for revenue and profit margin using `assign()`
+4. Group by month with `resample("M").agg()` for revenue, order count, and average order value
 
-### Time Series
-- `pd.to_datetime()`: parse dates from various formats
-- `df.set_index("date").resample("W").mean()`: weekly resampling
-- `df["col"].rolling(7).mean()`: 7-day rolling average
-- `df["col"].shift(1)`: lag by one period
-- `df["col"].pct_change()`: period-over-period percentage change
-- `pd.date_range()`, `pd.period_range()`: generate date sequences
-- Timezone: `df["date"].dt.tz_localize("UTC").dt.tz_convert("US/Eastern")`
+**Output:** A clean DataFrame with monthly revenue summaries ready for visualization or reporting.
 
-### Performance
-- Use `category` dtype for low-cardinality string columns — 90% less memory
-- `pd.read_csv(dtype={"id": "int32"})`: specify types upfront to avoid inference overhead
-- Vectorized operations over `.apply()`: `df["a"] * df["b"]` is 100x faster than row-wise
-- Parquet over CSV for storage: faster reads, smaller files, type preservation
-- `df.memory_usage(deep=True)`: profile memory consumption
-- For >10GB datasets: use Polars, DuckDB, or Dask instead of pandas
+### Example 2: Merge and enrich customer data from multiple sources
 
-## Code Standards
-- Use `pd.read_parquet()` for intermediate and output files — it's faster, smaller, and preserves types
-- Chain transformations with `.pipe()`: `df.pipe(clean).pipe(enrich).pipe(validate)` — readable and testable
-- Use named aggregation in `.agg()`: `agg(total=("revenue", "sum"))` — self-documenting column names
-- Set `dtype` explicitly on `read_csv()` for large files — type inference reads the full file twice
-- Use `category` dtype for columns with <1000 unique values — massive memory savings
-- Validate merges with `validate="one_to_many"` — catch data quality issues at merge time, not downstream
-- Use `query()` for complex filters instead of chained boolean indexing — more readable
+**User request:** "Join customer data from CRM, transactions, and support tickets into a single view"
+
+**Actions:**
+1. Load each dataset and standardize key columns (email, customer ID)
+2. Merge CRM and transactions with `pd.merge(on="customer_id", how="left", validate="one_to_many")`
+3. Aggregate support tickets per customer and merge counts
+4. Export the enriched dataset to Parquet for downstream analysis
+
+**Output:** A unified customer DataFrame with CRM info, transaction history, and support metrics.
+
+## Guidelines
+
+- Use `pd.read_parquet()` for intermediate and output files since it is faster, smaller, and preserves types.
+- Chain transformations with `.pipe()` for readable and testable code.
+- Use named aggregation in `.agg()` for self-documenting column names.
+- Set `dtype` explicitly on `read_csv()` for large files since type inference reads the full file twice.
+- Use `category` dtype for columns with fewer than 1000 unique values for significant memory savings.
+- Validate merges with `validate="one_to_many"` to catch data quality issues at merge time.
+- Use `query()` for complex filters instead of chained boolean indexing for better readability.

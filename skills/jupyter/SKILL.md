@@ -1,79 +1,66 @@
-# Jupyter — Interactive Computing Notebooks
+---
+name: jupyter
+description: >-
+  Assists with interactive data analysis, visualization, and reproducible research using
+  Jupyter notebooks. Use when building notebooks that combine code with rich output,
+  managing kernels, converting to reports, or parameterizing notebooks for batch execution.
+  Trigger words: jupyter, notebook, jupyterlab, ipynb, nbconvert, papermill.
+license: Apache-2.0
+compatibility: "Requires Python 3.8+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["jupyter", "notebook", "data-analysis", "visualization", "research"]
+---
 
-> Author: terminal-skills
+# Jupyter
 
-You are an expert in Jupyter for interactive data analysis, visualization, and reproducible research. You build notebooks that combine code, rich output, and narrative, manage kernels and environments, and convert notebooks into reports, dashboards, and production-ready scripts.
+## Overview
 
-## Core Competencies
+Jupyter is an interactive computing platform that combines code execution, rich output (tables, plots, widgets), and narrative text in notebook documents. It supports multiple kernels (Python, R, Julia), integrates with matplotlib, plotly, and ipywidgets for visualization, and enables reproducible research through nbconvert for report generation and papermill for parameterized batch execution.
 
-### JupyterLab
-- Multi-tab IDE: notebooks, terminals, file browser, extensions
-- Cell types: Code, Markdown, Raw
-- Keyboard shortcuts: `Shift+Enter` (run + advance), `Ctrl+Enter` (run in place), `A`/`B` (insert above/below)
-- Drag-and-drop cells, split/merge cells
-- Variable inspector, table of contents, debugger
-- Extensions: `jupyterlab-git`, `jupyterlab-lsp`, `jupyterlab-code-formatter`
+## Instructions
 
-### Kernels
-- Python (ipykernel): default, most common
-- R (IRkernel), Julia, JavaScript, Rust, Go: multi-language support
-- Virtual environments: `python -m ipykernel install --user --name=myenv`
-- Kernel management: restart, interrupt, change kernel per notebook
-- `%%time`, `%%timeit`: cell-level timing
-- `%%bash`, `%%javascript`, `%%html`: run different languages in specific cells
+- When building notebooks, organize cells with a clear flow: imports, data loading, exploration, analysis, and conclusions, using Markdown cells for narrative context between code cells.
+- When sharing notebooks, restart the kernel and "Run All" to ensure cells execute in order, then use `nbconvert` to generate HTML, PDF, or slides with `--no-input` for non-technical audiences.
+- When managing environments, install kernels from virtual environments with `python -m ipykernel install --user --name=myenv` and pin dependencies with `%pip install package==1.2.3` in the first cell.
+- When developing iteratively, use `%autoreload 2` to auto-reload imported modules on change, and extract proven code into `.py` modules for reuse.
+- When version controlling, use `jupytext` to pair `.ipynb` with `.py` files that diff cleanly, or use `nbstripout` to strip output before Git commits.
+- When running in production, use `papermill` to parameterize and execute notebooks programmatically for batch report generation.
 
-### Rich Output
-- DataFrames: automatic HTML table rendering with pandas
-- Plots: matplotlib, seaborn, plotly inline rendering
-- Interactive widgets: `ipywidgets` — sliders, dropdowns, text inputs
-- Images: PIL/Pillow images display inline
-- HTML, LaTeX, Markdown: `display(HTML("<h1>Title</h1>"))`, `display(Math(r"\frac{a}{b}"))`
-- Audio, video: inline playback for media analysis
+## Examples
 
-### Magic Commands
-- `%run script.py`: execute external script
-- `%load_ext autoreload` + `%autoreload 2`: auto-reload imported modules on change
-- `%matplotlib inline` / `%matplotlib widget`: plot rendering mode
-- `%env VAR=value`: set environment variables
-- `%who`, `%whos`: list variables in namespace
-- `%%capture output`: capture cell output into variable
-- `!pip install package`: shell commands from cells
+### Example 1: Build an exploratory data analysis notebook
 
-### nbconvert
-- `jupyter nbconvert --to html notebook.ipynb`: static HTML report
-- `--to pdf`: PDF via LaTeX
-- `--to slides`: reveal.js presentation
-- `--to script`: extract Python code only
-- `--to markdown`: Markdown with embedded images
-- `--execute`: run notebook before converting (reproducible reports)
-- `--no-input`: hide code cells (executive reports)
+**User request:** "Create a Jupyter notebook for EDA on a customer dataset"
 
-### Collaboration
-- JupyterHub: multi-user server for teams and classrooms
-- Google Colab: free hosted notebooks with GPU
-- `nbstripout`: strip output before Git commits (clean diffs)
-- `jupytext`: sync notebooks with plain Python scripts (`.py` ↔ `.ipynb`)
-- `papermill`: parameterize and execute notebooks programmatically
+**Actions:**
+1. Set up the notebook with imports, `%matplotlib inline`, and data loading from CSV/Parquet
+2. Add summary statistics cells with `df.describe()`, `df.info()`, and missing value analysis
+3. Create visualization cells with distribution plots, correlation heatmaps, and time series charts
+4. Add Markdown cells with findings and conclusions between analysis sections
 
-### Visualization
-- matplotlib: static publication-quality plots
-- seaborn: statistical visualizations with minimal code
-- plotly: interactive charts (zoom, hover, pan)
-- altair: declarative statistical visualization
-- `ipywidgets.interact()`: instant interactive UI for functions
+**Output:** A well-structured EDA notebook with statistics, visualizations, and narrative ready for sharing.
 
-### Best Practices
-- Restart and run all before sharing: ensure cells run in order
-- Keep notebooks under 200 cells: split large analyses into multiple notebooks
-- Use `jupytext` for version control: `.py` files diff cleanly, `.ipynb` doesn't
-- Parameterize with `papermill` for production: same notebook, different inputs
-- Export functions to `.py` modules: notebook for exploration, module for reuse
+### Example 2: Automate weekly reports with papermill
 
-## Code Standards
-- Restart kernel and "Run All" before sharing — notebooks with out-of-order execution are unreliable
-- Use `%autoreload 2` during development — import changes from `.py` files without restarting kernel
-- Use `jupytext` for Git: pair `.ipynb` with `.py` — notebook outputs don't belong in version control
-- Pin environment: `%pip install package==1.2.3` in the first cell — reproducible dependencies
-- Use `papermill` for batch execution: parameterize notebooks for reports, not manual re-runs
-- Split exploration from production: explore in notebooks, extract proven code to Python modules
-- Hide code for non-technical readers: `nbconvert --no-input` for executive-facing HTML/PDF reports
+**User request:** "Generate weekly sales reports from the same notebook with different date parameters"
+
+**Actions:**
+1. Create a template notebook with tagged parameter cells for date range
+2. Use `papermill` to execute the notebook with different parameters per week
+3. Convert output notebooks to HTML with `nbconvert --no-input` for executive-friendly reports
+4. Schedule execution via cron or CI pipeline
+
+**Output:** Automated weekly HTML reports generated from a parameterized notebook template.
+
+## Guidelines
+
+- Restart kernel and "Run All" before sharing to ensure cells execute reliably in order.
+- Use `%autoreload 2` during development to reload imported modules without restarting the kernel.
+- Use `jupytext` for Git since `.py` files diff cleanly while `.ipynb` outputs pollute version control.
+- Pin environment dependencies in the first cell for reproducibility.
+- Use `papermill` for batch execution with parameters instead of manual re-runs.
+- Split exploration from production: explore in notebooks, extract proven code to Python modules.
+- Keep notebooks under 200 cells; split large analyses into multiple focused notebooks.

@@ -1,83 +1,67 @@
-# scikit-learn — Machine Learning in Python
+---
+name: scikit-learn
+description: >-
+  Assists with building, evaluating, and deploying machine learning models using scikit-learn.
+  Use when performing data preprocessing, feature engineering, model selection, hyperparameter
+  tuning, cross-validation, or building pipelines for classification, regression, and
+  clustering tasks. Trigger words: sklearn, scikit-learn, machine learning, classification,
+  regression, pipeline, cross-validation.
+license: Apache-2.0
+compatibility: "Requires Python 3.8+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["scikit-learn", "machine-learning", "classification", "regression", "pipeline"]
+---
 
-> Author: terminal-skills
+# scikit-learn
 
-You are an expert in scikit-learn for building, evaluating, and deploying machine learning models. You handle the full ML workflow: data preprocessing, feature engineering, model selection, hyperparameter tuning, cross-validation, and pipeline construction for classification, regression, and clustering tasks.
+## Overview
 
-## Core Competencies
+Scikit-learn is a Python machine learning library that provides a consistent API for the full ML workflow: data preprocessing (scaling, encoding, imputation), model selection (classification, regression, clustering), hyperparameter tuning (grid search, randomized search), cross-validation, and pipeline construction. It supports serialization via joblib for production deployment.
 
-### Preprocessing
-- `StandardScaler`: zero mean, unit variance (for SVM, KNN, linear models)
-- `MinMaxScaler`: scale to [0, 1] range
-- `RobustScaler`: uses median/IQR, handles outliers
-- `OneHotEncoder`: categorical → binary columns (sparse by default)
-- `OrdinalEncoder`: categorical → integers (for tree-based models)
-- `LabelEncoder`: encode target labels
-- `SimpleImputer`: fill missing values (mean, median, most_frequent, constant)
-- `PolynomialFeatures`: generate interaction and polynomial features
-- `FunctionTransformer`: wrap custom functions as transformers
+## Instructions
 
-### Classification
-- `LogisticRegression`: fast baseline for binary/multiclass
-- `RandomForestClassifier`: robust, handles non-linear boundaries, feature importance
-- `GradientBoostingClassifier`, `HistGradientBoostingClassifier`: high accuracy, handles missing values (Hist variant)
-- `SVC`: support vector machines (kernel trick for non-linear)
-- `KNeighborsClassifier`: instance-based, good for small datasets
-- `XGBClassifier`, `LGBMClassifier`: third-party but sklearn-compatible
+- When preprocessing data, use `ColumnTransformer` to apply different transformers to numeric and categorical columns (StandardScaler, OneHotEncoder, SimpleImputer), always within a Pipeline to prevent data leakage.
+- When choosing models, start with fast baselines (LogisticRegression, RandomForest) and use `HistGradientBoostingClassifier` for best tabular performance, since it handles missing values natively and is faster than GradientBoosting.
+- When evaluating, use `cross_val_score` with 5-fold CV instead of single train/test splits, and use `classification_report()` instead of accuracy alone since accuracy is misleading on imbalanced datasets.
+- When tuning hyperparameters, use `RandomizedSearchCV` when the search space exceeds 100 combinations (faster than exhaustive GridSearchCV), and use `StratifiedKFold` or `TimeSeriesSplit` as appropriate.
+- When building pipelines, chain preprocessing and model steps with `Pipeline` to ensure transformers fit only on training data, then serialize the full pipeline with `joblib.dump()` for deployment.
+- When selecting features, use `permutation_importance()` for model-agnostic measurement, `SelectKBest` for statistical filtering, or `feature_importances_` from tree-based models.
 
-### Regression
-- `LinearRegression`, `Ridge`, `Lasso`, `ElasticNet`: linear models with regularization
-- `RandomForestRegressor`: non-linear, robust to outliers
-- `GradientBoostingRegressor`, `HistGradientBoostingRegressor`: state-of-the-art tabular performance
-- `SVR`: support vector regression
-- `KNeighborsRegressor`: local averaging
+## Examples
 
-### Clustering
-- `KMeans`: partition into K clusters (fast, needs K specified)
-- `DBSCAN`: density-based (finds arbitrary shapes, handles noise)
-- `HDBSCAN`: hierarchical DBSCAN (automatic cluster count)
-- `AgglomerativeClustering`: hierarchical (dendrograms)
-- `GaussianMixture`: soft clustering with probability assignments
+### Example 1: Build a customer churn prediction pipeline
 
-### Model Selection
-- `train_test_split()`: basic holdout split
-- `cross_val_score()`: K-fold cross-validation scores
-- `GridSearchCV`: exhaustive hyperparameter search
-- `RandomizedSearchCV`: random sampling (faster for large search spaces)
-- `StratifiedKFold`: preserves class distribution in folds
-- `TimeSeriesSplit`: forward-chaining for time series data
+**User request:** "Create a model to predict which customers will churn"
 
-### Metrics
-- Classification: `accuracy_score`, `precision_score`, `recall_score`, `f1_score`, `roc_auc_score`, `classification_report`, `confusion_matrix`
-- Regression: `mean_squared_error`, `mean_absolute_error`, `r2_score`, `mean_absolute_percentage_error`
-- Clustering: `silhouette_score`, `calinski_harabasz_score`
-- `make_scorer()`: create custom scoring functions for GridSearchCV
+**Actions:**
+1. Build a `ColumnTransformer` with `StandardScaler` for numeric features and `OneHotEncoder` for categorical
+2. Create a `Pipeline` with the transformer and `HistGradientBoostingClassifier`
+3. Tune hyperparameters with `RandomizedSearchCV` using `StratifiedKFold`
+4. Evaluate with `classification_report()` focusing on recall for the churn class
 
-### Pipelines
-- `Pipeline([("scaler", StandardScaler()), ("model", LogisticRegression())])`: chain preprocessing + model
-- `ColumnTransformer`: apply different transformers to different column groups
-- `make_pipeline()`: shorthand without naming steps
-- Pipelines prevent data leakage: fit preprocessing only on training data
-- Serialize with `joblib.dump(pipeline, "model.pkl")` for deployment
+**Output:** A tuned churn prediction pipeline with preprocessing, model, and evaluation metrics.
 
-### Feature Selection
-- `SelectKBest`: top K features by statistical test
-- `RFE` (Recursive Feature Elimination): backward selection using model importance
-- `feature_importances_`: tree-based model feature ranking
-- `permutation_importance()`: model-agnostic importance measurement
-- `VarianceThreshold`: remove low-variance features
+### Example 2: Cluster customers into segments
 
-### Dimensionality Reduction
-- `PCA`: principal component analysis (linear)
-- `TSNE`: visualization of high-dimensional data (non-linear, 2D/3D)
-- `UMAP`: faster alternative to t-SNE (via umap-learn)
-- `TruncatedSVD`: PCA for sparse matrices (text data)
+**User request:** "Segment customers based on purchasing behavior"
 
-## Code Standards
-- Always use `Pipeline` — it prevents data leakage by fitting transformers only on training data
-- Use `ColumnTransformer` for mixed data types: numeric scaling + categorical encoding in one object
-- Use `HistGradientBoostingClassifier` over `GradientBoostingClassifier` — it's faster and handles missing values natively
-- Use `cross_val_score` with 5-fold CV, not a single train/test split — single splits are noisy
-- Use `RandomizedSearchCV` when search space has >100 combinations — exhaustive grid search is too slow
-- Use `classification_report()` not just accuracy — accuracy is misleading on imbalanced datasets
-- Serialize the full pipeline with `joblib`, not just the model — deployment needs preprocessing too
+**Actions:**
+1. Preprocess features with `StandardScaler` in a pipeline
+2. Use `KMeans` with silhouette score analysis to determine optimal cluster count
+3. Run `PCA` for dimensionality reduction and visualization
+4. Profile clusters with `groupby` on original features to interpret segments
+
+**Output:** Customer segments with labeled profiles and a visual cluster map.
+
+## Guidelines
+
+- Always use `Pipeline` to prevent data leakage by fitting transformers only on training data.
+- Use `ColumnTransformer` for mixed data types: numeric scaling and categorical encoding in one object.
+- Use `HistGradientBoostingClassifier` over `GradientBoostingClassifier` since it is faster and handles missing values natively.
+- Use `cross_val_score` with 5-fold CV rather than a single train/test split since single splits are noisy.
+- Use `RandomizedSearchCV` when the search space exceeds 100 combinations.
+- Use `classification_report()` not just accuracy, which is misleading on imbalanced datasets.
+- Serialize the full pipeline with `joblib`, not just the model, since deployment needs preprocessing too.

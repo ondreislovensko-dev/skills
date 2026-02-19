@@ -1,78 +1,66 @@
-# PyTorch — Deep Learning Framework
+---
+name: pytorch
+description: >-
+  Assists with building, training, and deploying neural networks using PyTorch. Use when
+  designing architectures for computer vision, NLP, or tabular data, optimizing training
+  with mixed precision and distributed strategies, or exporting models for production
+  inference. Trigger words: pytorch, torch, neural network, deep learning, training loop, cuda.
+license: Apache-2.0
+compatibility: "Requires Python 3.8+ and CUDA-capable GPU (recommended)"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: data-ai
+  tags: ["pytorch", "deep-learning", "neural-network", "gpu", "machine-learning"]
+---
 
-> Author: terminal-skills
+# PyTorch
 
-You are an expert in PyTorch for building, training, and deploying neural networks. You design architectures for computer vision, NLP, and tabular data, optimize training with mixed precision and distributed strategies, and export models for production inference.
+## Overview
 
-## Core Competencies
+PyTorch is a deep learning framework for building and training neural networks with dynamic computation graphs and automatic differentiation. It provides tensor operations with GPU acceleration, `nn.Module` for defining architectures, DataLoader for efficient data loading, mixed precision training for performance, and export tools (TorchScript, ONNX) for production deployment.
 
-### Tensors
-- `torch.tensor([1, 2, 3])`: create tensors from Python lists
-- `torch.zeros()`, `torch.ones()`, `torch.randn()`: initialize tensors
-- `.to("cuda")`, `.to("mps")`, `.to(device)`: move to GPU/accelerator
-- `.shape`, `.dtype`, `.device`: tensor properties
-- Operations: `+`, `*`, `@` (matmul), `.sum()`, `.mean()`, `.view()`, `.reshape()`
-- Broadcasting: automatic shape expansion for element-wise operations
-- Autograd: `requires_grad=True` enables automatic differentiation
+## Instructions
 
-### nn.Module
-- Subclass `nn.Module`: define `__init__` (layers) and `forward` (computation)
-- Layers: `nn.Linear`, `nn.Conv2d`, `nn.LSTM`, `nn.TransformerEncoder`, `nn.Embedding`
-- Activations: `nn.ReLU`, `nn.GELU`, `nn.SiLU`, `nn.Softmax`
-- Normalization: `nn.BatchNorm2d`, `nn.LayerNorm`, `nn.GroupNorm`
-- Regularization: `nn.Dropout`, `nn.Dropout2d`
-- `nn.Sequential`: stack layers linearly
-- `model.parameters()`: access all trainable parameters
+- When defining models, subclass `nn.Module` with `__init__` for layers and `forward` for computation, using `nn.Sequential` for simple stacks and custom forward logic for complex architectures.
+- When training, implement the standard loop: forward pass, loss computation, `loss.backward()`, `optimizer.step()`, `optimizer.zero_grad()`, with gradient clipping via `clip_grad_norm_` for stability.
+- When loading data, subclass `Dataset` with `__len__` and `__getitem__`, then use `DataLoader` with `num_workers=4` and `pin_memory=True` for GPU training throughput.
+- When optimizing performance, use `torch.compile(model)` on PyTorch 2.0+ for 20-50% speedup, mixed precision with `torch.amp.autocast()` for halved memory and doubled throughput, and `DistributedDataParallel` for multi-GPU training.
+- When doing transfer learning, load pretrained models from `torchvision.models` or Hugging Face, freeze the backbone, and replace the classifier head for your task.
+- When deploying, use `torch.export()` or `torch.jit.trace()` for production, `torch.onnx.export()` for cross-framework compatibility, and `torch.quantization` for INT8 inference speedup.
 
-### Training Loop
-- Loss functions: `nn.CrossEntropyLoss`, `nn.MSELoss`, `nn.BCEWithLogitsLoss`, `nn.L1Loss`
-- Optimizers: `torch.optim.Adam`, `AdamW`, `SGD` with momentum
-- Schedulers: `CosineAnnealingLR`, `OneCycleLR`, `ReduceLROnPlateau`
-- `loss.backward()`: compute gradients
-- `optimizer.step()`: update parameters
-- `optimizer.zero_grad()`: reset gradients
-- Gradient clipping: `torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)`
+## Examples
 
-### Data Loading
-- `Dataset`: subclass with `__len__` and `__getitem__`
-- `DataLoader`: batching, shuffling, multi-worker loading, pin_memory
-- `torchvision.transforms.v2`: image augmentation pipeline
-- `torchtext`, `torchaudio`: domain-specific data utilities
-- `num_workers=4, pin_memory=True`: optimize data loading throughput
+### Example 1: Fine-tune a vision model for image classification
 
-### Computer Vision
-- `torchvision.models`: pretrained ResNet, EfficientNet, ViT, YOLO
-- Transfer learning: freeze backbone, replace classifier head
-- `torchvision.transforms.v2`: Resize, RandomCrop, Normalize, ColorJitter
-- Segmentation: `DeepLabV3`, `FCN`, custom U-Net
-- Detection: `FasterRCNN`, `RetinaNet` with backbone customization
+**User request:** "Fine-tune a pretrained ResNet for classifying product images"
 
-### NLP
-- `nn.Embedding`: word/token embeddings
-- `nn.TransformerEncoder`: self-attention layers
-- Integration with Hugging Face `transformers`: `AutoModel.from_pretrained()`
-- Tokenization: use HuggingFace tokenizers, not manual
-- Fine-tuning: LoRA adapters via `peft` library
+**Actions:**
+1. Load `resnet50(weights=ResNet50_Weights.DEFAULT)` and freeze all layers except the final classifier
+2. Replace the classifier head with `nn.Linear(2048, num_classes)`
+3. Set up DataLoader with image augmentation transforms (RandomCrop, ColorJitter, Normalize)
+4. Train with AdamW, CosineAnnealingLR scheduler, and mixed precision
 
-### Performance
-- Mixed precision: `torch.amp.autocast("cuda")` + `GradScaler` — 2x speedup, half memory
-- `torch.compile(model)`: graph compilation for 20-50% speedup (PyTorch 2.0+)
-- Distributed: `DistributedDataParallel` for multi-GPU training
-- `torch.utils.checkpoint`: gradient checkpointing to reduce memory
-- `torch.backends.cudnn.benchmark = True`: auto-tune convolution algorithms
+**Output:** A fine-tuned image classifier with production-quality accuracy and efficient mixed-precision training.
 
-### Export and Deployment
-- `torch.jit.trace()`, `torch.jit.script()`: TorchScript for production
-- `torch.onnx.export()`: ONNX format for cross-framework deployment
-- `torch.export()`: PyTorch 2.0+ export (replaces TorchScript)
-- `torch.quantization`: INT8 quantization for inference speedup
-- TorchServe: model serving with batching and versioning
+### Example 2: Train a text classification model with Hugging Face
 
-## Code Standards
-- Use `torch.compile(model)` on PyTorch 2.0+ — free 20-50% speedup with one line
-- Use `AdamW` over `Adam` — correct weight decay implementation for modern architectures
-- Use mixed precision (`torch.amp`) for any GPU training — halves memory, doubles throughput
-- Move data to device in the training loop, not in the Dataset — keeps Dataset device-agnostic
-- Use `model.eval()` and `torch.no_grad()` during inference — prevents unnecessary gradient computation
-- Use `pin_memory=True` in DataLoader when training on GPU — speeds up CPU→GPU data transfer
-- Save `model.state_dict()` not the full model — state dicts are portable across code changes
+**User request:** "Build a sentiment analysis model using a pretrained transformer"
+
+**Actions:**
+1. Load `AutoModel.from_pretrained("bert-base-uncased")` with a classification head
+2. Tokenize the dataset using `AutoTokenizer` and create a DataLoader
+3. Fine-tune with AdamW, linear warmup scheduler, and gradient clipping
+4. Export the trained model with `torch.export()` for production serving
+
+**Output:** A sentiment analysis model fine-tuned on custom data and exported for production inference.
+
+## Guidelines
+
+- Use `torch.compile(model)` on PyTorch 2.0+ for a free 20-50% speedup with one line.
+- Use `AdamW` over `Adam` for correct weight decay implementation with modern architectures.
+- Use mixed precision (`torch.amp`) for any GPU training to halve memory and double throughput.
+- Move data to device in the training loop, not in the Dataset, to keep Dataset device-agnostic.
+- Use `model.eval()` and `torch.no_grad()` during inference to prevent unnecessary gradient computation.
+- Use `pin_memory=True` in DataLoader when training on GPU to speed up CPU-to-GPU data transfer.
+- Save `model.state_dict()` not the full model since state dicts are portable across code changes.
