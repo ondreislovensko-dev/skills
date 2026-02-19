@@ -54,13 +54,10 @@ r.ping()  # Returns True
 ```javascript
 // redis-client.js — Node.js connection with ioredis
 import Redis from 'ioredis';
-
 const redis = new Redis({
-  host: 'localhost',
-  port: 6379,
-  password: 'your-password',
+  host: 'localhost', port: 6379, password: 'your-password',
   maxRetriesPerRequest: 3,
-  retryStrategy: (times) => Math.min(times * 50, 2000), // Exponential backoff, cap at 2s
+  retryStrategy: (times) => Math.min(times * 50, 2000),
 });
 ```
 
@@ -201,49 +198,7 @@ def is_rate_limited(key: str, limit: int, window_seconds: int) -> bool:
     return count > limit
 ```
 
-### Token Bucket (smoother)
-
-```python
-"""token_bucket.py — Token bucket rate limiter using Lua script."""
-
-TOKEN_BUCKET_SCRIPT = """
-local key = KEYS[1]
-local capacity = tonumber(ARGV[1])
-local refill_rate = tonumber(ARGV[2])  -- tokens per second
-local now = tonumber(ARGV[3])
-
-local data = redis.call('HMGET', key, 'tokens', 'last_refill')
-local tokens = tonumber(data[1]) or capacity
-local last_refill = tonumber(data[2]) or now
-
--- Refill tokens based on elapsed time
-local elapsed = now - last_refill
-tokens = math.min(capacity, tokens + elapsed * refill_rate)
-
-if tokens >= 1 then
-    tokens = tokens - 1
-    redis.call('HMSET', key, 'tokens', tokens, 'last_refill', now)
-    redis.call('EXPIRE', key, math.ceil(capacity / refill_rate) + 1)
-    return 1  -- Allowed
-else
-    redis.call('HMSET', key, 'tokens', tokens, 'last_refill', now)
-    return 0  -- Denied
-end
-"""
-
-# Register the script once
-bucket_sha = r.script_load(TOKEN_BUCKET_SCRIPT)
-
-def check_token_bucket(key: str, capacity: int = 10, refill_rate: float = 1.0) -> bool:
-    """Check token bucket rate limiter.
-
-    Args:
-        key: Identifier for the bucket.
-        capacity: Maximum tokens (burst size).
-        refill_rate: Tokens added per second.
-    """
-    return r.evalsha(bucket_sha, 1, f"bucket:{key}", capacity, refill_rate, time.time()) == 1
-```
+For smoother rate limiting, consider a token bucket implementation using a Lua script that tracks tokens and refill timestamps in a Redis hash.
 
 ## Pub/Sub
 
@@ -282,62 +237,7 @@ def subscribe_to_events(pattern: str, callback):
 
 ## Streams (persistent messaging)
 
-Unlike pub/sub, streams persist messages and support consumer groups:
-
-```python
-"""streams.py — Redis Streams for reliable event processing."""
-
-def add_to_stream(stream: str, data: dict, maxlen: int = 10000) -> str:
-    """Add an event to a stream with automatic trimming.
-
-    Args:
-        stream: Stream name (e.g., "events:orders").
-        data: Event data as flat dict (values must be strings).
-        maxlen: Approximate max stream length for memory management.
-
-    Returns:
-        Message ID (e.g., "1708123456789-0").
-    """
-    return r.xadd(stream, data, maxlen=maxlen, approximate=True)
-
-def create_consumer_group(stream: str, group: str):
-    """Create a consumer group, starting from new messages.
-
-    Args:
-        stream: Stream name.
-        group: Consumer group name.
-    """
-    try:
-        r.xgroup_create(stream, group, id="$", mkstream=True)
-    except redis.ResponseError as e:
-        if "BUSYGROUP" not in str(e):  # Group already exists — that's fine
-            raise
-
-def consume_stream(stream: str, group: str, consumer: str,
-                   handler, batch_size: int = 10):
-    """Consume messages from a stream with acknowledgment.
-
-    Args:
-        stream: Stream name.
-        group: Consumer group name.
-        consumer: This consumer's unique name.
-        handler: Function called with (message_id, data) for each message.
-        batch_size: Messages to read per iteration.
-    """
-    while True:
-        messages = r.xreadgroup(group, consumer, {stream: ">"},
-                                count=batch_size, block=5000)  # Block 5s
-        if not messages:
-            continue
-        for _, entries in messages:
-            for msg_id, data in entries:
-                try:
-                    handler(msg_id, data)
-                    r.xack(stream, group, msg_id)
-                except Exception as e:
-                    print(f"Failed to process {msg_id}: {e}")
-                    # Message stays pending — will be retried or claimed
-```
+Unlike pub/sub, streams persist messages and support consumer groups. Use `XADD` to add events, `XGROUP CREATE` to create consumer groups, and `XREADGROUP`/`XACK` to consume and acknowledge messages. Set `maxlen` on `XADD` to cap stream memory.
 
 ## Distributed Locking
 
@@ -378,51 +278,11 @@ def release_lock(name: str, token: str) -> bool:
 
 ## Leaderboards
 
-```python
-"""leaderboard.py — Real-time leaderboard using sorted sets."""
-
-def update_score(board: str, user_id: str, score: float):
-    """Set or update a user's score on a leaderboard.
-
-    Args:
-        board: Leaderboard name.
-        user_id: Player/user identifier.
-        score: New score value.
-    """
-    r.zadd(f"leaderboard:{board}", {user_id: score})
-
-def get_top(board: str, count: int = 10) -> list[tuple[str, float]]:
-    """Get top N users by score (highest first).
-
-    Args:
-        board: Leaderboard name.
-        count: Number of top entries to return.
-    """
-    return r.zrevrange(f"leaderboard:{board}", 0, count - 1, withscores=True)
-
-def get_rank(board: str, user_id: str) -> int | None:
-    """Get a user's rank (0-based, highest score = rank 0).
-
-    Args:
-        board: Leaderboard name.
-        user_id: Player/user identifier.
-    """
-    rank = r.zrevrank(f"leaderboard:{board}", user_id)
-    return rank  # None if user not on board
-```
+Use sorted sets (`ZADD`, `ZREVRANGE`, `ZREVRANK`) for real-time leaderboards. `ZADD` sets scores, `ZREVRANGE` returns top N entries, and `ZREVRANK` gets a member's rank.
 
 ## Production Configuration
 
-```
-# redis.conf — production settings
-maxmemory 2gb
-maxmemory-policy allkeys-lru      # Evict least recently used keys when memory full
-appendonly yes                     # AOF persistence for durability
-appendfsync everysec               # Flush to disk every second (balance speed/safety)
-tcp-keepalive 300
-timeout 0
-databases 16
-```
+Key settings: `maxmemory 2gb`, `maxmemory-policy allkeys-lru`, `appendonly yes`, `appendfsync everysec`. Always set a `maxmemory` limit to prevent out-of-memory crashes.
 
 ## Guidelines
 

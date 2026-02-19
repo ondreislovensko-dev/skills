@@ -1,79 +1,67 @@
-# Astro — The Web Framework for Content-Driven Websites
+---
+name: astro
+description: >-
+  Assists with building content-driven websites using Astro's island architecture. Use when
+  creating static sites, blogs, documentation, or marketing pages that ship zero JavaScript
+  by default. Trigger words: astro, static site, island architecture, content collections,
+  SSG, hybrid rendering, astro components.
+license: Apache-2.0
+compatibility: "Requires Node.js 18+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["astro", "static-site", "island-architecture", "ssg", "content"]
+---
 
-> Author: terminal-skills
+# Astro
 
-You are an expert in Astro for building fast, content-focused websites. You leverage Astro's island architecture to ship zero JavaScript by default, hydrating only interactive components — achieving perfect Lighthouse scores while using React, Vue, Svelte, or any UI framework where needed.
+## Overview
 
-## Core Competencies
+Astro is a web framework for building content-driven websites that ships zero JavaScript by default. Its island architecture hydrates only interactive components, achieving excellent Lighthouse scores while supporting React, Vue, Svelte, or any UI framework where interactivity is needed.
 
-### Project Structure
-- Pages: `src/pages/` with file-based routing (`.astro`, `.md`, `.mdx`)
-- Layouts: `src/layouts/` for shared page structure
-- Components: `src/components/` — Astro components (`.astro`) or framework components (`.tsx`, `.vue`, `.svelte`)
-- Content Collections: `src/content/` with schema validation via Zod
-- Public assets: `public/` for static files (fonts, images, favicons)
-- Middleware: `src/middleware.ts` for request/response processing
+## Instructions
 
-### Island Architecture
-- Zero JS by default: Astro components render to HTML with no client-side JavaScript
-- Client directives for interactive islands:
-  - `client:load` — hydrate immediately on page load
-  - `client:idle` — hydrate when browser is idle (requestIdleCallback)
-  - `client:visible` — hydrate when component scrolls into viewport (IntersectionObserver)
-  - `client:media="(max-width: 768px)"` — hydrate on media query match
-  - `client:only="react"` — skip SSR, render only on client
-- Mix frameworks: use React header, Vue carousel, and Svelte form on the same page
+- When creating pages, use file-based routing in `src/pages/` with `.astro`, `.md`, or `.mdx` files, and organize shared structure in `src/layouts/`.
+- When adding interactivity, use client directives on framework components: prefer `client:visible` or `client:idle` over `client:load` since most components do not need immediate hydration.
+- When managing content, define Content Collections in `src/content/` with strict Zod schemas using `defineCollection()`, and query with `getCollection()` and `getEntry()`.
+- When choosing rendering modes, default to static (SSG) for marketing and content pages, use `output: "server"` for dynamic pages, or use hybrid rendering with per-page `export const prerender = false`.
+- When optimizing images, use the `<Image>` component from `astro:assets` for automatic format conversion (WebP/AVIF), resizing, and lazy loading instead of raw `<img>` tags.
+- When adding page transitions, enable View Transitions with `<ViewTransitions />` for SPA-like navigation without shipping a client-side router.
+- When integrating UI frameworks, install the appropriate integration (`@astrojs/react`, `@astrojs/vue`, `@astrojs/svelte`) and use Astro components for static content, reaching for framework components only when interactivity is required.
 
-### Content Collections
-- Type-safe content with Zod schemas: `defineCollection({ schema: z.object({...}) })`
-- Query content: `getCollection("blog")`, `getEntry("blog", "my-post")`
-- Markdown/MDX support with frontmatter validation
-- Custom content loaders: fetch from CMS, database, or API
-- Reference other collections: `z.reference("authors")` for relational content
+## Examples
 
-### Routing
-- File-based: `src/pages/about.astro` → `/about`
-- Dynamic routes: `src/pages/blog/[slug].astro` with `getStaticPaths()`
-- Rest parameters: `src/pages/docs/[...slug].astro` for catch-all routes
-- API routes: `src/pages/api/search.ts` with `GET`, `POST` handlers
-- i18n routing: built-in `i18n` config for multilingual sites
-- Redirects: `astro.config.mjs` redirects map or `Astro.redirect()`
+### Example 1: Build a blog with Content Collections
 
-### Rendering Modes
-- **Static (SSG)**: Pre-render at build time — fastest, default mode
-- **Server (SSR)**: Render on demand — `output: "server"` in config
-- **Hybrid**: Per-page choice — static by default, `export const prerender = false` for dynamic pages
-- Adapters: Node.js, Vercel, Netlify, Cloudflare, Deno, AWS Lambda
+**User request:** "Create an Astro blog with type-safe Markdown content"
 
-### Integrations
-- UI frameworks: `@astrojs/react`, `@astrojs/vue`, `@astrojs/svelte`, `@astrojs/preact`, `@astrojs/solid-js`, `@astrojs/lit`
-- Styling: `@astrojs/tailwind`, Sass, CSS Modules (built-in scoped styles)
-- CMS: Contentful, Sanity, Storyblok, WordPress, Strapi connectors
-- SEO: `@astrojs/sitemap`, canonical URLs, Open Graph
-- Images: `astro:assets` with automatic optimization, lazy loading, responsive sizes
-- MDX: `@astrojs/mdx` for components in Markdown
-- View Transitions: `<ViewTransitions />` for SPA-like page transitions
+**Actions:**
+1. Define a blog Content Collection with Zod schema for frontmatter (title, date, tags, author)
+2. Create dynamic route `src/pages/blog/[slug].astro` with `getStaticPaths()`
+3. Build blog index page querying `getCollection("blog")` with sorting
+4. Add layout with SEO meta tags, navigation, and View Transitions
 
-### Performance
-- Image optimization: `<Image>` component with automatic format conversion (WebP/AVIF), resize, lazy loading
-- Font optimization: inline critical CSS, font-display swap
-- Prefetching: `<a data-astro-prefetch>` for instant navigation
-- View Transitions API: smooth page transitions without SPA overhead
-- Automatic CSS scoping: styles in `.astro` files are scoped by default
+**Output:** A statically generated blog with validated content, clean URLs, and smooth page transitions.
 
-### Data Fetching
-- Top-level `await` in `.astro` component frontmatter
-- Fetch at build time (SSG) or request time (SSR)
-- `Astro.props` for component data passing
-- `Astro.params` for dynamic route parameters
-- `Astro.request` for server-side request access (headers, cookies)
-- `Astro.cookies` for cookie management in SSR mode
+### Example 2: Add interactive components to a static site
 
-## Code Standards
-- Use Astro components (`.astro`) for static content — only reach for React/Vue/Svelte when you need interactivity
-- Default to `client:visible` or `client:idle` over `client:load` — most interactive components don't need immediate hydration
-- Define Content Collections with strict Zod schemas — catch content errors at build time, not in production
-- Use `astro:assets` `<Image>` over raw `<img>` tags for automatic optimization
-- Keep layouts thin: shared `<head>`, navigation, footer — page-specific content in pages
-- Use hybrid rendering: static for marketing pages, SSR only for personalized/dynamic pages
-- Enable View Transitions for SPA-like feel without shipping a router
+**User request:** "Add a React search component to my Astro documentation site"
+
+**Actions:**
+1. Install `@astrojs/react` integration
+2. Create the React search component with state and event handling
+3. Add the component to the page with `client:idle` directive
+4. Pass static data as props from the Astro page frontmatter
+
+**Output:** A documentation site that is fully static except for the interactive search island.
+
+## Guidelines
+
+- Use Astro components (`.astro`) for static content; only use React/Vue/Svelte when interactivity is needed.
+- Default to `client:visible` or `client:idle` over `client:load` for hydration directives.
+- Define Content Collections with strict Zod schemas to catch content errors at build time.
+- Use `astro:assets` `<Image>` over raw `<img>` tags for automatic optimization.
+- Keep layouts thin with shared `<head>`, navigation, and footer; put page-specific content in pages.
+- Use hybrid rendering: static for marketing pages, SSR only for personalized or dynamic pages.
+- Enable View Transitions for SPA-like navigation without shipping a router.
