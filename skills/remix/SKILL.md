@@ -1,78 +1,67 @@
-# Remix — Web Standards Full-Stack Framework
+---
+name: remix
+description: >-
+  Assists with building full-stack web applications using Remix. Use when creating apps with
+  nested routing, loader/action patterns, progressive enhancement, or deploying to Node.js,
+  Cloudflare Workers, or other adapters. Trigger words: remix, remix run, loader, action,
+  useFetcher, nested routes, progressive enhancement.
+license: Apache-2.0
+compatibility: "Requires Node.js 18+ (or compatible edge runtime with appropriate adapter)"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["remix", "react", "full-stack", "web-standards", "progressive-enhancement"]
+---
 
-> Author: terminal-skills
+# Remix
 
-You are an expert in Remix for building full-stack web applications that embrace web standards. You use Remix's nested routing, loader/action pattern, and progressive enhancement to build fast, resilient applications that work even when JavaScript fails to load.
+## Overview
 
-## Core Competencies
+Remix is a full-stack React framework built on web standards that uses nested routing, loader/action data patterns, and progressive enhancement to build fast, resilient applications. Forms work without JavaScript, nested routes load data in parallel, and error boundaries isolate failures to individual route segments.
 
-### Nested Routing
-- File-based routes: `app/routes/dashboard.tsx` → `/dashboard`
-- Nested routes: `app/routes/dashboard.projects.tsx` → `/dashboard/projects` (nested inside dashboard layout)
-- Dynamic segments: `app/routes/users.$userId.tsx`
-- Optional segments: `app/routes/($lang).about.tsx`
-- Splat routes: `app/routes/files.$.tsx` for catch-all paths
-- Layout routes: `app/routes/dashboard.tsx` renders `<Outlet />` for child routes
-- Pathless layouts: `app/routes/_auth.tsx` groups routes under a shared layout without URL segment
-- Route modules: each file is both the UI and the data layer
+## Instructions
 
-### Loaders (Data Loading)
-- `loader`: server-side function that provides data to the route
-- Runs on every navigation (server-side for SSR, fetch for client navigation)
-- Return `json()`, `defer()`, `redirect()`, or raw `Response`
-- Access request: `loader({ request, params, context })`
-- Headers, cookies, sessions from the `request` object
-- Parallel loading: nested route loaders run in parallel (not waterfall)
-- `defer()` for streaming: return promises that resolve progressively
+- When building routes, use file-based nested routing where each route module contains both the UI and data layer, with `<Outlet />` for child routes and pathless layouts for shared UI without URL segments.
+- When loading data, use `loader` functions that run server-side and return data with `json()`, `defer()`, or `redirect()`. Nested route loaders run in parallel to avoid client-server waterfalls.
+- When handling mutations, use `action` functions triggered by `<Form method="post">`, return validation errors with appropriate HTTP status codes, and rely on automatic revalidation of all page loaders after actions.
+- When enhancing UX, use `useFetcher()` for non-navigation mutations (like buttons, inline edits), `useNavigation()` for form submission state, and `fetcher.formData` for optimistic UI.
+- When handling errors, add `ErrorBoundary` at every route level to prevent child errors from crashing the whole page, and use `isRouteErrorResponse()` to distinguish 404s from server errors.
+- When managing auth, use `createCookieSessionStorage()` for encrypted sessions, redirect in loaders when unauthenticated, and leverage built-in CSRF protection.
+- When deploying, choose the appropriate adapter (`@remix-run/node`, `@remix-run/cloudflare`, `@remix-run/deno`) and use Vite as the compiler.
 
-### Actions (Mutations)
-- `action`: server-side function for handling form submissions
-- Triggered by `<Form method="post">` or `fetcher.submit()`
-- Return validation errors: `json({ errors: {...} }, { status: 400 })`
-- Automatic revalidation: after an action, all loaders on the page re-run
-- Multiple forms per page: use `intent` field to distinguish actions
-- File uploads: `request.formData()` for multipart handling
+## Examples
 
-### Forms and Progressive Enhancement
-- `<Form>`: enhanced HTML form — works without JavaScript, smooth with JavaScript
-- `useNavigation()`: track form submission state (idle, submitting, loading)
-- `useFetcher()`: non-navigation form submission (modals, inline edits, like buttons)
-- `useActionData()`: access action return values for error display
-- `useLoaderData()`: typed access to loader data in the component
-- Optimistic UI: `fetcher.formData` for instant UI feedback before server responds
+### Example 1: Build a CRUD app with progressive enhancement
 
-### Sessions and Auth
-- Session storage: cookie, file, memory, Cloudflare KV, custom
-- `createCookieSessionStorage()`: encrypted cookie-based sessions
-- `getSession()`, `commitSession()`, `destroySession()` pattern
-- CSRF protection: built into Remix's form handling
-- Auth patterns: redirect in loader if unauthenticated
+**User request:** "Create a Remix app with task management and form-based mutations"
 
-### Error Handling
-- `ErrorBoundary`: per-route error UI (catches thrown responses and exceptions)
-- `isRouteErrorResponse()`: distinguish between 404s and server errors
-- Thrown responses: `throw json({ message: "Not found" }, { status: 404 })`
-- Granular: errors in a child route don't crash the parent layout
+**Actions:**
+1. Define nested routes for task list and task detail pages
+2. Implement loaders for data fetching with parallel loading
+3. Create actions for create, update, delete with validation error handling
+4. Use `<Form>` for progressive enhancement and `useFetcher()` for inline edits
 
-### Deployment
-- **Adapters**: Node.js, Cloudflare Workers/Pages, Deno, Vercel, Netlify, AWS Lambda, Fly.io
-- `@remix-run/node`: standard Node.js server
-- `@remix-run/cloudflare`: Cloudflare Workers edge deployment
-- `@remix-run/deno`: Deno runtime
-- Vite-based: Remix uses Vite as the compiler (since v2.8)
+**Output:** A full-stack task app that works without JavaScript and is enhanced with JavaScript.
 
-### Performance
-- Nested route parallel loading eliminates client-server waterfalls
-- Prefetching: `<Link prefetch="intent">` loads data on hover
-- HTTP caching: set `Cache-Control` headers in loaders for CDN caching
-- Single fetch (v2.9+): batch all loader calls into a single HTTP request
-- Streaming with `defer()`: show a shell immediately, stream data as it resolves
+### Example 2: Deploy a Remix app to Cloudflare Workers
 
-## Code Standards
-- Use `loader` for all data fetching — never `useEffect` + `fetch` for initial page data
-- Use `<Form>` instead of `<form>` + `onSubmit` — get progressive enhancement for free
-- Return proper HTTP status codes from loaders and actions (404, 400, 403) — not just `json({ error })`
-- Use `useFetcher()` for mutations that shouldn't trigger navigation (like/unlike, inline edits, search)
-- Handle errors at every route level with `ErrorBoundary` — don't let child errors crash the whole page
-- Use `defer()` for slow data that's below the fold — show the page fast, stream non-critical data
-- Keep loaders and actions in the route file — co-location makes it easy to see what a route does
+**User request:** "Set up a Remix app for edge deployment on Cloudflare"
+
+**Actions:**
+1. Configure `@remix-run/cloudflare` adapter in the project
+2. Set up loaders using KV and D1 bindings from the context
+3. Add streaming with `defer()` for slow data below the fold
+4. Configure HTTP caching headers in loaders for CDN performance
+
+**Output:** An edge-deployed Remix app with serverless data access and CDN caching.
+
+## Guidelines
+
+- Use `loader` for all data fetching; never use `useEffect` + `fetch` for initial page data.
+- Use `<Form>` instead of `<form>` + `onSubmit` for progressive enhancement.
+- Return proper HTTP status codes from loaders and actions (404, 400, 403), not just `json({ error })`.
+- Use `useFetcher()` for mutations that should not trigger navigation (like/unlike, inline edits, search).
+- Handle errors at every route level with `ErrorBoundary`; do not let child errors crash the whole page.
+- Use `defer()` for slow data below the fold to show the page fast and stream non-critical data.
+- Keep loaders and actions in the route file; co-location makes it easy to see what a route does.

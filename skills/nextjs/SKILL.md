@@ -1,83 +1,67 @@
-# Next.js — The React Full-Stack Framework
+---
+name: nextjs
+description: >-
+  Assists with building production-grade React applications using Next.js. Use when working with
+  the App Router, Server Components, Server Actions, Middleware, or deploying to Vercel or
+  self-hosted environments. Trigger words: nextjs, next.js, app router, server components,
+  server actions, react framework, ssr, isr.
+license: Apache-2.0
+compatibility: "Requires Node.js 18+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["nextjs", "react", "full-stack", "ssr", "server-components"]
+---
 
-> Author: terminal-skills
+# Next.js
 
-You are an expert in Next.js for building production-grade React applications. You leverage the App Router, Server Components, Server Actions, and Middleware to build fast, SEO-friendly, full-stack applications with optimal performance.
+## Overview
 
-## Core Competencies
+Next.js is a full-stack React framework featuring the App Router with Server Components, Server Actions for mutations, and multiple rendering strategies (SSG, SSR, ISR, PPR). It provides automatic code splitting, image optimization, and deployment options from Vercel to self-hosted Docker.
 
-### App Router
-- File-based routing: `app/about/page.tsx` → `/about`
-- Layouts: `layout.tsx` for shared UI that persists across navigations
-- Templates: `template.tsx` for layouts that re-mount on navigation
-- Loading UI: `loading.tsx` with React Suspense for streaming
-- Error boundaries: `error.tsx` for route-level error handling
-- Not found: `not-found.tsx` for 404 pages
-- Route groups: `(marketing)/about/page.tsx` — group without URL segment
-- Parallel routes: `@modal/page.tsx` for simultaneous rendering
-- Intercepting routes: `(.)photo/[id]` for modal patterns
+## Instructions
 
-### Server Components (Default)
-- Zero client-side JavaScript by default — components render on the server
-- Direct database access: query PostgreSQL, MongoDB, Redis in components
-- `async/await` at component level: `async function Page() { const data = await db.query(...) }`
-- Streaming: components load progressively with Suspense boundaries
-- Automatic code splitting: only client components ship JavaScript
+- When creating routes, use file-based routing in the `app/` directory with `page.tsx` for pages, `layout.tsx` for persistent layouts, `loading.tsx` for streaming, and `error.tsx` for error boundaries.
+- When building components, default to Server Components (no directive needed) for zero client-side JavaScript, and add `"use client"` only for components needing event handlers, hooks, or browser APIs.
+- When fetching data, query databases directly in Server Components with `async/await`, use `fetch()` with caching options (`revalidate`, `force-cache`), and co-locate data fetching with the component that needs it.
+- When handling mutations, use Server Actions with `"use server"` directive and `<form action={...}>` for progressive enhancement, then call `revalidatePath()` or `revalidateTag()` after mutations.
+- When choosing rendering, default to ISR with `revalidate` for most pages, use `generateStaticParams()` for fully static pages, and `dynamic = "force-dynamic"` only when fresh data is required on every request.
+- When adding middleware, use `middleware.ts` at the project root for auth redirects, geolocation, and A/B testing with matcher config to scope it to specific routes.
+- When optimizing, use `next/image` for all images (WebP/AVIF, lazy loading), `next/font` for zero layout shift fonts, and `generateMetadata()` for dynamic SEO.
 
-### Client Components
-- `"use client"` directive to opt into client-side rendering
-- Event handlers: `onClick`, `onChange`, forms with client-side validation
-- Hooks: `useState`, `useEffect`, `useContext`, custom hooks
-- Keep client components at the leaf level — push `"use client"` as far down as possible
+## Examples
 
-### Server Actions
-- `"use server"` directive for server-side mutations
-- Form actions: `<form action={createPost}>` — no API route needed
-- Progressive enhancement: forms work without JavaScript
-- Revalidation: `revalidatePath()`, `revalidateTag()` after mutations
-- Optimistic updates: `useOptimistic()` for instant UI feedback
-- Error handling: return validation errors from server actions
+### Example 1: Build a dashboard with Server Components
 
-### Data Fetching
-- Server Components fetch data directly (no `getServerSideProps`)
-- `fetch()` with caching: `{ cache: "force-cache" }`, `{ next: { revalidate: 3600 } }`
-- `unstable_cache()` for database query caching
-- Parallel data fetching: multiple `await` calls with `Promise.all()`
-- Request memoization: identical `fetch()` calls deduplicated per request
+**User request:** "Create a Next.js dashboard with server-side data fetching and streaming"
 
-### Rendering Strategies
-- **Static (SSG)**: pages built at `next build` — `generateStaticParams()`
-- **Dynamic (SSR)**: pages rendered per request — `dynamic = "force-dynamic"`
-- **ISR**: revalidate static pages — `revalidate = 3600` (seconds)
-- **PPR (Partial Prerendering)**: static shell with streaming dynamic holes
-- **Client-side**: `"use client"` components with `useEffect` for browser-only data
+**Actions:**
+1. Create dashboard layout with `layout.tsx` and parallel routes for widgets
+2. Fetch data directly in async Server Components with database queries
+3. Add `loading.tsx` for Suspense-based streaming of slow components
+4. Use `revalidate` for ISR to balance freshness and performance
 
-### Middleware
-- `middleware.ts` at project root: runs before every request
-- Use cases: auth redirects, A/B testing, geolocation, bot detection, rate limiting
-- `NextResponse.rewrite()`, `.redirect()`, `.next()`, `.json()`
-- Matcher config: `export const config = { matcher: ["/dashboard/:path*"] }`
+**Output:** A fast dashboard that streams data progressively with zero client-side JavaScript for data fetching.
 
-### Optimization
-- `<Image>`: automatic optimization, lazy loading, responsive sizes, blur placeholder
-- `<Link>`: prefetching, client-side navigation without full page reload
-- `<Script>`: load third-party scripts with `strategy: "lazyOnload" | "afterInteractive"`
-- Font optimization: `next/font/google` and `next/font/local` for zero layout shift
-- Metadata API: `generateMetadata()` for dynamic SEO tags, Open Graph, JSON-LD
-- Route handlers: `route.ts` for API endpoints with streaming and Web API support
+### Example 2: Add authentication with Server Actions
 
-### Deployment
-- **Vercel**: zero-config, automatic ISR, Edge Functions, Analytics
-- **Self-hosted**: `next build && next start` on any Node.js server
-- **Docker**: `output: "standalone"` for minimal container images
-- **Static export**: `output: "export"` for pure static sites (no server needed)
-- **Cloudflare**: `@opennextjs/cloudflare` for Workers deployment
+**User request:** "Implement login/signup with Server Actions and middleware protection"
 
-## Code Standards
-- Default to Server Components — add `"use client"` only for interactivity (event handlers, hooks, browser APIs)
-- Use Server Actions for mutations instead of API routes — they're simpler and support progressive enhancement
-- Co-locate data fetching with components: fetch in the Server Component that needs the data, not in a parent
-- Use `loading.tsx` at route boundaries for streaming — don't block the entire page on a slow query
-- Use `generateMetadata()` for dynamic pages — static `metadata` export for fixed pages
-- Set `revalidate` on fetch calls or page-level: ISR is almost always better than full SSR
-- Use `next/image` for all images — the optimization is significant (WebP/AVIF, lazy loading, responsive)
+**Actions:**
+1. Create login form with `<form action={loginAction}>` using Server Actions
+2. Implement session management with encrypted cookies
+3. Add middleware to redirect unauthenticated users from `/dashboard/*`
+4. Use `useOptimistic()` for instant form feedback
+
+**Output:** A progressively enhanced auth system with server-side validation and route protection.
+
+## Guidelines
+
+- Default to Server Components; add `"use client"` only for interactivity (event handlers, hooks, browser APIs).
+- Use Server Actions for mutations instead of API routes; they are simpler and support progressive enhancement.
+- Co-locate data fetching with components: fetch in the Server Component that needs the data, not in a parent.
+- Use `loading.tsx` at route boundaries for streaming; do not block the entire page on a slow query.
+- Use `generateMetadata()` for dynamic pages; static `metadata` export for fixed pages.
+- Set `revalidate` on fetch calls or at page level: ISR is almost always better than full SSR.
+- Use `next/image` for all images; the optimization is significant (WebP/AVIF, lazy loading, responsive).
