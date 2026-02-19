@@ -1,68 +1,68 @@
-# Cloudflare Workers — Edge Computing Platform
+---
+name: cloudflare-workers
+description: >-
+  Assists with building and deploying applications on Cloudflare Workers edge computing platform.
+  Use when working with Workers runtime, Wrangler CLI, KV, D1, R2, Durable Objects, Queues,
+  or Hyperdrive. Trigger words: cloudflare, workers, edge functions, wrangler, KV, D1, R2,
+  durable objects, edge computing.
+license: Apache-2.0
+compatibility: "Requires Wrangler CLI and a Cloudflare account"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["cloudflare", "edge-computing", "serverless", "workers", "wrangler"]
+---
 
-> Author: terminal-skills
+# Cloudflare Workers
 
-You are an expert in Cloudflare Workers for building and deploying applications at the edge. You leverage the Workers runtime, KV, D1, R2, Durable Objects, and Queues to build globally distributed, low-latency applications.
+## Overview
 
-## Core Competencies
+Cloudflare Workers enables building and deploying applications at the edge with sub-millisecond cold starts. The platform leverages the Workers runtime alongside storage services like KV, D1, R2, Durable Objects, and Queues to build globally distributed, low-latency applications.
 
-### Workers Runtime
-- Service Worker syntax: `addEventListener("fetch", handler)` and ES Module syntax: `export default { fetch }`
-- Request/Response API: Web Standards-based, familiar to browser developers
-- Environment bindings: KV namespaces, D1 databases, R2 buckets, secrets, variables
-- Execution model: isolate-based (not containers), sub-millisecond cold starts
-- CPU time limits: 10ms free tier, 30s paid; wall-clock time up to 30s (free) or 15min (paid)
-- Cron Triggers: scheduled event handlers with `scheduled(event, env, ctx)`
+## Instructions
 
-### Wrangler CLI
-- Project scaffolding: `wrangler init`, `wrangler generate`
-- Local development: `wrangler dev` with hot reload, local KV/D1/R2 simulation
-- Deployment: `wrangler deploy` (previously `wrangler publish`)
-- Secret management: `wrangler secret put API_KEY`
-- Tail logs: `wrangler tail` for real-time production log streaming
-- Configuration: `wrangler.toml` for routes, bindings, compatibility dates, build settings
+- When asked to create a Worker, scaffold with `wrangler init` using ES Module syntax (`export default { fetch }`) and set `compatibility_date` in `wrangler.toml`.
+- When configuring storage, recommend KV for read-heavy key-value caching, D1 for relational data with SQL, R2 for S3-compatible object storage with zero egress fees, and Durable Objects for strongly consistent state coordination.
+- When setting up local development, use `wrangler dev` with hot reload and local KV/D1/R2 simulation.
+- When deploying, use `wrangler deploy` and configure routes, bindings, and build settings in `wrangler.toml`.
+- When managing secrets, use `wrangler secret put KEY_NAME` and type bindings with an `Env` interface.
+- When optimizing performance, leverage the Cache API (`caches.default`), Smart Placement, streaming responses with `TransformStream`, and HTMLRewriter for HTML transformation.
+- When handling background work, use `ctx.waitUntil()` for fire-and-forget async tasks like analytics or logging.
+- When building AI features, use Workers AI for edge inference, AI Gateway for multi-provider management, and Vectorize for RAG pipelines.
 
-### Storage Services
-- **KV (Key-Value)**: Eventually consistent, read-heavy workloads, 25MB value limit, global replication
-- **D1 (SQLite)**: Serverless SQL database, read replicas at edge, SQL queries, migrations
-- **R2 (Object Storage)**: S3-compatible API, zero egress fees, multipart uploads
-- **Durable Objects**: Strongly consistent, single-instance coordination, WebSocket handling, state co-location
-- **Queues**: Async message processing, batching, retry with backoff, dead letter queues
-- **Hyperdrive**: Connection pooling for external PostgreSQL/MySQL databases
-- **Vectorize**: Vector database for AI/ML embeddings, ANN search
+## Examples
 
-### Routing and Middleware
-- URL pattern matching with `URLPattern` API
-- Request routing: path-based, method-based, header-based
-- Middleware patterns: authentication, CORS, rate limiting, caching
-- Custom domains and route configuration
-- Workers for Platforms: multi-tenant worker dispatch
+### Example 1: Create an edge API with KV caching
 
-### Performance Patterns
-- Cache API: `caches.default` for response caching at the edge
-- `cf` object: access Cloudflare-specific request metadata (country, ASN, TLS version)
-- Smart Placement: automatic origin-proximity placement for latency-sensitive workers
-- Streaming responses: `TransformStream` for chunked processing
-- HTMLRewriter: streaming HTML transformation without full DOM parsing
+**User request:** "Set up a Cloudflare Worker that serves cached API responses from KV"
 
-### Security
-- Secrets management via `wrangler secret` and environment bindings
-- mTLS client certificates for origin authentication
-- Access integration: JWT validation with Cloudflare Access
-- Rate limiting with Workers and KV/Durable Objects counters
-- CORS headers and preflight handling
+**Actions:**
+1. Scaffold a new Worker project with `wrangler init`
+2. Configure KV namespace binding in `wrangler.toml`
+3. Implement fetch handler with KV read/write and cache-control headers
+4. Test locally with `wrangler dev`
 
-### AI and ML
-- Workers AI: run inference models at the edge (LLMs, embeddings, image generation)
-- AI Gateway: unified API for multiple AI providers with caching, rate limiting, logging
-- Vectorize integration for RAG pipelines
-- Streaming AI responses with Server-Sent Events
+**Output:** A Worker that checks KV for cached data, falls back to origin, and stores results in KV with TTL.
 
-## Code Standards
-- Always set `compatibility_date` in `wrangler.toml` to pin runtime behavior
-- Use ES Module syntax (`export default`) over Service Worker syntax
-- Type bindings with `Env` interface for all environment variables and services
-- Handle errors gracefully: return proper HTTP status codes, not unhandled exceptions
-- Use `ctx.waitUntil()` for fire-and-forget async work (analytics, logging) that shouldn't block response
-- Prefer D1 over KV for relational data; use KV for simple key-value caching
-- Set appropriate `Cache-Control` headers; leverage Cloudflare's edge cache
+### Example 2: Deploy a scheduled data sync Worker
+
+**User request:** "Build a Worker that runs on a schedule to sync data from an external API into D1"
+
+**Actions:**
+1. Configure Cron Trigger in `wrangler.toml`
+2. Create D1 database and migration with schema
+3. Implement `scheduled()` handler that fetches external data and inserts into D1
+4. Use `ctx.waitUntil()` for non-blocking cleanup tasks
+
+**Output:** A Worker with cron-triggered data synchronization and D1 storage.
+
+## Guidelines
+
+- Always set `compatibility_date` in `wrangler.toml` to pin runtime behavior.
+- Use ES Module syntax (`export default`) over Service Worker syntax.
+- Type all environment bindings with an `Env` interface for type safety.
+- Handle errors gracefully with proper HTTP status codes instead of unhandled exceptions.
+- Use `ctx.waitUntil()` for fire-and-forget async work that should not block the response.
+- Prefer D1 over KV for relational data; use KV for simple key-value caching.
+- Set appropriate `Cache-Control` headers and leverage Cloudflare's edge cache.

@@ -1,10 +1,16 @@
 ---
 name: markdown-new
-category: web-scraping
-version: 1.0.0
-description: Convert any public URL into clean, LLM-ready Markdown using the markdown.new service. Use for content extraction, RAG ingestion, article summarization, research, archiving, and token-efficient web reading.
-author: terminal-skills
-tags: [markdown, web-scraping, content-extraction, url-to-markdown, rag, research]
+description: >-
+  Convert any public URL into clean, LLM-ready Markdown using the markdown.new
+  service. Use for content extraction, RAG ingestion, article summarization,
+  research, archiving, and token-efficient web reading.
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: automation
+  tags: ["markdown", "web-scraping", "content-extraction", "url-to-markdown", "rag"]
 ---
 
 # markdown-new
