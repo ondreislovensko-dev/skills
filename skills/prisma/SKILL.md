@@ -1,14 +1,17 @@
 ---
 name: prisma
-category: development
-version: 1.0.0
 description: >-
   Build type-safe database layers with Prisma ORM — schema modeling, migrations,
   queries, relations, transactions, and seeding. Use when tasks involve database
   schema design, type-safe data access in TypeScript/JavaScript, migrating
   between databases, or setting up a data layer for a new project.
-author: terminal-skills
-tags: [prisma, orm, database, typescript, migrations, postgresql]
+license: Apache-2.0
+compatibility: "Requires Node.js 16+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["prisma", "orm", "database", "typescript", "migrations"]
 ---
 
 # Prisma ORM

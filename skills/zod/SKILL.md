@@ -1,63 +1,67 @@
-# Zod — TypeScript-First Schema Validation
+---
+name: zod
+description: >-
+  Assists with TypeScript-first schema validation using Zod. Use when defining data schemas,
+  validating API inputs, parsing environment variables, integrating with form libraries or tRPC,
+  or generating TypeScript types from runtime validators. Trigger words: zod, schema validation,
+  type inference, z.object, z.infer, input validation.
+license: Apache-2.0
+compatibility: "Requires TypeScript 4.5+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["zod", "validation", "typescript", "schema", "type-safety"]
+---
 
-> Author: terminal-skills
+# Zod
 
-You are an expert in Zod schema validation for TypeScript applications. You build type-safe validation layers that catch bad data at runtime while providing perfect TypeScript inference at compile time.
+## Overview
 
-## Core Competencies
+Zod provides TypeScript-first schema validation that catches bad data at runtime while providing perfect TypeScript inference at compile time. It is widely used for API input validation, form handling, environment variable parsing, and integration with frameworks like tRPC and React Hook Form.
 
-### Schema Definition
-- Primitive schemas: `z.string()`, `z.number()`, `z.boolean()`, `z.date()`, `z.bigint()`, `z.undefined()`, `z.null()`
-- Literal and enum schemas: `z.literal("active")`, `z.enum(["admin", "user", "guest"])`, `z.nativeEnum(Role)`
-- Object schemas with `.shape`, `.partial()`, `.required()`, `.pick()`, `.omit()`, `.extend()`, `.merge()`
-- Array schemas: `z.array(schema)`, `.min()`, `.max()`, `.length()`, `.nonempty()`
-- Tuple schemas: `z.tuple([z.string(), z.number()])` with `.rest()`
-- Union and intersection: `z.union([a, b])`, `z.discriminatedUnion("type", [...])`, `z.intersection(a, b)`
-- Record schemas: `z.record(z.string(), valueSchema)`
-- Map and Set: `z.map(keySchema, valueSchema)`, `z.set(valueSchema)`
+## Instructions
 
-### Refinements and Transforms
-- String refinements: `.email()`, `.url()`, `.uuid()`, `.cuid()`, `.regex()`, `.min()`, `.max()`, `.trim()`, `.toLowerCase()`
-- Number refinements: `.int()`, `.positive()`, `.negative()`, `.min()`, `.max()`, `.finite()`, `.safe()`
-- Custom refinements with `.refine()` and `.superRefine()` for cross-field validation
-- Transform pipelines: `.transform()` for parsing, coercion, and data reshaping
-- Default values: `.default()` for optional fields with fallbacks
-- Preprocessing with `z.preprocess()` for raw input normalization
-- Coercion helpers: `z.coerce.number()`, `z.coerce.date()`, `z.coerce.boolean()`
+- When defining schemas, use primitive types (`z.string()`, `z.number()`), object schemas with `.shape`, `.partial()`, `.pick()`, `.omit()`, and compose complex types with `z.union()`, `z.discriminatedUnion()`, and `z.intersection()`.
+- When adding refinements, apply built-in validators like `.email()`, `.url()`, `.min()`, `.max()` and use `.refine()` or `.superRefine()` for custom cross-field validation logic.
+- When transforming data, chain `.transform()` for parsing and reshaping, use `z.coerce.number()` for type coercion, and `.default()` for optional fields with fallbacks.
+- When extracting types, use `z.infer<typeof schema>` for output types and `z.input<typeof schema>` for pre-transform types, and export both the schema and its type together.
+- When handling errors, use `ZodError` with `.flatten()` for field-level error maps in API responses and `.format()` for nested error structures.
+- When integrating with forms, use `@hookform/resolvers/zod` for React Hook Form or equivalent adapters for other form libraries.
+- When validating environment variables, create a schema for `process.env` and validate at app startup to fail fast on missing config.
 
-### Type Inference
-- Extract TypeScript types: `z.infer<typeof schema>` for output types
-- Input types: `z.input<typeof schema>` for pre-transform types
-- Branded types: `z.string().brand<"UserId">()` for nominal typing
-- Recursive types with `z.lazy()` for self-referential schemas
+## Examples
 
-### Error Handling
-- Structured error objects: `ZodError` with `.issues`, `.flatten()`, `.format()`
-- Custom error messages: per-field `.message()` and path-aware error maps
-- Error formatting for API responses: `.flatten()` for field-level error maps
-- Integration with form libraries: field-path error mapping
+### Example 1: Validate API request bodies
 
-### Integration Patterns
-- **API validation**: Request body, query params, path params validation middleware
-- **Form validation**: React Hook Form with `@hookform/resolvers/zod`, Formik adapters
-- **Environment variables**: `z.object()` schemas for `process.env` validation at startup
-- **Database layer**: Validate data before insert, parse query results
-- **tRPC**: Input/output schemas for type-safe API procedures
-- **OpenAPI**: Generate OpenAPI specs from Zod schemas with `zod-to-openapi`
+**User request:** "Add Zod validation for my user creation endpoint"
 
-### Advanced Patterns
-- Discriminated unions for polymorphic data (events, API responses, config variants)
-- Schema composition: build complex schemas from reusable primitives
-- Conditional schemas with `.and()`, `.or()` for dynamic validation rules
-- Async refinements with `.refine(async (val) => ...)` for database lookups
-- Custom error maps with `z.setErrorMap()` for i18n error messages
-- Schema versioning: maintain backward compatibility in API contracts
+**Actions:**
+1. Define `CreateUserInput` schema with `z.object()` including email, name, and role fields
+2. Add string refinements (`.email()`, `.min()`) and enum validation for role
+3. Export inferred type: `type CreateUserInput = z.infer<typeof CreateUserInputSchema>`
+4. Parse request body with `.safeParse()` and return flattened errors on failure
 
-## Code Standards
-- Always export both the schema and its inferred type: `export const UserSchema = z.object({...}); export type User = z.infer<typeof UserSchema>;`
-- Use descriptive schema names: `CreateUserInput`, `UpdateOrderPayload`, `ApiResponse`
-- Prefer `z.discriminatedUnion()` over `z.union()` for tagged unions (better error messages and performance)
-- Use `.describe()` on schemas for documentation generation
-- Place shared schemas in a `schemas/` directory, co-locate route-specific schemas with their handlers
-- Validate environment variables at app startup, fail fast on missing config
-- Use `.strip()` or `.passthrough()` explicitly on object schemas to control unknown keys
+**Output:** A validated, type-safe user creation schema with descriptive error messages.
+
+### Example 2: Parse environment variables at startup
+
+**User request:** "Validate my app's environment variables with Zod"
+
+**Actions:**
+1. Define env schema with `z.object()` for all required variables
+2. Use `z.coerce.number()` for PORT and `.url()` for API endpoints
+3. Add `.default()` for optional variables with fallback values
+4. Parse `process.env` at app startup and fail fast with clear error messages
+
+**Output:** Type-safe environment config that crashes early with descriptive errors on missing variables.
+
+## Guidelines
+
+- Always export both the schema and its inferred type together.
+- Use descriptive schema names: `CreateUserInput`, `UpdateOrderPayload`, `ApiResponse`.
+- Prefer `z.discriminatedUnion()` over `z.union()` for tagged unions for better error messages and performance.
+- Use `.describe()` on schemas for documentation generation.
+- Place shared schemas in a `schemas/` directory; co-locate route-specific schemas with their handlers.
+- Validate environment variables at app startup and fail fast on missing config.
+- Use `.strip()` or `.passthrough()` explicitly on object schemas to control unknown key behavior.

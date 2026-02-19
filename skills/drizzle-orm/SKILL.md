@@ -1,14 +1,17 @@
 ---
 name: drizzle-orm
-category: development
-version: 1.0.0
 description: >-
   Build type-safe database layers with Drizzle ORM — schema definition in
   TypeScript, SQL-like query builder, migrations, relations, and prepared
   statements. Use when tasks need a lightweight, SQL-first ORM for TypeScript
   with zero code generation, edge runtime support, or migration from raw SQL.
-author: terminal-skills
-tags: [drizzle, orm, database, typescript, sql, migrations]
+license: Apache-2.0
+compatibility: "Requires Node.js 16+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["drizzle", "orm", "database", "typescript", "sql"]
 ---
 
 # Drizzle ORM

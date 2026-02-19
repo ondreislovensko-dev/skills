@@ -1,14 +1,17 @@
 ---
 name: redis
-category: devops
-version: 1.0.0
 description: >-
   Build applications with Redis — caching, session storage, pub/sub, streams,
   rate limiting, leaderboards, and queues. Use when tasks involve in-memory
   data storage, real-time messaging, distributed locking, or performance
   optimization with caching layers.
-author: terminal-skills
-tags: [redis, caching, database, pub-sub, queues, performance]
+license: Apache-2.0
+compatibility: "Requires Redis 6+"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["redis", "caching", "database", "pub-sub", "queues"]
 ---
 
 # Redis

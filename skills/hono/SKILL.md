@@ -1,70 +1,67 @@
-# Hono — Ultrafast Web Framework for the Edge
+---
+name: hono
+description: >-
+  Assists with building APIs and web applications using Hono, an ultrafast web framework
+  that runs on Cloudflare Workers, Deno, Bun, Vercel, AWS Lambda, and Node.js. Use when
+  creating edge-first APIs, configuring middleware, or setting up type-safe RPC clients.
+  Trigger words: hono, edge framework, web framework, hono routing, hono middleware.
+license: Apache-2.0
+compatibility: "Runs on Cloudflare Workers, Deno, Bun, Node.js, AWS Lambda, Vercel"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: development
+  tags: ["hono", "web-framework", "edge", "api", "typescript"]
+---
 
-> Author: terminal-skills
+# Hono
 
-You are an expert in Hono, a lightweight, ultrafast web framework that runs on Cloudflare Workers, Deno, Bun, Vercel, AWS Lambda, and Node.js. You build performant APIs and web applications using Hono's Web Standards-based API.
+## Overview
 
-## Core Competencies
+Hono is a lightweight, ultrafast web framework built on Web Standards that runs across multiple runtimes including Cloudflare Workers, Deno, Bun, and Node.js. It provides expressive routing, a rich middleware ecosystem, and type-safe RPC capabilities for building performant APIs and web applications.
 
-### Routing
-- Path routing: `app.get("/users/:id", handler)`, `app.post()`, `app.put()`, `app.delete()`
-- Wildcard routes: `app.get("/files/*", handler)` for catch-all patterns
-- Route grouping: `app.route("/api/v1", apiRouter)` for modular organization
-- RegExp routes: pattern matching for complex URL structures
-- Method chaining: `app.on(["GET", "POST"], "/path", handler)`
-- Base path: `new Hono({ basePath: "/api" })` for prefix all routes
+## Instructions
 
-### Middleware
-- Built-in middleware: `cors()`, `logger()`, `prettyJSON()`, `secureHeaders()`, `compress()`, `etag()`
-- Authentication: `basicAuth()`, `bearerAuth()`, `jwt()` middleware
-- Custom middleware: `app.use("*", async (c, next) => { ... await next() })`
-- Route-specific middleware: `app.use("/admin/*", authMiddleware)`
-- Third-party middleware: `@hono/zod-validator`, `@hono/swagger-ui`, `@hono/graphql-server`
+- When creating a new API, set up routing with `app.get()`, `app.post()`, etc., and organize routes into modular sub-routers using `app.route()`.
+- When adding middleware, use built-in options like `cors()`, `logger()`, `secureHeaders()` globally with `app.use("*", ...)` and scope auth middleware to protected paths.
+- When handling requests, use the Context API: `c.req.param()` for path params, `c.req.query()` for query strings, `c.req.json()` for body parsing, and `c.json()` for responses.
+- When validating input, integrate `@hono/zod-validator` with `zValidator("json", schema)` for request body, query, and param validation with type inference.
+- When building type-safe clients, use Hono's RPC mode with `hc<AppType>(baseUrl)` to generate a typed HTTP client from route definitions without code generation.
+- When deploying to Cloudflare Workers, type environment bindings with `new Hono<{ Bindings: Env }>()` and use `c.executionCtx.waitUntil()` for background tasks.
+- When rendering HTML, use Hono's built-in JSX runtime (`hono/jsx`) for lightweight server-side rendering without React.
+- When writing tests, call `app.request("/path")` directly to test routes as pure functions without an HTTP server.
 
-### Context API
-- Request: `c.req.param("id")`, `c.req.query("page")`, `c.req.header("Authorization")`
-- Body parsing: `c.req.json()`, `c.req.text()`, `c.req.formData()`, `c.req.parseBody()`
-- Response helpers: `c.json({ data })`, `c.text("ok")`, `c.html(content)`, `c.redirect("/new")`
-- Headers: `c.header("X-Custom", "value")`, `c.status(201)`
-- Variables: `c.set("user", user)`, `c.get("user")` for request-scoped data
-- Streaming: `c.streamText()`, `c.stream()` for SSE and chunked responses
+## Examples
 
-### Validation
-- Zod validator: `@hono/zod-validator` for input validation with type inference
-- `zValidator("json", schema)`, `zValidator("query", schema)`, `zValidator("param", schema)`
-- TypeBox and Valibot validators also available
-- Custom validators with `validator()` helper
+### Example 1: Build a REST API with validation
 
-### RPC Mode
-- Type-safe client: `hc<AppType>(baseUrl)` generates typed HTTP client from route definitions
-- End-to-end type safety without code generation (similar to tRPC)
-- Works across monorepo packages: share `AppType` between server and client
+**User request:** "Create a Hono API with user CRUD endpoints and Zod validation"
 
-### Runtime Adapters
-- **Cloudflare Workers**: Native, zero-config, access to KV/D1/R2 via `c.env`
-- **Deno / Deno Deploy**: `Deno.serve(app.fetch)`
-- **Bun**: `export default app` or `Bun.serve({ fetch: app.fetch })`
-- **Node.js**: `@hono/node-server` adapter
-- **AWS Lambda**: `@hono/aws-lambda` adapter
-- **Vercel**: Edge and serverless function adapters
-- **Fastly Compute**: `@hono/fastly` adapter
+**Actions:**
+1. Initialize Hono app with typed environment bindings
+2. Define Zod schemas for user creation and update payloads
+3. Create route handlers with `zValidator("json", schema)` middleware
+4. Group routes with `app.route("/api/users", userRouter)`
 
-### JSX and Templating
-- Built-in JSX: `c.html(<Layout><Page /></Layout>)` without React
-- `hono/jsx`: lightweight JSX runtime for server-side rendering
-- Streaming SSR: `c.html(renderToReadableStream(<App />))`
-- `html` tagged template literal for simple HTML responses
+**Output:** A type-safe REST API with validated inputs and proper HTTP status codes.
 
-### Testing
-- Direct handler testing: `app.request("/path")` returns a `Response`
-- No HTTP server needed: test routes as pure functions
-- Integration with Vitest, Jest, Deno test runner
+### Example 2: Deploy a multi-runtime API
 
-## Code Standards
-- Use `new Hono<{ Bindings: Env }>()` to type environment bindings on Cloudflare
-- Group related routes into separate files, merge with `app.route()`
-- Apply global middleware with `app.use("*", middleware)`, scope auth to protected paths
-- Use `@hono/zod-validator` for all user input — never trust raw request data
-- Return proper HTTP status codes: 201 for creation, 204 for deletion, 4xx for client errors
-- Use `c.executionCtx.waitUntil()` on Cloudflare for background tasks
-- Prefer Hono's RPC mode over manual fetch calls for internal service communication
+**User request:** "Set up a Hono API that works on both Cloudflare Workers and Node.js"
+
+**Actions:**
+1. Create shared Hono app with routes and middleware
+2. Configure Cloudflare Workers entry with `export default app`
+3. Add Node.js entry using `@hono/node-server` adapter
+4. Set up environment-specific binding types
+
+**Output:** A portable API deployable to multiple runtimes with shared route logic.
+
+## Guidelines
+
+- Use `new Hono<{ Bindings: Env }>()` to type environment bindings on Cloudflare.
+- Group related routes into separate files and merge with `app.route()`.
+- Apply global middleware with `app.use("*", middleware)` and scope auth to protected paths.
+- Use `@hono/zod-validator` for all user input; never trust raw request data.
+- Return proper HTTP status codes: 201 for creation, 204 for deletion, 4xx for client errors.
+- Prefer Hono's RPC mode over manual fetch calls for internal service communication.

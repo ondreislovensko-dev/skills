@@ -1,14 +1,17 @@
 ---
 name: airtable
-category: productivity
-version: 1.0.0
 description: >-
   Build integrations with the Airtable Web API — bases, tables, records, fields,
   views, webhooks, and OAuth. Use when tasks involve reading or writing Airtable
   data, syncing external sources with Airtable bases, building automations
   triggered by record changes, or migrating data to/from Airtable.
-author: terminal-skills
-tags: [airtable, api, productivity, databases, automation, no-code]
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: productivity
+  tags: ["airtable", "api", "productivity", "databases", "automation"]
 ---
 
 # Airtable API Integration

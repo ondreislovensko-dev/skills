@@ -1,14 +1,17 @@
 ---
 name: notion
-category: productivity
-version: 1.0.0
 description: >-
   Build integrations with the Notion API — databases, pages, blocks, comments,
   search, and OAuth. Use when tasks involve reading or writing Notion workspace
   data, syncing external tools with Notion databases, building dashboards from
   Notion content, or automating page creation and updates.
-author: terminal-skills
-tags: [notion, api, productivity, databases, workspace, automation]
+license: Apache-2.0
+compatibility: "No special requirements"
+metadata:
+  author: terminal-skills
+  version: "1.0.0"
+  category: productivity
+  tags: ["notion", "api", "productivity", "databases", "automation"]
 ---
 
 # Notion API Integration
@@ -27,47 +30,7 @@ export NOTION_TOKEN="ntn_..."
 
 ### Public Integration (OAuth)
 
-For multi-user apps, implement the OAuth flow:
-
-```python
-"""notion_oauth.py — OAuth 2.0 flow for public Notion integrations."""
-
-AUTHORIZE_URL = "https://api.notion.com/v1/oauth/authorize"
-TOKEN_URL = "https://api.notion.com/v1/oauth/token"
-
-def get_auth_url(client_id: str, redirect_uri: str) -> str:
-    """Build the OAuth authorization URL.
-
-    Args:
-        client_id: From your Notion integration settings.
-        redirect_uri: Where Notion redirects after authorization.
-    """
-    return (
-        f"{AUTHORIZE_URL}?client_id={client_id}"
-        f"&response_type=code&owner=user"
-        f"&redirect_uri={redirect_uri}"
-    )
-
-def exchange_code(code: str, client_id: str, client_secret: str) -> dict:
-    """Exchange authorization code for access token.
-
-    Args:
-        code: The code from Notion's redirect.
-        client_id: Integration client ID.
-        client_secret: Integration client secret.
-    """
-    import requests, base64
-    credentials = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
-    resp = requests.post(TOKEN_URL, json={
-        "grant_type": "authorization_code",
-        "code": code,
-        "redirect_uri": "https://yourapp.com/callback",
-    }, headers={
-        "Authorization": f"Basic {credentials}",
-        "Notion-Version": "2022-06-28",
-    })
-    return resp.json()  # Contains access_token, workspace_id, bot_id
-```
+For multi-user apps, implement the OAuth flow using the authorization URL `https://api.notion.com/v1/oauth/authorize` and exchange the code at `https://api.notion.com/v1/oauth/token` with Basic auth (base64-encoded `client_id:client_secret`).
 
 ## Core API Patterns
 
@@ -230,25 +193,6 @@ blocks = [
         "rich_text": [{"text": {"content": "console.log('hello')"}}],
         "language": "javascript",
     }},
-    # Callout
-    {"type": "callout", "callout": {
-        "rich_text": [{"text": {"content": "Important note"}}],
-        "icon": {"emoji": "⚠️"},
-    }},
-    # Table (2 columns, 1 row)
-    {"type": "table", "table": {
-        "table_width": 2, "has_column_header": True,
-        "children": [
-            {"type": "table_row", "table_row": {"cells": [
-                [{"text": {"content": "Metric"}}],
-                [{"text": {"content": "Value"}}],
-            ]}},
-            {"type": "table_row", "table_row": {"cells": [
-                [{"text": {"content": "Uptime"}}],
-                [{"text": {"content": "99.9%"}}],
-            ]}},
-        ],
-    }},
 ]
 ```
 
@@ -349,53 +293,6 @@ def sync_github_issues(database_id: str, issues: list[dict]):
             update_page(existing_numbers[issue["number"]], props)
         else:
             create_page(database_id, props)
-```
-
-### Export Notion Database to CSV
-
-```python
-import csv
-
-def export_to_csv(database_id: str, output_path: str):
-    """Export all rows from a Notion database to CSV.
-
-    Args:
-        database_id: Source database UUID.
-        output_path: Path for the output CSV file.
-    """
-    pages = query_database(database_id)
-    if not pages:
-        return
-
-    # Extract property names from first page
-    prop_names = list(pages[0]["properties"].keys())
-
-    with open(output_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=prop_names)
-        writer.writeheader()
-        for page in pages:
-            row = {}
-            for name in prop_names:
-                prop = page["properties"][name]
-                # Extract plain text value based on property type
-                ptype = prop["type"]
-                if ptype == "title":
-                    row[name] = "".join(t["plain_text"] for t in prop["title"])
-                elif ptype == "rich_text":
-                    row[name] = "".join(t["plain_text"] for t in prop["rich_text"])
-                elif ptype == "number":
-                    row[name] = prop["number"]
-                elif ptype == "select":
-                    row[name] = prop["select"]["name"] if prop["select"] else ""
-                elif ptype == "multi_select":
-                    row[name] = ", ".join(s["name"] for s in prop["multi_select"])
-                elif ptype == "date":
-                    row[name] = prop["date"]["start"] if prop["date"] else ""
-                elif ptype == "checkbox":
-                    row[name] = prop["checkbox"]
-                else:
-                    row[name] = str(prop.get(ptype, ""))
-            writer.writerow(row)
 ```
 
 ## Guidelines
