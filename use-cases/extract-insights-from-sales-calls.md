@@ -2,7 +2,7 @@
 title: "Extract Product Insights from Hundreds of Sales Call Recordings"
 slug: extract-insights-from-sales-calls
 description: "Transcribe sales calls, extract feature requests and objections, and produce a prioritized product roadmap backed by real customer data."
-skills: [voice-to-text, data-analysis, report-generator, content-writer]
+skills: [whisper, data-analysis, report-generator, content-writer]
 category: business
 tags: [sales-calls, product-management, voice-transcription, customer-insights, roadmap]
 ---

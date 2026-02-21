@@ -1,6 +1,34 @@
 {
   "skills": [
     {
+      "name": "3dsmax-rendering",
+      "slug": "3dsmax-rendering",
+      "description": "Configure and optimize rendering in 3ds Max — V-Ray and Corona render settings, render elements, light mix, batch rendering, network rendering, denoising, and post-production workflows. Use when tasks involve setting up production renders, optimizing render times, batch rendering multiple views, or configuring render farms for archviz and product visualization.",
+      "category": "design",
+      "tags": [
+        "3dsmax",
+        "vray",
+        "corona",
+        "rendering",
+        "archviz",
+        "optimization"
+      ]
+    },
+    {
+      "name": "3dsmax-scripting",
+      "slug": "3dsmax-scripting",
+      "description": "Automate 3ds Max with MAXScript and Python — scene manipulation, object creation, material assignment, camera setup, batch operations, UI tools, and file I/O. Use when tasks involve automating repetitive 3ds Max workflows, batch processing scenes, creating custom tools, or scripting scene setup for archviz, product visualization, or VFX.",
+      "category": "design",
+      "tags": [
+        "3dsmax",
+        "maxscript",
+        "python",
+        "automation",
+        "scripting",
+        "3d"
+      ]
+    },
+    {
       "name": "3proxy",
       "slug": "3proxy",
       "description": "Deploy and configure 3proxy — a lightweight universal proxy server. Use when a user asks to set up HTTP, HTTPS, SOCKS4, SOCKS5, or transparent proxies, build proxy chains, configure authentication, set bandwidth limits, manage access control lists, set up proxy rotation, create multi-port proxy servers, configure logging and traffic accounting, or deploy a lightweight proxy without heavy VPN overhead. Covers all 3proxy features including proxy chaining, ACLs, traffic shaping, and multi-protocol support.",
@@ -57,6 +85,19 @@
         "pitch-deck",
         "keynote",
         "storytelling"
+      ]
+    },
+    {
+      "name": "airtable",
+      "slug": "airtable",
+      "description": "Build integrations with the Airtable Web API — bases, tables, records, fields, views, webhooks, and OAuth. Use when tasks involve reading or writing Airtable data, syncing external sources with Airtable bases, building automations triggered by record changes, or migrating data to/from Airtable.",
+      "category": "productivity",
+      "tags": [
+        "airtable",
+        "api",
+        "productivity",
+        "databases",
+        "automation"
       ]
     },
     {
@@ -143,6 +184,19 @@
       ]
     },
     {
+      "name": "astro",
+      "slug": "astro",
+      "description": "Assists with building content-driven websites using Astro's island architecture. Use when creating static sites, blogs, documentation, or marketing pages that ship zero JavaScript by default. Trigger words: astro, static site, island architecture, content collections, SSG, hybrid rendering, astro components.",
+      "category": "development",
+      "tags": [
+        "astro",
+        "static-site",
+        "island-architecture",
+        "ssg",
+        "content"
+      ]
+    },
+    {
       "name": "audiowaveform",
       "slug": "audiowaveform",
       "description": "Generate waveform visualizations from audio files. Use when a user asks to create waveform images, build audio player visualizations, generate waveform data for web players, create podcast episode previews, build audio thumbnails, render waveform PNGs for social media, extract peak data as JSON, or integrate waveform generation into audio processing pipelines. Covers audiowaveform CLI, JSON/binary data output, and web player integration.",
@@ -160,6 +214,19 @@
         "oauth",
         "rbac",
         "security"
+      ]
+    },
+    {
+      "name": "authjs",
+      "slug": "authjs",
+      "description": "Assists with adding authentication to web applications using Auth.js (formerly NextAuth.js). Use when configuring OAuth providers, database sessions, JWT strategies, role-based access, or multi-tenant auth in Next.js, SvelteKit, Express, or other frameworks. Trigger words: authjs, nextauth, oauth, authentication, login, session, providers.",
+      "category": "development",
+      "tags": [
+        "authjs",
+        "nextauth",
+        "oauth",
+        "authentication",
+        "session"
       ]
     },
     {
@@ -185,6 +252,19 @@
         "invoicing",
         "payments",
         "automation"
+      ]
+    },
+    {
+      "name": "biome",
+      "slug": "biome",
+      "description": "Assists with formatting and linting JavaScript, TypeScript, JSX, JSON, and CSS using Biome. Use when replacing ESLint and Prettier with a single fast tool, configuring lint rules, setting up CI checks, or migrating from existing linter configurations. Trigger words: biome, linter, formatter, code quality, lint, eslint replacement.",
+      "category": "development",
+      "tags": [
+        "biome",
+        "linter",
+        "formatter",
+        "code-quality",
+        "typescript"
       ]
     },
     {
@@ -338,6 +418,19 @@
       ]
     },
     {
+      "name": "bun",
+      "slug": "bun",
+      "description": "Assists with using Bun as an all-in-one JavaScript/TypeScript runtime, package manager, bundler, and test runner. Use when building HTTP servers, managing packages, running tests, or migrating from Node.js. Trigger words: bun, bun serve, bun install, bun test, bun build, javascript runtime, bun runtime.",
+      "category": "development",
+      "tags": [
+        "bun",
+        "javascript-runtime",
+        "package-manager",
+        "bundler",
+        "typescript"
+      ]
+    },
+    {
       "name": "cache-strategy",
       "slug": "cache-strategy",
       "description": "Design and implement caching layers for APIs and web applications using Redis or Memcached. Use when you need to reduce database load, improve response times, or handle traffic spikes. Covers cache-aside, write-through, and write-behind patterns, TTL strategies, cache invalidation, and stampede prevention. Trigger words: cache, Redis, Memcached, TTL, cache invalidation, response time, throughput, rate limiting.",
@@ -347,6 +440,19 @@
         "redis",
         "performance",
         "api-optimization"
+      ]
+    },
+    {
+      "name": "caddy",
+      "slug": "caddy",
+      "description": "Configure Caddy as a web server and reverse proxy — automatic HTTPS, reverse proxy, load balancing, file server, redirects, headers, rate limiting, and API configuration. Use when tasks involve serving websites, proxying to backend services, automatic TLS certificate management, or replacing Nginx with a simpler configuration.",
+      "category": "devops",
+      "tags": [
+        "caddy",
+        "web-server",
+        "reverse-proxy",
+        "https",
+        "tls"
       ]
     },
     {
@@ -382,6 +488,19 @@
       ]
     },
     {
+      "name": "changesets",
+      "slug": "changesets",
+      "description": "Assists with managing versioning and changelogs in JavaScript/TypeScript monorepos using Changesets. Use when automating semantic versioning, generating changelogs from PRs, coordinating multi-package releases, or publishing to npm. Trigger words: changesets, versioning, changelog, npm publish, monorepo release, semver.",
+      "category": "development",
+      "tags": [
+        "changesets",
+        "versioning",
+        "changelog",
+        "monorepo",
+        "npm"
+      ]
+    },
+    {
       "name": "chat-with-pdf",
       "slug": "chat-with-pdf",
       "description": "Answer questions about PDF content, summarize documents, and extract key information from any PDF file. Use when a user asks to chat with a PDF, ask questions about a document, find specific information in a PDF, get a summary of a PDF, or understand what a PDF document says. Works with reports, papers, manuals, and any text-based PDF.",
@@ -395,6 +514,19 @@
       ]
     },
     {
+      "name": "chromadb",
+      "slug": "chromadb",
+      "description": "Assists with storing, searching, and managing vector embeddings using ChromaDB. Use when building RAG pipelines, semantic search engines, or recommendation systems. Trigger words: chromadb, chroma, vector database, embeddings, semantic search, similarity search, vector store, rag.",
+      "category": "data-ai",
+      "tags": [
+        "chromadb",
+        "vector-database",
+        "embeddings",
+        "rag",
+        "semantic-search"
+      ]
+    },
+    {
       "name": "cicd-pipeline",
       "slug": "cicd-pipeline",
       "description": "Generate and optimize CI/CD pipelines for automated testing, building, and deployment. Use when a user asks to create a GitHub Actions workflow, set up GitLab CI, build a CI pipeline, automate deployments, add test automation, configure continuous integration, set up continuous deployment, create a release workflow, or optimize build times. Supports GitHub Actions, GitLab CI, and CircleCI.",
@@ -405,6 +537,19 @@
         "gitlab-ci",
         "pipeline",
         "deployment"
+      ]
+    },
+    {
+      "name": "clerk-auth",
+      "slug": "clerk-auth",
+      "description": "Add authentication to web apps with Clerk — social login, email/password, magic links, organizations, RBAC, session management, webhooks, and multi-framework support. Use when tasks involve user authentication, team/org management, role-based access control, or integrating auth into Next.js, React, Remix, or Express applications.",
+      "category": "development",
+      "tags": [
+        "clerk",
+        "authentication",
+        "nextjs",
+        "react",
+        "rbac"
       ]
     },
     {
@@ -424,6 +569,19 @@
         "cost-optimization",
         "aws",
         "infrastructure-audit"
+      ]
+    },
+    {
+      "name": "cloudflare-workers",
+      "slug": "cloudflare-workers",
+      "description": "Assists with building and deploying applications on Cloudflare Workers edge computing platform. Use when working with Workers runtime, Wrangler CLI, KV, D1, R2, Durable Objects, Queues, or Hyperdrive. Trigger words: cloudflare, workers, edge functions, wrangler, KV, D1, R2, durable objects, edge computing.",
+      "category": "development",
+      "tags": [
+        "cloudflare",
+        "edge-computing",
+        "serverless",
+        "workers",
+        "wrangler"
       ]
     },
     {
@@ -538,6 +696,19 @@
       ]
     },
     {
+      "name": "convex",
+      "slug": "convex",
+      "description": "Assists with building real-time reactive backends using Convex. Use when creating databases with automatic client sync, reactive queries, file storage, scheduled functions, or full-text and vector search. Trigger words: convex, reactive backend, real-time database, useQuery, useMutation, convex functions, convex schema.",
+      "category": "data-ai",
+      "tags": [
+        "convex",
+        "real-time",
+        "reactive",
+        "backend",
+        "database"
+      ]
+    },
+    {
       "name": "coolify",
       "slug": "coolify",
       "description": "Deploy and manage applications, databases, and services on Coolify. Use when a user asks to deploy an app to Coolify, manage Coolify deployments, check deployment logs, sync environment variables, create or manage databases on Coolify, trigger a deployment, manage Coolify servers, or troubleshoot Coolify issues. Covers the Coolify CLI and REST API. For infrastructure provisioning on Hetzner, see hetzner-cloud.",
@@ -588,6 +759,32 @@
         "pdf",
         "career",
         "rendercv"
+      ]
+    },
+    {
+      "name": "cypress",
+      "slug": "cypress",
+      "description": "Assists with end-to-end testing of web applications using Cypress. Use when writing E2E tests, setting up component testing, configuring CI pipelines with parallelization, or building custom test commands. Trigger words: cypress, e2e testing, end-to-end, cypress run, cy.get, integration testing, browser testing.",
+      "category": "development",
+      "tags": [
+        "cypress",
+        "e2e-testing",
+        "testing",
+        "browser-testing",
+        "automation"
+      ]
+    },
+    {
+      "name": "d3",
+      "slug": "d3",
+      "description": "Assists with building custom interactive data visualizations using D3.js. Use when creating charts, graphs, maps, force layouts, or hierarchical diagrams that require fine-grained control beyond what charting libraries provide. Trigger words: d3, data visualization, chart, svg, scales, force graph, treemap, choropleth.",
+      "category": "design",
+      "tags": [
+        "d3",
+        "data-visualization",
+        "charts",
+        "svg",
+        "interactive"
       ]
     },
     {
@@ -674,16 +871,16 @@
       ]
     },
     {
-      "name": "db-explain-analyzer",
-      "slug": "db-explain-analyzer",
-      "description": "Analyze database query execution plans (EXPLAIN/EXPLAIN ANALYZE) and provide actionable optimization recommendations. Use when a user asks to debug slow queries, understand query plans, find missing indexes, analyze table scans, or diagnose database performance issues. Supports PostgreSQL, MySQL, and SQLite.",
+      "name": "deno",
+      "slug": "deno",
+      "description": "Assists with building secure JavaScript and TypeScript applications using the Deno runtime. Use when creating servers, CLI tools, or scripts with Deno's built-in tooling, permission model, and web standards APIs. Trigger words: deno, deno deploy, deno serve, deno kv, deno permissions, secure runtime, jsr.",
       "category": "development",
       "tags": [
-        "database",
-        "performance",
-        "explain",
-        "query-plan",
-        "indexing"
+        "deno",
+        "typescript",
+        "runtime",
+        "secure",
+        "web-standards"
       ]
     },
     {
@@ -738,6 +935,19 @@
       ]
     },
     {
+      "name": "docker-compose",
+      "slug": "docker-compose",
+      "description": "Assists with defining and running multi-container applications using Docker Compose. Use when configuring services, networking, volumes, health checks, development environments with hot-reload, or production-ready compose files with resource limits. Trigger words: docker compose, docker-compose, multi-container, services, compose file, depends_on.",
+      "category": "devops",
+      "tags": [
+        "docker-compose",
+        "docker",
+        "containers",
+        "orchestration",
+        "devops"
+      ]
+    },
+    {
       "name": "docker-helper",
       "slug": "docker-helper",
       "description": "Build, debug, and optimize Docker configurations. Use when a user asks to create a Dockerfile, fix Docker build errors, optimize image size, write docker-compose files, debug container issues, set up multi-stage builds, or troubleshoot networking between containers. Covers Dockerfile best practices and compose orchestration.",
@@ -751,17 +961,6 @@
       ]
     },
     {
-      "name": "docker-optimizer",
-      "slug": "docker-optimizer",
-      "description": "Analyzes and optimizes Docker images for production. Use when you need to reduce image sizes, implement multi-stage builds, select minimal base images, optimize layer caching, create .dockerignore files, or audit Dockerfiles for bloat. Trigger words: Docker image size, optimize Dockerfile, multi-stage build, slim image, distroless, Alpine, reduce container size, layer caching, Docker bloat.",
-      "category": "devops",
-      "tags": [
-        "docker",
-        "optimization",
-        "containers"
-      ]
-    },
-    {
       "name": "doppler",
       "slug": "doppler",
       "description": "Manage secrets and environment variables using the Doppler CLI. Use when the user wants to set up Doppler, inject secrets into processes, manage projects and configs, upload or download secrets, create service tokens, use secret templates, or integrate Doppler with Docker, Kubernetes, or CI/CD pipelines. Trigger words: doppler, secrets manager, env vars, secret injection, doppler run, doppler setup, service token, secret rotation.",
@@ -772,6 +971,32 @@
         "environment-variables",
         "devops",
         "security"
+      ]
+    },
+    {
+      "name": "drizzle-orm",
+      "slug": "drizzle-orm",
+      "description": "Build type-safe database layers with Drizzle ORM — schema definition in TypeScript, SQL-like query builder, migrations, relations, and prepared statements. Use when tasks need a lightweight, SQL-first ORM for TypeScript with zero code generation, edge runtime support, or migration from raw SQL.",
+      "category": "development",
+      "tags": [
+        "drizzle",
+        "orm",
+        "database",
+        "typescript",
+        "sql"
+      ]
+    },
+    {
+      "name": "electron",
+      "slug": "electron",
+      "description": "Assists with building cross-platform desktop applications using Electron. Use when architecting main/renderer process communication, configuring secure contexts, implementing auto-updates, or packaging apps for Windows, macOS, and Linux. Trigger words: electron, desktop app, browserwindow, ipc, auto-update, electron-builder.",
+      "category": "development",
+      "tags": [
+        "electron",
+        "desktop",
+        "cross-platform",
+        "ipc",
+        "packaging"
       ]
     },
     {
@@ -860,6 +1085,19 @@
       ]
     },
     {
+      "name": "expo",
+      "slug": "expo",
+      "description": "Assists with building, deploying, and updating React Native applications using Expo. Use when setting up file-based routing with Expo Router, configuring EAS Build and Submit, implementing over-the-air updates, or integrating Expo SDK modules for camera, location, and notifications. Trigger words: expo, expo router, eas build, eas update, expo sdk.",
+      "category": "development",
+      "tags": [
+        "expo",
+        "react-native",
+        "mobile",
+        "eas",
+        "cross-platform"
+      ]
+    },
+    {
       "name": "facebook-marketing",
       "slug": "facebook-marketing",
       "description": "Create, optimize, and automate Facebook content for Pages, Groups, and Ads. Use when someone asks to \"grow Facebook page\", \"create Facebook ads\", \"manage Facebook group\", \"Facebook API integration\", \"automate Facebook posting\", \"Facebook analytics\", or \"Facebook marketing strategy\". Covers Pages, Groups, Graph API publishing, Ads Manager API, Messenger bots, and growth strategies.",
@@ -930,11 +1168,37 @@
       ]
     },
     {
+      "name": "fly-io",
+      "slug": "fly-io",
+      "description": "Assists with deploying applications globally on Fly.io edge infrastructure. Use when deploying Docker-based apps, configuring multi-region machines, setting up persistent storage, or managing global databases. Trigger words: fly.io, fly deploy, fly machines, fly launch, multi-region, edge deployment, flyctl.",
+      "category": "devops",
+      "tags": [
+        "fly-io",
+        "deployment",
+        "edge",
+        "multi-region",
+        "infrastructure"
+      ]
+    },
+    {
       "name": "form-cro",
       "slug": "form-cro",
       "description": "When the user wants to optimize any form that is NOT signup/registration — including lead capture forms, contact forms, demo request forms, application forms, survey forms, or checkout forms. Also use when the user mentions \"form optimization,\" \"lead form conversions,\" \"form friction,\" \"form fields,\" \"form completion rate,\" or \"contact form.\" For signup/registration forms, see signup-flow-cro. For popups containing forms, see popup-cro.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "framer-motion",
+      "slug": "framer-motion",
+      "description": "Assists with building fluid animations and gestures in React applications using Framer Motion. Use when creating enter/exit animations, layout transitions, scroll-triggered effects, drag interactions, or orchestrated animation sequences. Trigger words: framer motion, motion, animate, spring, layout animation, animatepresence, scroll animation.",
+      "category": "design",
+      "tags": [
+        "framer-motion",
+        "animation",
+        "react",
+        "gestures",
+        "transitions"
+      ]
     },
     {
       "name": "free-tool-strategy",
@@ -994,6 +1258,20 @@
       ]
     },
     {
+      "name": "github-actions",
+      "slug": "github-actions",
+      "description": "Build CI/CD pipelines with GitHub Actions — workflows, jobs, steps, triggers, caching, artifacts, matrix builds, secrets, environments, reusable workflows, and custom actions. Use when tasks involve automating tests, builds, deployments, code quality checks, or any GitHub-triggered automation.",
+      "category": "devops",
+      "tags": [
+        "github-actions",
+        "cicd",
+        "automation",
+        "testing",
+        "deployment",
+        "github"
+      ]
+    },
+    {
       "name": "google-indexing",
       "slug": "google-indexing",
       "description": "Submit URLs to Google for indexing using the Google Indexing API and bulk-submit from sitemaps. Use when a user asks to index pages on Google, submit URLs to Google Search Console, speed up Google indexing, request crawling, bulk index pages, submit a sitemap's URLs for indexing, or check indexing status. Also use when the user mentions \"Google Indexing API\", \"request indexing\", \"submit to Google\", or \"pages not indexed\".",
@@ -1021,6 +1299,19 @@
       "tags": []
     },
     {
+      "name": "hashicorp-vault",
+      "slug": "hashicorp-vault",
+      "description": "Assists with managing secrets, encryption keys, and dynamic credentials using HashiCorp Vault. Use when configuring secret engines, setting up dynamic database credentials, implementing access policies, integrating with Kubernetes, or using Transit for encryption as a service. Trigger words: vault, secrets management, dynamic secrets, transit engine, pki, approle, vault agent.",
+      "category": "devops",
+      "tags": [
+        "hashicorp-vault",
+        "secrets",
+        "security",
+        "encryption",
+        "dynamic-credentials"
+      ]
+    },
+    {
       "name": "hetzner-cloud",
       "slug": "hetzner-cloud",
       "description": "Manage Hetzner Cloud infrastructure from the terminal. Use when a user asks to create a Hetzner server, manage VPS instances, set up firewalls, configure networks, manage volumes, create snapshots, handle SSH keys, or provision infrastructure on Hetzner. Covers the hcloud CLI for all resource types. For deploying applications on top of Hetzner servers, see coolify.",
@@ -1034,11 +1325,50 @@
       ]
     },
     {
+      "name": "hono",
+      "slug": "hono",
+      "description": "Assists with building APIs and web applications using Hono, an ultrafast web framework that runs on Cloudflare Workers, Deno, Bun, Vercel, AWS Lambda, and Node.js. Use when creating edge-first APIs, configuring middleware, or setting up type-safe RPC clients. Trigger words: hono, edge framework, web framework, hono routing, hono middleware.",
+      "category": "development",
+      "tags": [
+        "hono",
+        "web-framework",
+        "edge",
+        "api",
+        "typescript"
+      ]
+    },
+    {
+      "name": "infra-rate-limiting",
+      "slug": "infra-rate-limiting",
+      "description": "Assists with configuring infrastructure-level rate limiting at the reverse proxy, API gateway, CDN, and WAF layers. Use when setting up Nginx rate limiting, Cloudflare rate rules, AWS API Gateway throttling, Kong rate limiting plugins, or CDN-level DDoS protection. Trigger words: nginx rate limit, api gateway throttling, cloudflare rate limiting, waf, cdn rate limit, infrastructure throttling.",
+      "category": "devops",
+      "tags": [
+        "rate-limiting",
+        "nginx",
+        "api-gateway",
+        "cdn",
+        "waf"
+      ]
+    },
+    {
       "name": "instagram-marketing",
       "slug": "instagram-marketing",
       "description": "Create, optimize, and automate Instagram content including Reels, Stories, carousels, and feed posts. Use when someone asks to \"grow on Instagram\", \"create Instagram Reels\", \"Instagram content strategy\", \"Instagram API integration\", \"automate Instagram posting\", \"Instagram analytics\", or \"Instagram marketing\". Covers Reels-first strategy, visual content guidelines, Instagram Graph API, and growth tactics.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "instructor",
+      "slug": "instructor",
+      "description": "Assists with extracting structured, validated data from LLM responses using Instructor. Use when converting unstructured text into typed objects, classifying content, extracting entities, or building reliable data extraction pipelines with automatic retries. Trigger words: instructor, structured output, pydantic, llm extraction, entity extraction, structured data, response model.",
+      "category": "data-ai",
+      "tags": [
+        "instructor",
+        "structured-output",
+        "llm",
+        "extraction",
+        "validation"
+      ]
     },
     {
       "name": "invoice-generator",
@@ -1098,6 +1428,19 @@
       ]
     },
     {
+      "name": "jupyter",
+      "slug": "jupyter",
+      "description": "Assists with interactive data analysis, visualization, and reproducible research using Jupyter notebooks. Use when building notebooks that combine code with rich output, managing kernels, converting to reports, or parameterizing notebooks for batch execution. Trigger words: jupyter, notebook, jupyterlab, ipynb, nbconvert, papermill.",
+      "category": "data-ai",
+      "tags": [
+        "jupyter",
+        "notebook",
+        "data-analysis",
+        "visualization",
+        "research"
+      ]
+    },
+    {
       "name": "jwt-handler",
       "slug": "jwt-handler",
       "description": "When the user needs to generate, validate, refresh, or debug JSON Web Tokens. Use when the user mentions \"JWT,\" \"access token,\" \"refresh token,\" \"token rotation,\" \"token expiration,\" \"token validation,\" \"bearer token,\" or \"decode JWT.\" Handles secure token lifecycle including signing, verification, refresh rotation, and revocation. For full auth system design, see auth-system-setup.",
@@ -1119,6 +1462,19 @@
         "cost-optimization",
         "resource-management",
         "finops"
+      ]
+    },
+    {
+      "name": "kafka",
+      "slug": "kafka",
+      "description": "Build event-driven systems with Apache Kafka — producers, consumers, consumer groups, topics, partitions, schemas, and exactly-once semantics. Use when tasks involve real-time event streaming, microservice communication, log aggregation, change data capture, or building event sourcing pipelines.",
+      "category": "devops",
+      "tags": [
+        "kafka",
+        "streaming",
+        "event-driven",
+        "messaging",
+        "microservices"
       ]
     },
     {
@@ -1182,6 +1538,19 @@
       ]
     },
     {
+      "name": "lemon-squeezy",
+      "slug": "lemon-squeezy",
+      "description": "Assists with selling digital products, SaaS subscriptions, and software licenses using Lemon Squeezy as a Merchant of Record. Use when setting up checkout flows, webhook handling, license key validation, or subscription management with automatic global tax compliance. Trigger words: lemon squeezy, merchant of record, digital sales, license keys, subscriptions.",
+      "category": "business",
+      "tags": [
+        "lemon-squeezy",
+        "payments",
+        "subscriptions",
+        "merchant-of-record",
+        "licensing"
+      ]
+    },
+    {
       "name": "linear",
       "slug": "linear",
       "description": "Manage projects and issues with Linear. Use when a user asks to set up Linear workspaces, create issues and projects, automate workflows, build Linear integrations, sync issues with GitHub, manage sprints and cycles, set up triage processes, build custom views, use Linear's GraphQL API, create webhooks, automate issue transitions, or build tools on top of Linear. Covers workspace configuration, team workflows, API automation, and integration patterns.",
@@ -1194,6 +1563,19 @@
       "description": "Create, optimize, and automate LinkedIn content for personal branding, lead generation, and B2B marketing. Use when someone asks to \"write a LinkedIn post\", \"grow on LinkedIn\", \"LinkedIn content strategy\", \"LinkedIn API integration\", \"automate LinkedIn posting\", \"LinkedIn carousel\", \"LinkedIn analytics\", or \"LinkedIn outreach\". Covers content creation with platform-specific formatting, API integration, analytics, and growth strategies.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "llamaindex",
+      "slug": "llamaindex",
+      "description": "Assists with building RAG pipelines, knowledge assistants, and data-augmented LLM applications using LlamaIndex. Use when ingesting documents, configuring retrieval strategies, building query engines, or creating multi-step agents. Trigger words: llamaindex, rag, retrieval augmented generation, vector index, query engine, document loader, knowledge base.",
+      "category": "data-ai",
+      "tags": [
+        "llamaindex",
+        "rag",
+        "llm",
+        "retrieval",
+        "knowledge-base"
+      ]
     },
     {
       "name": "lm-studio-subagents",
@@ -1228,11 +1610,37 @@
       ]
     },
     {
+      "name": "lucia-auth",
+      "slug": "lucia-auth",
+      "description": "Assists with building custom session-based authentication systems using Lucia. Use when implementing password auth, OAuth flows, two-factor authentication, or session management with full control over the auth logic in Next.js, SvelteKit, Express, or other Node.js frameworks. Trigger words: lucia, session auth, custom auth, password hashing, 2fa, totp.",
+      "category": "development",
+      "tags": [
+        "lucia",
+        "authentication",
+        "session",
+        "oauth",
+        "two-factor"
+      ]
+    },
+    {
       "name": "maps-geolocation",
       "slug": "maps-geolocation",
       "description": "Build location-based features with mapping APIs. Use when a user asks to integrate Google Maps, Mapbox, or Leaflet, implement geocoding and reverse geocoding, calculate routes and distances, build store locators, add interactive maps to web apps, implement geofencing, work with GeoJSON, build delivery tracking systems, optimize routes for fleets, display heatmaps, implement address autocomplete, or build any location-aware application. Covers Google Maps Platform, Mapbox, Leaflet, and OpenStreetMap/Nominatim.",
       "category": "development",
       "tags": []
+    },
+    {
+      "name": "markdown-new",
+      "slug": "markdown-new",
+      "description": "Convert any public URL into clean, LLM-ready Markdown using the markdown.new service. Use for content extraction, RAG ingestion, article summarization, research, archiving, and token-efficient web reading.",
+      "category": "automation",
+      "tags": [
+        "markdown",
+        "web-scraping",
+        "content-extraction",
+        "url-to-markdown",
+        "rag"
+      ]
     },
     {
       "name": "markdown-writer",
@@ -1328,6 +1736,19 @@
       ]
     },
     {
+      "name": "mongodb",
+      "slug": "mongodb",
+      "description": "Assists with designing document schemas, building aggregation pipelines, managing indexes, and operating MongoDB clusters. Use when working with flexible schemas, nested documents, horizontal scaling, Atlas Search, or vector search for AI applications. Trigger words: mongodb, mongo, document database, aggregation, atlas, nosql.",
+      "category": "data-ai",
+      "tags": [
+        "mongodb",
+        "nosql",
+        "document-database",
+        "aggregation",
+        "atlas"
+      ]
+    },
+    {
       "name": "monorepo-manager",
       "slug": "monorepo-manager",
       "description": "Manage dependencies, workspace configurations, and cross-package relationships in monorepos using npm workspaces, pnpm, Yarn, Turborepo, or Nx. Use when syncing dependency versions across packages, resolving version conflicts, analyzing the dependency graph, or setting up build orchestration. Trigger words: monorepo, workspace, dependency sync, version conflict, turborepo, nx, pnpm workspace, cross-package, internal dependency.",
@@ -1352,6 +1773,19 @@
       "description": "Build and manage Microsoft Access databases, queries, forms, reports, and VBA automation. Use when someone asks to \"create Access database\", \"write Access queries\", \"build Access forms\", \"Access VBA macro\", \"migrate from Access\", \"Access report\", \"link Access to SQL Server\", or \"convert Access to web app\". Covers table design, relationships, SQL queries, forms, reports, VBA automation, and migration strategies to modern platforms.",
       "category": "development",
       "tags": []
+    },
+    {
+      "name": "msw",
+      "slug": "msw",
+      "description": "Assists with intercepting network requests for API mocking using Mock Service Worker (MSW). Use when mocking REST or GraphQL APIs for unit tests, integration tests, or local development without modifying application code or running mock servers. Trigger words: msw, mock service worker, api mocking, test mocking, request handlers, setupServer.",
+      "category": "development",
+      "tags": [
+        "msw",
+        "testing",
+        "api-mocking",
+        "rest",
+        "graphql"
+      ]
     },
     {
       "name": "n8n-self-host",
@@ -1380,6 +1814,13 @@
       ]
     },
     {
+      "name": "n8n-workflow-sdk",
+      "slug": "n8n-workflow-sdk",
+      "description": "Build n8n workflows programmatically with the official TypeScript SDK. Use when a user asks to create n8n workflows from code, generate workflow JSON, build automation pipelines programmatically, convert between n8n JSON and TypeScript, or integrate n8n workflow creation into applications.",
+      "category": "automation",
+      "tags": []
+    },
+    {
       "name": "nda-generator",
       "slug": "nda-generator",
       "description": "Generate professional Non-Disclosure Agreements for meetings, partnerships, and employment. Use when a user asks to create an NDA, draft a confidentiality agreement, generate a non-disclosure document, make an NDA for a meeting, or prepare a mutual NDA for a partnership. Supports unilateral and mutual NDAs.",
@@ -1393,6 +1834,58 @@
       ]
     },
     {
+      "name": "neon",
+      "slug": "neon",
+      "description": "Assists with building applications using Neon serverless PostgreSQL. Use when setting up serverless databases, creating branches for development workflows, integrating with edge runtimes, or configuring Prisma/Drizzle with Neon. Trigger words: neon, serverless postgres, database branching, neon serverless driver, pgvector, neon database.",
+      "category": "data-ai",
+      "tags": [
+        "neon",
+        "postgresql",
+        "serverless",
+        "database",
+        "branching"
+      ]
+    },
+    {
+      "name": "next-intl",
+      "slug": "next-intl",
+      "description": "Assists with adding internationalization to Next.js applications using next-intl. Use when configuring locale routing, managing translation messages, handling pluralization and date/number formatting, or building localized apps with App Router and Server Components. Trigger words: next-intl, i18n, internationalization, translations, locale, pluralization.",
+      "category": "development",
+      "tags": [
+        "next-intl",
+        "i18n",
+        "internationalization",
+        "nextjs",
+        "localization"
+      ]
+    },
+    {
+      "name": "nextjs",
+      "slug": "nextjs",
+      "description": "Assists with building production-grade React applications using Next.js. Use when working with the App Router, Server Components, Server Actions, Middleware, or deploying to Vercel or self-hosted environments. Trigger words: nextjs, next.js, app router, server components, server actions, react framework, ssr, isr.",
+      "category": "development",
+      "tags": [
+        "nextjs",
+        "react",
+        "full-stack",
+        "ssr",
+        "server-components"
+      ]
+    },
+    {
+      "name": "nginx",
+      "slug": "nginx",
+      "description": "Assists with configuring Nginx as a web server, reverse proxy, and load balancer. Use when serving static files, proxying to application servers, setting up TLS termination, configuring caching, rate limiting, or writing security headers. Trigger words: nginx, reverse proxy, load balancer, tls, ssl, server block, location block.",
+      "category": "devops",
+      "tags": [
+        "nginx",
+        "reverse-proxy",
+        "load-balancer",
+        "tls",
+        "web-server"
+      ]
+    },
+    {
       "name": "notification-system",
       "slug": "notification-system",
       "description": "Designs and implements multi-channel notification systems with email, push, and in-app delivery. Use when you need to build a notification service, set up user notification preferences, create delivery pipelines, implement retry logic for failed notifications, or route messages across channels. Trigger words: notification system, push notifications, email notifications, in-app notifications, notification preferences, delivery tracking, unsubscribe, notification routing.",
@@ -1401,6 +1894,32 @@
         "notifications",
         "messaging",
         "email"
+      ]
+    },
+    {
+      "name": "notion",
+      "slug": "notion",
+      "description": "Build integrations with the Notion API — databases, pages, blocks, comments, search, and OAuth. Use when tasks involve reading or writing Notion workspace data, syncing external tools with Notion databases, building dashboards from Notion content, or automating page creation and updates.",
+      "category": "productivity",
+      "tags": [
+        "notion",
+        "api",
+        "productivity",
+        "databases",
+        "automation"
+      ]
+    },
+    {
+      "name": "oauth2-oidc",
+      "slug": "oauth2-oidc",
+      "description": "Assists with implementing OAuth 2.0 and OpenID Connect for secure authentication and authorization. Use when configuring authorization flows, validating tokens, implementing PKCE for public clients, setting up social login, or building secure token handling for SPAs, mobile apps, and APIs. Trigger words: oauth, oidc, openid connect, authorization code, pkce, jwt, access token, refresh token.",
+      "category": "devops",
+      "tags": [
+        "oauth2",
+        "oidc",
+        "authentication",
+        "authorization",
+        "jwt"
       ]
     },
     {
@@ -1490,6 +2009,19 @@
       ]
     },
     {
+      "name": "opentelemetry",
+      "slug": "opentelemetry",
+      "description": "Assists with instrumenting applications using OpenTelemetry for distributed tracing, metrics, and logs. Use when adding observability, configuring auto-instrumentation, building custom spans, setting up OTel Collectors, or exporting telemetry to Jaeger, Grafana, or Datadog. Trigger words: opentelemetry, otel, tracing, spans, metrics, observability, collector.",
+      "category": "devops",
+      "tags": [
+        "opentelemetry",
+        "observability",
+        "tracing",
+        "metrics",
+        "monitoring"
+      ]
+    },
+    {
       "name": "openvpn",
       "slug": "openvpn",
       "description": "Deploy and manage OpenVPN servers and clients. Use when a user asks to set up a VPN server, create client certificates, configure site-to-site tunnels, set up split tunneling, manage PKI with EasyRSA, harden OpenVPN security, automate client provisioning, configure routing and NAT, set up MFA for VPN, monitor connected clients, or troubleshoot VPN connectivity. Covers server deployment, PKI management, client configuration, and production hardening.",
@@ -1504,6 +2036,19 @@
       "tags": []
     },
     {
+      "name": "owasp-zap",
+      "slug": "owasp-zap",
+      "description": "Assists with finding security vulnerabilities in web applications using OWASP ZAP. Use when configuring automated scans, writing scan policies, integrating security scanning into CI/CD pipelines, or analyzing results for OWASP Top 10 vulnerabilities like XSS, SQL injection, and CSRF. Trigger words: owasp zap, security scan, vulnerability scanner, penetration testing, zap-baseline, active scan, passive scan.",
+      "category": "devops",
+      "tags": [
+        "owasp-zap",
+        "security",
+        "vulnerability-scanning",
+        "penetration-testing",
+        "ci-cd"
+      ]
+    },
+    {
       "name": "page-cro",
       "slug": "page-cro",
       "description": "When the user wants to optimize, improve, or increase conversions on any marketing page — including homepage, landing pages, pricing pages, feature pages, or blog posts. Also use when the user says \"CRO,\" \"conversion rate optimization,\" \"this page isn't converting,\" \"improve conversions,\" or \"why isn't this page working.\" For signup/registration flows, see signup-flow-cro. For post-signup activation, see onboarding-cro. For forms outside of signup, see form-cro. For popups/modals, see popup-cro.",
@@ -1516,6 +2061,32 @@
       "description": "When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. Also use when the user mentions 'PPC,' 'paid media,' 'ad copy,' 'ad creative,' 'ROAS,' 'CPA,' 'ad campaign,' 'retargeting,' or 'audience targeting.' This skill covers campaign strategy, ad creation, audience targeting, and optimization.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "pandas",
+      "slug": "pandas",
+      "description": "Assists with loading, cleaning, transforming, and analyzing tabular data using pandas. Use when importing CSV/Excel/SQL data, handling missing values, performing groupby aggregations, merging datasets, working with time series, or building analysis-ready datasets. Trigger words: pandas, dataframe, csv, groupby, merge, time series, data cleaning.",
+      "category": "data-ai",
+      "tags": [
+        "pandas",
+        "data-analysis",
+        "dataframe",
+        "python",
+        "tabular-data"
+      ]
+    },
+    {
+      "name": "payload-cms",
+      "slug": "payload-cms",
+      "description": "Assists with building content management systems using Payload CMS with a code-first approach. Use when defining collections in TypeScript, configuring access control, customizing the admin panel, or integrating with Next.js. Trigger words: payload, payload cms, headless cms, collections, admin panel, content management, payload fields.",
+      "category": "content",
+      "tags": [
+        "payload-cms",
+        "cms",
+        "headless-cms",
+        "content-management",
+        "nextjs"
+      ]
     },
     {
       "name": "paywall-upgrade-cro",
@@ -1609,11 +2180,37 @@
       "tags": []
     },
     {
+      "name": "pocketbase",
+      "slug": "pocketbase",
+      "description": "Assists with building backends using PocketBase, a single-binary backend with embedded SQLite, real-time subscriptions, file storage, and authentication. Use when creating MVPs, prototyping APIs, configuring collections, or setting up auth flows. Trigger words: pocketbase, backend, sqlite, real-time, single binary, collections, pb.",
+      "category": "devops",
+      "tags": [
+        "pocketbase",
+        "backend",
+        "sqlite",
+        "real-time",
+        "baas"
+      ]
+    },
+    {
       "name": "popup-cro",
       "slug": "popup-cro",
       "description": "When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. Also use when the user mentions \"exit intent,\" \"popup conversions,\" \"modal optimization,\" \"lead capture popup,\" \"email popup,\" \"announcement banner,\" or \"overlay.\" For forms outside of popups, see form-cro. For general page conversion optimization, see page-cro.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "postgresql",
+      "slug": "postgresql",
+      "description": "Assists with designing schemas, writing performant queries, managing indexes, and operating PostgreSQL databases. Use when working with JSONB, full-text search, window functions, CTEs, row-level security, replication, or performance tuning. Trigger words: postgresql, postgres, sql, database, jsonb, rls, window functions, cte.",
+      "category": "data-ai",
+      "tags": [
+        "postgresql",
+        "database",
+        "sql",
+        "relational",
+        "jsonb"
+      ]
     },
     {
       "name": "powerpoint",
@@ -1634,6 +2231,19 @@
       "description": "When the user wants help with pricing decisions, packaging, or monetization strategy. Also use when the user mentions 'pricing,' 'pricing tiers,' 'freemium,' 'free trial,' 'packaging,' 'price increase,' 'value metric,' 'Van Westendorp,' 'willingness to pay,' or 'monetization.' This skill covers pricing research, tier structure, and packaging strategy.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "prisma",
+      "slug": "prisma",
+      "description": "Build type-safe database layers with Prisma ORM — schema modeling, migrations, queries, relations, transactions, and seeding. Use when tasks involve database schema design, type-safe data access in TypeScript/JavaScript, migrating between databases, or setting up a data layer for a new project.",
+      "category": "development",
+      "tags": [
+        "prisma",
+        "orm",
+        "database",
+        "typescript",
+        "migrations"
+      ]
     },
     {
       "name": "product-marketing-context",
@@ -1675,6 +2285,45 @@
       ]
     },
     {
+      "name": "pulumi",
+      "slug": "pulumi",
+      "description": "Assists with defining and managing cloud infrastructure using Pulumi with TypeScript, Python, Go, or C#. Use when provisioning AWS, GCP, Azure, or Kubernetes resources with real programming languages instead of HCL. Trigger words: pulumi, infrastructure as code, iac, pulumi up, pulumi stack, cloud infrastructure, component resource.",
+      "category": "devops",
+      "tags": [
+        "pulumi",
+        "infrastructure-as-code",
+        "cloud",
+        "devops",
+        "multi-cloud"
+      ]
+    },
+    {
+      "name": "pytorch",
+      "slug": "pytorch",
+      "description": "Assists with building, training, and deploying neural networks using PyTorch. Use when designing architectures for computer vision, NLP, or tabular data, optimizing training with mixed precision and distributed strategies, or exporting models for production inference. Trigger words: pytorch, torch, neural network, deep learning, training loop, cuda.",
+      "category": "data-ai",
+      "tags": [
+        "pytorch",
+        "deep-learning",
+        "neural-network",
+        "gpu",
+        "machine-learning"
+      ]
+    },
+    {
+      "name": "rabbitmq",
+      "slug": "rabbitmq",
+      "description": "Build messaging systems with RabbitMQ — queues, exchanges, routing, dead-letter queues, delayed messages, priority queues, and RPC patterns. Use when tasks involve task queues, background job processing, inter-service communication, request-reply patterns, or reliable message delivery with acknowledgments.",
+      "category": "devops",
+      "tags": [
+        "rabbitmq",
+        "messaging",
+        "queues",
+        "amqp",
+        "microservices"
+      ]
+    },
+    {
       "name": "railway-deploy",
       "slug": "railway-deploy",
       "description": "Manage Railway deployments using the CLI. Use when a user asks to deploy to Railway, check deployment status, manage Railway services, set environment variables on Railway, view Railway logs, link a Railway project, add a database on Railway, scale Railway services, manage Railway environments, rollback a Railway deployment, or run commands with Railway env vars. Covers the full deploy lifecycle from project setup to production monitoring.",
@@ -1696,6 +2345,32 @@
         "rate-limiting",
         "api-security",
         "middleware"
+      ]
+    },
+    {
+      "name": "react-email",
+      "slug": "react-email",
+      "description": "Assists with building responsive, cross-client email templates using React Email components. Use when creating transactional emails (welcome, receipts, password reset) that render correctly in Gmail, Outlook, Apple Mail, and mobile clients. Trigger words: react email, email template, transactional email, email components, email rendering.",
+      "category": "automation",
+      "tags": [
+        "react-email",
+        "email",
+        "transactional",
+        "templates",
+        "rendering"
+      ]
+    },
+    {
+      "name": "react-native",
+      "slug": "react-native",
+      "description": "Assists with building iOS and Android applications from a single TypeScript codebase using React Native. Use when implementing mobile UI components, navigation, native device APIs, performance optimization, or setting up testing and CI pipelines for mobile apps. Trigger words: react native, mobile app, ios, android, flatlist, reanimated.",
+      "category": "development",
+      "tags": [
+        "react-native",
+        "mobile",
+        "ios",
+        "android",
+        "cross-platform"
       ]
     },
     {
@@ -1749,6 +2424,19 @@
       ]
     },
     {
+      "name": "redis",
+      "slug": "redis",
+      "description": "Build applications with Redis — caching, session storage, pub/sub, streams, rate limiting, leaderboards, and queues. Use when tasks involve in-memory data storage, real-time messaging, distributed locking, or performance optimization with caching layers.",
+      "category": "development",
+      "tags": [
+        "redis",
+        "caching",
+        "database",
+        "pub-sub",
+        "queues"
+      ]
+    },
+    {
       "name": "referral-program",
       "slug": "referral-program",
       "description": "When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. Also use when the user mentions 'referral,' 'affiliate,' 'ambassador,' 'word of mouth,' 'viral loop,' 'refer a friend,' or 'partner program.' This skill covers program design, incentive structure, and growth optimization.",
@@ -1768,6 +2456,19 @@
       ]
     },
     {
+      "name": "remix",
+      "slug": "remix",
+      "description": "Assists with building full-stack web applications using Remix. Use when creating apps with nested routing, loader/action patterns, progressive enhancement, or deploying to Node.js, Cloudflare Workers, or other adapters. Trigger words: remix, remix run, loader, action, useFetcher, nested routes, progressive enhancement.",
+      "category": "development",
+      "tags": [
+        "remix",
+        "react",
+        "full-stack",
+        "web-standards",
+        "progressive-enhancement"
+      ]
+    },
+    {
       "name": "remotion-video-toolkit",
       "slug": "remotion-video-toolkit",
       "description": "Programmatic video creation with React using Remotion. Use when a user asks to create videos with code, generate personalized videos, build animated data visualizations, add TikTok-style captions, render video programmatically, or automate video production. Supports CLI rendering, AWS Lambda, and Google Cloud Run deployment.",
@@ -1781,6 +2482,19 @@
       ]
     },
     {
+      "name": "renovate",
+      "slug": "renovate",
+      "description": "Assists with automating dependency updates across JavaScript, Python, Docker, Go, Rust, Terraform, and 50+ ecosystems using Renovate. Use when configuring update strategies, automerge policies, grouping rules, or scheduling to keep dependencies current. Trigger words: renovate, dependency updates, automerge, package rules, dependency management.",
+      "category": "development",
+      "tags": [
+        "renovate",
+        "dependencies",
+        "automation",
+        "security",
+        "devops"
+      ]
+    },
+    {
       "name": "report-generator",
       "slug": "report-generator",
       "description": "Generate professional data reports with charts, tables, and visualizations. Use when a user asks to create a report, generate a data report, build a dashboard report, produce a PDF report with charts, create an executive summary, or generate a weekly/monthly report from data.",
@@ -1791,6 +2505,19 @@
         "pdf",
         "charts",
         "business-intelligence"
+      ]
+    },
+    {
+      "name": "resend",
+      "slug": "resend",
+      "description": "Send transactional and marketing emails with Resend — API sending, React email templates, domain verification, delivery tracking, batch sending, audiences, and webhooks. Use when tasks involve sending emails from an application, building email templates, tracking delivery, or migrating from SMTP.",
+      "category": "automation",
+      "tags": [
+        "resend",
+        "email",
+        "transactional",
+        "react-email",
+        "templates"
       ]
     },
     {
@@ -1845,6 +2572,19 @@
       "tags": []
     },
     {
+      "name": "sanity",
+      "slug": "sanity",
+      "description": "Assists with building content platforms using Sanity's structured content and real-time collaboration features. Use when defining schemas, writing GROQ queries, configuring Sanity Studio, or integrating with Next.js for content-driven sites. Trigger words: sanity, groq, sanity studio, structured content, portable text, content lake, sanity schema.",
+      "category": "content",
+      "tags": [
+        "sanity",
+        "cms",
+        "structured-content",
+        "groq",
+        "headless-cms"
+      ]
+    },
+    {
       "name": "sap",
       "slug": "sap",
       "description": "Integrate with SAP systems and build extensions. Use when a user asks to connect to SAP S/4HANA, SAP Business One, or SAP ERP via OData, RFC, BAPI, or IDoc interfaces, build SAP BTP (Business Technology Platform) applications, work with SAP CAP (Cloud Application Programming), consume SAP APIs from the API Business Hub, manage master data, automate procurement or sales processes, build Fiori apps, extract SAP data for analytics, or integrate SAP with external systems. Covers S/4HANA APIs, Business One, BTP, CAP, and integration patterns.",
@@ -1868,6 +2608,19 @@
         "migrations",
         "schema",
         "rollback"
+      ]
+    },
+    {
+      "name": "scikit-learn",
+      "slug": "scikit-learn",
+      "description": "Assists with building, evaluating, and deploying machine learning models using scikit-learn. Use when performing data preprocessing, feature engineering, model selection, hyperparameter tuning, cross-validation, or building pipelines for classification, regression, and clustering tasks. Trigger words: sklearn, scikit-learn, machine learning, classification, regression, pipeline, cross-validation.",
+      "category": "data-ai",
+      "tags": [
+        "scikit-learn",
+        "machine-learning",
+        "classification",
+        "regression",
+        "pipeline"
       ]
     },
     {
@@ -1909,6 +2662,19 @@
       ]
     },
     {
+      "name": "sentry",
+      "slug": "sentry",
+      "description": "Assists with monitoring application errors, performance, and user experience using Sentry. Use when integrating Sentry SDKs, configuring alerting, analyzing stack traces, uploading source maps, or tracking release health in production. Trigger words: sentry, error monitoring, error tracking, performance monitoring, source maps, session replay.",
+      "category": "development",
+      "tags": [
+        "sentry",
+        "error-monitoring",
+        "performance",
+        "observability",
+        "debugging"
+      ]
+    },
+    {
       "name": "seo-audit",
       "slug": "seo-audit",
       "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" or \"SEO health check.\" For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.",
@@ -1926,6 +2692,19 @@
         "debugging",
         "cold-start",
         "cloudwatch"
+      ]
+    },
+    {
+      "name": "shadcn-ui",
+      "slug": "shadcn-ui",
+      "description": "Assists with building accessible, customizable React interfaces using shadcn/ui components. Use when adding UI components from shadcn CLI, theming with CSS variables, building data tables, or integrating forms with React Hook Form and Zod. Trigger words: shadcn, shadcn-ui, radix, component library, ui components, tailwind components, cn utility.",
+      "category": "design",
+      "tags": [
+        "shadcn-ui",
+        "react",
+        "components",
+        "tailwind",
+        "radix-ui"
       ]
     },
     {
@@ -1995,6 +2774,45 @@
       ]
     },
     {
+      "name": "sst",
+      "slug": "sst",
+      "description": "Assists with building and deploying full-stack serverless applications on AWS using SST. Use when defining Lambda functions, API Gateway routes, DynamoDB tables, S3 buckets, or deploying Next.js/Remix/Astro with SSR on AWS. Trigger words: sst, serverless stack, sst dev, sst deploy, aws lambda, sst ion, resource linking.",
+      "category": "devops",
+      "tags": [
+        "sst",
+        "serverless",
+        "aws",
+        "lambda",
+        "full-stack"
+      ]
+    },
+    {
+      "name": "storybook",
+      "slug": "storybook",
+      "description": "Assists with developing, documenting, and testing UI components in isolation using Storybook. Use when writing component stories, setting up visual regression testing, configuring addons, or generating component documentation. Trigger words: storybook, stories, csf, component story format, visual testing, chromatic, storybook addons.",
+      "category": "development",
+      "tags": [
+        "storybook",
+        "component-testing",
+        "ui-development",
+        "documentation",
+        "visual-testing"
+      ]
+    },
+    {
+      "name": "stripe-billing",
+      "slug": "stripe-billing",
+      "description": "Build subscription billing with Stripe — products, prices, checkout sessions, subscriptions, invoices, usage-based metering, customer portal, coupons, webhooks, and dunning. Use when tasks involve SaaS billing, recurring payments, free trials, plan upgrades/downgrades, or usage-based pricing.",
+      "category": "business",
+      "tags": [
+        "stripe",
+        "billing",
+        "subscriptions",
+        "payments",
+        "saas"
+      ]
+    },
+    {
       "name": "stripe-testing",
       "slug": "stripe-testing",
       "description": "Test and debug Stripe payment integrations. Use when someone needs to verify webhook handling, simulate payment flows, debug failed charges, validate subscription lifecycle, or troubleshoot Stripe API errors. Trigger words: stripe, payment testing, webhook debugging, charge failed, subscription error, payment intent, checkout session.",
@@ -2015,6 +2833,19 @@
       "tags": []
     },
     {
+      "name": "sveltekit",
+      "slug": "sveltekit",
+      "description": "Assists with building full-stack web applications using SvelteKit. Use when creating Svelte apps with file-based routing, server-side rendering, form actions, or API endpoints. Trigger words: sveltekit, svelte, svelte routing, form actions, svelte hooks, svelte adapter, svelte load function.",
+      "category": "development",
+      "tags": [
+        "sveltekit",
+        "svelte",
+        "full-stack",
+        "ssr",
+        "web-framework"
+      ]
+    },
+    {
       "name": "table-extractor",
       "slug": "table-extractor",
       "description": "Extract tables from PDFs with high accuracy using camelot. Handles complex table structures including merged cells, multi-line rows, and spanning headers. Use when a user asks to extract a table from a PDF, pull tabular data from a document, convert PDF tables to CSV or Excel, or parse structured tables from reports.",
@@ -2025,6 +2856,58 @@
         "camelot",
         "csv",
         "spreadsheet"
+      ]
+    },
+    {
+      "name": "tailscale",
+      "slug": "tailscale",
+      "description": "Build zero-trust networks with Tailscale — mesh VPN setup, ACLs, exit nodes, subnet routing, MagicDNS, Funnel, SSH, and API automation. Use when tasks involve connecting remote machines, securing internal services, replacing traditional VPNs, or exposing local services to the internet.",
+      "category": "devops",
+      "tags": [
+        "tailscale",
+        "vpn",
+        "networking",
+        "wireguard",
+        "zero-trust"
+      ]
+    },
+    {
+      "name": "tailwindcss",
+      "slug": "tailwindcss",
+      "description": "Build UIs with Tailwind CSS — utility classes, responsive design, dark mode, custom configuration, component patterns, animations, plugins, and design system setup. Use when tasks involve styling web applications, configuring design tokens, building responsive layouts, or migrating from other CSS approaches.",
+      "category": "development",
+      "tags": [
+        "tailwindcss",
+        "css",
+        "frontend",
+        "responsive",
+        "design-system"
+      ]
+    },
+    {
+      "name": "tanstack",
+      "slug": "tanstack",
+      "description": "Assists with building React applications using the TanStack ecosystem: Query for server state management, Router for type-safe routing, Table for headless data tables, and Virtual for list virtualization. Trigger words: tanstack, react query, tanstack query, tanstack table, tanstack router, useQuery, useMutation.",
+      "category": "development",
+      "tags": [
+        "tanstack",
+        "react-query",
+        "data-table",
+        "routing",
+        "state-management"
+      ]
+    },
+    {
+      "name": "tauri",
+      "slug": "tauri",
+      "description": "Assists with building lightweight cross-platform desktop (and mobile) applications using Tauri. Use when creating small, fast, secure apps with a web frontend and Rust backend that use the system webview instead of bundling Chromium. Trigger words: tauri, rust desktop, system webview, tauri commands, tauri plugins.",
+      "category": "development",
+      "tags": [
+        "tauri",
+        "desktop",
+        "rust",
+        "cross-platform",
+        "webview"
       ]
     },
     {
@@ -2090,11 +2973,63 @@
       ]
     },
     {
+      "name": "threejs",
+      "slug": "threejs",
+      "description": "Assists with building interactive 3D experiences in the browser using Three.js. Use when creating 3D product configurators, data visualizations, games, or creative experiences with scenes, cameras, lighting, model loading, and performance optimization. Trigger words: threejs, three.js, 3d, webgl, react three fiber, r3f, glb, gltf.",
+      "category": "design",
+      "tags": [
+        "threejs",
+        "3d",
+        "webgl",
+        "react-three-fiber",
+        "visualization"
+      ]
+    },
+    {
       "name": "tiktok-marketing",
       "slug": "tiktok-marketing",
       "description": "Create, optimize, and automate TikTok content for brand awareness, audience growth, and conversions. Use when someone asks to \"grow on TikTok\", \"create TikTok content\", \"TikTok marketing strategy\", \"TikTok API integration\", \"automate TikTok posting\", \"TikTok analytics\", or \"TikTok for business\". Covers short-form video strategy, trending sounds, TikTok Content Posting API, analytics, and growth tactics.",
       "category": "marketing",
       "tags": []
+    },
+    {
+      "name": "trpc",
+      "slug": "trpc",
+      "description": "Assists with building end-to-end type-safe APIs using tRPC without code generation. Use when creating type-safe client-server bridges, defining procedures with Zod validation, integrating with Next.js or React Query, or setting up WebSocket subscriptions. Trigger words: trpc, type-safe api, procedures, react query, end-to-end types.",
+      "category": "development",
+      "tags": [
+        "trpc",
+        "typescript",
+        "api",
+        "type-safety",
+        "react-query"
+      ]
+    },
+    {
+      "name": "turborepo",
+      "slug": "turborepo",
+      "description": "Assists with managing JavaScript/TypeScript monorepos using Turborepo. Use when configuring build pipelines, setting up caching, pruning workspaces for Docker, or optimizing CI/CD for monorepo projects. Trigger words: turborepo, turbo, monorepo, pipeline, workspace, remote cache, turbo.json.",
+      "category": "development",
+      "tags": [
+        "turborepo",
+        "monorepo",
+        "build-system",
+        "caching",
+        "ci-cd"
+      ]
+    },
+    {
+      "name": "turso",
+      "slug": "turso",
+      "description": "Assists with building applications using Turso, an edge SQLite database built on libSQL. Use when setting up embedded replicas for zero-latency reads, implementing multi-tenant database-per-user architecture, or integrating with Drizzle ORM. Trigger words: turso, libsql, edge sqlite, embedded replica, database-per-tenant, turso cli.",
+      "category": "data-ai",
+      "tags": [
+        "turso",
+        "sqlite",
+        "edge-database",
+        "libsql",
+        "embedded-replica"
+      ]
     },
     {
       "name": "twitter-x-marketing",
@@ -2114,6 +3049,45 @@
         "design-system",
         "user-experience",
         "interaction-design"
+      ]
+    },
+    {
+      "name": "upstash",
+      "slug": "upstash",
+      "description": "Assists with building serverless applications using Upstash Redis, QStash, Workflow, and Vector. Use when adding caching, rate limiting, message queues, durable workflows, or vector search to edge and serverless applications. Trigger words: upstash, serverless redis, rate limiting, qstash, upstash workflow, upstash vector.",
+      "category": "data-ai",
+      "tags": [
+        "upstash",
+        "redis",
+        "serverless",
+        "rate-limiting",
+        "message-queue"
+      ]
+    },
+    {
+      "name": "uptime-kuma",
+      "slug": "uptime-kuma",
+      "description": "Monitor service uptime with Uptime Kuma — HTTP, TCP, DNS, Docker, and keyword checks, multi-channel alerts (Slack, email, webhook, Telegram, Discord), status pages, maintenance windows, and API automation. Use when tasks involve monitoring website or service availability, setting up alerting, creating public status pages, or tracking SLA metrics.",
+      "category": "devops",
+      "tags": [
+        "uptime-kuma",
+        "monitoring",
+        "alerts",
+        "status-page",
+        "uptime"
+      ]
+    },
+    {
+      "name": "vercel-ai-sdk",
+      "slug": "vercel-ai-sdk",
+      "description": "Assists with building AI-powered applications using the Vercel AI SDK. Use when streaming LLM responses, generating structured data with Zod, building chat interfaces, creating multi-step agents with tool calling, or implementing RAG. Trigger words: vercel ai sdk, ai sdk, streamText, generateObject, useChat, tool calling, ai agent.",
+      "category": "data-ai",
+      "tags": [
+        "vercel-ai-sdk",
+        "ai",
+        "llm",
+        "streaming",
+        "structured-output"
       ]
     },
     {
@@ -2156,16 +3130,29 @@
       ]
     },
     {
-      "name": "voice-to-text",
-      "slug": "voice-to-text",
-      "description": "Transcribe voice and audio to text using OpenAI Whisper. Use when the user wants to convert speech to text, transcribe audio files, record voice memos, dictate text, create meeting transcripts, or convert MP3/WAV/M4A recordings to written text. Supports both local Whisper and OpenAI API.",
-      "category": "productivity",
+      "name": "vite",
+      "slug": "vite",
+      "description": "Assists with configuring and using Vite as a frontend build tool for modern web applications. Use when setting up dev servers, optimizing production builds, configuring plugins, migrating from Webpack or CRA, or building component libraries. Trigger words: vite, build tool, HMR, hot module replacement, vite config, rollup, bundling.",
+      "category": "development",
       "tags": [
-        "voice",
-        "transcription",
-        "whisper",
-        "speech-to-text",
-        "audio"
+        "vite",
+        "build-tool",
+        "bundler",
+        "frontend",
+        "hmr"
+      ]
+    },
+    {
+      "name": "vitest",
+      "slug": "vitest",
+      "description": "Assists with unit and integration testing using Vitest, a Vite-native test runner. Use when writing tests, configuring mocks, setting up coverage, or migrating from Jest. Trigger words: vitest, unit testing, test runner, vi.fn, vi.mock, test coverage, jest replacement.",
+      "category": "development",
+      "tags": [
+        "vitest",
+        "testing",
+        "unit-testing",
+        "vite",
+        "jest-alternative"
       ]
     },
     {
@@ -2299,11 +3286,37 @@
       "tags": []
     },
     {
+      "name": "zod",
+      "slug": "zod",
+      "description": "Assists with TypeScript-first schema validation using Zod. Use when defining data schemas, validating API inputs, parsing environment variables, integrating with form libraries or tRPC, or generating TypeScript types from runtime validators. Trigger words: zod, schema validation, type inference, z.object, z.infer, input validation.",
+      "category": "development",
+      "tags": [
+        "zod",
+        "validation",
+        "typescript",
+        "schema",
+        "type-safety"
+      ]
+    },
+    {
       "name": "zoho",
       "slug": "zoho",
       "description": "Integrate and automate Zoho products. Use when a user asks to work with Zoho CRM, Zoho Books, Zoho Desk, Zoho Projects, Zoho Mail, or Zoho Creator, build custom integrations via Zoho APIs, automate workflows with Deluge scripting, sync data between Zoho apps and external systems, manage leads and deals, automate invoicing, build custom Zoho Creator apps, set up webhooks, or manage Zoho organization settings. Covers Zoho CRM, Books, Desk, Projects, Creator, and cross-product integrations.",
       "category": "business",
       "tags": []
+    },
+    {
+      "name": "zustand",
+      "slug": "zustand",
+      "description": "Assists with managing global and shared state in React applications using Zustand. Use when creating stores, handling async operations, persisting state, integrating with DevTools, or splitting stores into slices. Trigger words: zustand, state management, store, persist, selectors, react state.",
+      "category": "development",
+      "tags": [
+        "zustand",
+        "state-management",
+        "react",
+        "store",
+        "global-state"
+      ]
     }
   ],
   "categories": [
@@ -2319,5 +3332,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-18T21:03:53.843Z"
+  "updatedAt": "2026-02-21T20:50:27.081Z"
 }

@@ -4,7 +4,7 @@ slug: add-auth-and-billing-to-saas-app
 description: Add Google/GitHub OAuth login, role-based access, and Stripe subscription billing to a Next.js SaaS app — with webhook-driven plan management, customer portal, and usage-based metering.
 skills:
   - authjs
-  - stripe
+  - stripe-billing
   - nextjs
   - neon
 category: SaaS

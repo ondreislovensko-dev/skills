@@ -2,7 +2,7 @@
 title: "Optimize Docker Image Sizes for Production with AI"
 slug: optimize-docker-images-for-production
 description: "Reduce Docker image sizes by 60-90% through multi-stage builds, layer optimization, and base image selection guided by AI analysis."
-skills: [docker-optimizer, docker-helper]
+skills: [docker-helper]
 category: devops
 tags: [docker, containers, optimization, multi-stage-builds, production]
 ---

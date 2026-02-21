@@ -2,7 +2,7 @@
 title: "Optimize SQL Queries and Database Performance"
 slug: optimize-sql-queries
 description: "Analyze slow database queries, recommend indexes, rewrite SQL for better performance, and reduce infrastructure costs through query optimization."
-skills: [sql-optimizer, db-explain-analyzer, data-analysis]
+skills: [sql-optimizer, data-analysis]
 category: data-ai
 tags: [sql, performance, indexing, database, query-optimization, postgresql, mysql]
 ---

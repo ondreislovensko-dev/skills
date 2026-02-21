@@ -6,7 +6,7 @@ skills:
   - database-schema-designer
   - schema-versioning
   - data-migration
-  - db-explain-analyzer
+  - sql-optimizer
 category: development
 tags:
   - database

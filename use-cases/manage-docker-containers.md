@@ -2,7 +2,7 @@
 title: "Optimize Docker Workflows and Cut Build Times by 70%"
 slug: manage-docker-containers
 description: "Create efficient Dockerfiles, streamline container orchestration, and optimize CI/CD pipelines to dramatically reduce build times and costs."
-skills: [docker-helper, docker-optimizer, cicd-pipeline]
+skills: [docker-helper, cicd-pipeline]
 category: devops
 tags: [docker, containers, optimization, build-time, cicd]
 ---

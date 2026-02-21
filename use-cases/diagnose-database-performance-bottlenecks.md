@@ -2,7 +2,7 @@
 title: "Diagnose Database Performance Bottlenecks with AI"
 slug: diagnose-database-performance-bottlenecks
 description: "Find and fix the slow queries killing your application's response times using AI-powered execution plan analysis."
-skills: [db-explain-analyzer, sql-optimizer, data-analysis]
+skills: [sql-optimizer, data-analysis]
 category: development
 tags: [database, performance, postgresql, query-optimization, indexing]
 ---
