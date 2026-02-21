@@ -48,7 +48,32 @@ Run the winning prompt template through Vertex AI Imagen to produce the full mon
 
 > Using the winning prompt template, generate product lifestyle images for all 40 products in the Q1 catalog. Generate 3 variations per product at 1024x1792 resolution. Use Imagen 4.0 with style_preset set to "photographic" and negative prompt "text, watermark, blurry, distorted, cartoon." Save to ./generated_assets/{product_slug}/ with descriptive filenames.
 
-Batch generation produces 120 images in under an hour. The three variations per product give the design team options without requiring multiple prompt iterations. Images that score below 7/10 on the automated rubric get flagged for regeneration with adjusted parameters.
+The batch job tracks progress and flags quality issues automatically:
+
+```text
+Batch Generation Report — Q1 Catalog
+=======================================
+Total products:     40
+Variations/product: 3
+Total generated:    120 images
+
+Quality Scores (automated rubric):
+  Passed (>= 7/10):  106 images (88.3%)
+  Flagged (< 7/10):   14 images (11.7%)
+
+Flagged breakdown:
+  Low product_visibility:  6 images (product partially occluded)
+  Low brand_consistency:   5 images (color palette drift)
+  Low composition_quality: 3 images (awkward cropping)
+
+Generation time:  52 minutes
+API cost:         $43.20 (120 images x $0.36/image)
+Storage:          2.1 GB (1024x1792 PNG)
+
+Flagged images queued for regeneration with adjusted parameters.
+```
+
+The three variations per product give the design team options without requiring multiple prompt iterations. Flagged images get regenerated with adjusted parameters -- tighter cropping guidance for visibility issues, explicit color hex codes for palette drift.
 
 ### 4. Generate short video clips with Veo
 
@@ -61,3 +86,10 @@ Video generation uses the same prompt principles validated in the image testing 
 ## Real-World Example
 
 An e-commerce brand producing 200 lifestyle images monthly switched from agency photo shoots to this AI pipeline. The prompt testing phase took one afternoon and identified that "editorial flat-lay" templates scored 34% higher than "lifestyle scene" templates for their minimalist brand. Batch generation of 200 images through Vertex AI Imagen cost $45 in API credits and completed in 90 minutes. The design team rejected 12% of outputs (vs 8% rejection from traditional shoots), but the cost per usable image dropped from $38 to $0.26. Monthly video production went from zero (too expensive at $2,000 per clip) to 20 clips per month at $3.50 each. Total monthly content production cost dropped from $8,000 to $340, and turnaround went from 2 weeks to same-day delivery.
+
+## Tips
+
+- Test at least 5 prompt template variants with 3 products each before committing to batch generation. A small upfront testing investment prevents regenerating hundreds of off-brand images.
+- Include explicit color hex codes from your brand guide in the prompt rather than color names. "Warm beige" is ambiguous; "#D4C5A9 background" is reproducible.
+- Generate 3 variations per asset and let the design team pick. The marginal cost of extra variations is negligible compared to the time spent iterating on prompts for a single perfect output.
+- Save the winning prompt templates in version control. When the brand guidelines update, you can diff the old and new templates to see exactly what changed.

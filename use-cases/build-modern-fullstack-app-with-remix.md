@@ -35,6 +35,37 @@ Replace client-side fetch waterfalls with parallel server loaders.
 
 Remix loaders run on the server before any HTML is sent to the browser. The product page goes from three sequential client fetches to one server response.
 
+The loader runs on the server and returns all data the page needs in a single response:
+
+```typescript
+// app/routes/products.$slug.tsx
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+
+export async function loader({ params }: LoaderFunctionArgs) {
+  const [product, reviews, recommendations] = await Promise.all([
+    db.products.findBySlug(params.slug!),
+    db.reviews.findByProduct(params.slug!, { limit: 10 }),
+    db.recommendations.forProduct(params.slug!, { limit: 4 }),
+  ]);
+  if (!product) throw new Response("Not Found", { status: 404 });
+  return json({ product, reviews, recommendations });
+}
+
+export default function ProductDetail() {
+  const { product, reviews, recommendations } = useLoaderData<typeof loader>();
+  return (
+    <div>
+      <ProductHero product={product} />
+      <ReviewList reviews={reviews} />
+      <RecommendationGrid items={recommendations} />
+    </div>
+  );
+}
+```
+
+The three database calls execute in parallel via `Promise.all` on the server. The browser receives fully rendered HTML with all data embedded, eliminating the cascade of loading spinners that plagued the SPA version.
+
 ### 2. Migrate existing SPA pages incrementally
 
 Convert the highest-traffic pages first without rewriting the entire app at once.
@@ -58,3 +89,10 @@ Remix forms work without JavaScript, then enhance with client-side validation wh
 ## Real-World Example
 
 A direct-to-consumer brand with 180,000 monthly visitors had a React SPA that scored 34 on mobile Lighthouse performance. Product pages were invisible to Google until client JavaScript executed, costing them an estimated 30% of organic search traffic. The team migrated five key routes to Remix over one week, cutting Time to First Byte from 1.8 seconds to 220ms. Zustand handled cart state without SSR hydration mismatches. Mobile Lighthouse jumped to 89, and organic search impressions increased 45% in the following month as Google indexed previously invisible product pages.
+
+## Tips
+
+- Migrate routes by traffic volume, not by complexity. The homepage and product pages deliver the most SEO and performance value first.
+- Use a Remix catch-all route (`app/routes/$.tsx`) to serve unmigrated SPA pages. This lets you run both patterns simultaneously without a hard cutover.
+- Keep Zustand stores in a separate module that does not import server-only code. This prevents accidental bundling of database clients or API secrets into the client JavaScript.
+- Test SSR hydration mismatches by disabling JavaScript in the browser and verifying the page still renders correctly. Remix forms should work without JS as a baseline.

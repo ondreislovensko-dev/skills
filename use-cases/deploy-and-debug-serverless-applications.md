@@ -41,6 +41,31 @@ Identify and fix the sources of cold start latency.
 
 > Our Lambda functions have 3-4 second cold starts. Analyze the cold start breakdown for our top 5 most-invoked functions. Show me how much time goes to runtime init, dependency loading, and handler initialization. Recommend specific fixes: which functions should use provisioned concurrency, which need dependency pruning, and which are loading unused modules.
 
+The debugger produces a detailed cold start breakdown for each function:
+
+```text
+COLD START ANALYSIS — Top 5 Functions
+======================================
+
+Function: create-order (Node.js 20)
+  Total cold start:         3,412ms
+  ├─ Runtime init:            312ms
+  ├─ Dependency loading:    2,148ms
+  │   ├─ aws-sdk (full):    1,680ms  ← ISSUE: loads all 300+ service clients
+  │   ├─ pg (postgres):       284ms
+  │   └─ zod + utils:        184ms
+  ├─ Handler init:            952ms
+  │   └─ DB connection pool:  810ms  ← ISSUE: pool created inside handler
+  └─ Recommended fixes:
+      1. Replace aws-sdk v2 with @aws-sdk/client-s3 (saves ~1,600ms)
+      2. Move pg pool to module scope (saves ~800ms)
+      3. Expected cold start after fixes: ~410ms
+
+Function: process-payment (Node.js 20)
+  Total cold start:         2,890ms
+  ...
+```
+
 The debugger reveals that 2.1 seconds of the 3.4-second cold start comes from loading the full AWS SDK v2 instead of importing only the needed clients. Another 800ms comes from initializing a database connection pool inside the handler instead of outside it. After fixes, cold starts drop to 400ms without provisioned concurrency.
 
 ### 3. Move the image processor to Railway
@@ -58,6 +83,8 @@ Create unified monitoring across Lambda and Railway services.
 > Set up monitoring that covers both our SST Lambda functions and the Railway container service. Track invocation count, error rate, duration p95, and cold start percentage for Lambda. Track CPU, memory, and queue depth for Railway. Alert when Lambda error rate exceeds 1% or Railway queue depth exceeds 100 items for more than 5 minutes.
 
 The unified dashboard shows the health of the entire system -- serverless functions handling API traffic and the Railway container processing background jobs. The team sees both platforms in one view instead of switching between AWS Console and Railway dashboard.
+
+When deciding which workloads to keep on Lambda versus move to Railway, use a simple rule: if the function runs under 60 seconds and has predictable memory usage, Lambda is cheaper at scale. If it needs more than 15 minutes, requires persistent connections, or has unpredictable memory spikes, Railway containers give you more control without the infrastructure management overhead.
 
 ## Real-World Example
 

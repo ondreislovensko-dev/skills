@@ -45,6 +45,26 @@ Build a central dispatcher that routes notifications to the correct channel base
 
 > Create a notification router that accepts a POST request with {customer_id, alert_type, data}. Look up the customer's preferred channel, render the correct template, and dispatch through the appropriate bot. Implement retry with exponential backoff (3 attempts over 15 minutes), fallback to email if all retries fail, and log delivery status to a database. Support broadcast mode for sending to all customers at once.
 
+The routing engine configuration defines delivery rules, retry behavior, and fallback chains in a single YAML file:
+
+```yaml
+# config/notification-routes.yaml
+channels:
+  slack:     { rate_limit: 50/sec, timeout_ms: 5000, retry: { max: 3, backoff: exponential } }
+  telegram:  { rate_limit: 30/sec, timeout_ms: 3000, retry: { max: 3, backoff: exponential } }
+  whatsapp:  { rate_limit: 20/sec, timeout_ms: 8000, retry: { max: 3, backoff: exponential } }
+
+fallback_chain: [preferred_channel, email, webhook]
+
+alert_types:
+  deployment_complete: { priority: high,   batch_window_sec: 0 }
+  inventory_low:       { priority: high,   batch_window_sec: 300 }
+  weekly_report:       { priority: low,    batch_window_sec: 3600 }
+  order_shipped:       { priority: normal, batch_window_sec: 0 }
+```
+
+This configuration ensures high-priority alerts like inventory warnings are delivered immediately, while lower-priority weekly reports can be batched to reduce noise.
+
 ### 4. Add interactive responses and channel switching
 
 Let customers interact with notifications and change their preferred channel from within any bot.
@@ -54,3 +74,9 @@ Let customers interact with notifications and change their preferred channel fro
 ## Real-World Example
 
 An e-commerce platform integrated the multi-channel bot for order status notifications. Their 800 customers split across 340 on Slack, 280 on Telegram, and 180 on WhatsApp. When they launched a new "inventory low" alert type, a single developer wrote one template in 20 minutes instead of three separate implementations. Delivery success rates improved from 91% to 99.4% thanks to cross-channel fallback. The average time for customers to acknowledge critical alerts dropped from 47 minutes to 8 minutes because notifications now reach people on the channel they actually check.
+
+## Tips
+
+- WhatsApp requires pre-approved message templates for messages sent outside the 24-hour customer service window. Submit your templates for approval before launch day to avoid delays.
+- Test each channel's rate limits independently. Slack allows 50 messages per second per workspace, but WhatsApp's Cloud API limits vary by business tier and can be as low as 80 messages per second.
+- Log every delivery attempt with the channel, timestamp, and response code. When customers report missing notifications, this log is the only way to diagnose whether the message was sent, delivered, or dropped by the platform.

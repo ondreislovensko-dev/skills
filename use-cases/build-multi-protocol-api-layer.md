@@ -53,6 +53,46 @@ The inventory and payment services communicate with the order service thousands 
 
 > Define Protocol Buffer messages and service definitions for the order service. Set up bidirectional streaming for real-time order status updates between the order service and the shipping tracker. Include deadline propagation and retry policies for transient failures.
 
+The Protocol Buffer definition provides the contract that all internal services compile against:
+
+```protobuf
+syntax = "proto3";
+package orders.v1;
+
+service OrderService {
+  rpc CreateOrder (CreateOrderRequest) returns (Order);
+  rpc GetOrder (GetOrderRequest) returns (Order);
+  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);
+  rpc StreamOrderStatus (StreamOrderStatusRequest) returns (stream OrderStatusUpdate);
+}
+
+message Order {
+  string id = 1;
+  string customer_id = 2;
+  repeated OrderItem items = 3;
+  int64 total_cents = 4;
+  OrderStatus status = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  ORDER_STATUS_PENDING = 1;
+  ORDER_STATUS_CONFIRMED = 2;
+  ORDER_STATUS_SHIPPED = 3;
+  ORDER_STATUS_DELIVERED = 4;
+}
+```
+
+The `StreamOrderStatus` RPC uses server-side streaming so the shipping tracker receives status changes the instant they happen, without polling.
+
 ## Real-World Example
 
 An e-commerce company serving 50,000 daily orders had a REST-only API. The mobile team complained about 6 sequential requests to render the order detail screen, adding 800ms of latency. Internal services were parsing JSON at 2,000 requests per second and hitting CPU limits. The team introduced GraphQL for the mobile app, cutting order detail load to a single request, and gRPC for internal communication, handling 15,000 requests per second on the same hardware. The shared service layer meant every bug fix applied to all three protocols simultaneously.
+
+## Tips
+
+- Start with the shared service layer, not the transport protocols. If the business logic is tangled with HTTP handling, adding GraphQL and gRPC means untangling it under pressure.
+- Version the REST API with URL prefixes (/api/v1/) but version the gRPC service in the package name (orders.v1). This keeps versioning consistent within each protocol's conventions.
+- Use DataLoader in the GraphQL layer from the start. N+1 query problems are invisible at low traffic but cause exponential database load as usage grows.
+- Keep the Protobuf definitions in a shared repository that both the client and server teams import. Copy-pasting .proto files between repos leads to version drift within weeks.

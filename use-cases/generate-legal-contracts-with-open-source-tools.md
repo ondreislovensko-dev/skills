@@ -43,6 +43,27 @@ Produce actual contracts from a CSV of client data, substituting all variables a
 
 > Use picoclaw to generate contracts for 8 new clients from /data/new_clients.csv. For each row, substitute the variables (client name, address, effective date, payment terms, governing state, project scope) into the appropriate template type. Render each contract to Markdown and PDF. Validate that no unsubstituted [[variables]] remain in the output. Save to /output/{client_name}/.
 
+After running the generation, picoclaw produces a summary showing every contract and any variable issues:
+
+```text
+picoclaw generate --input /data/new_clients.csv --templates /templates/ --output /output/
+
+Processing 8 contracts...
+  [1/8] Meridian Consulting   MSA          18 clauses  OK     -> /output/meridian_consulting/
+  [2/8] Atlas Digital          SOW          12 clauses  OK     -> /output/atlas_digital/
+  [3/8] Greenfield Labs        Consulting   15 clauses  OK     -> /output/greenfield_labs/
+  [4/8] Horizon Partners       MSA          18 clauses  OK     -> /output/horizon_partners/
+  [5/8] Cascade Software       MSA          18 clauses  OK     -> /output/cascade_software/
+  [6/8] Northwind Analytics    SOW          12 clauses  OK     -> /output/northwind_analytics/
+  [7/8] Redstone Ventures      Consulting   15 clauses  OK     -> /output/redstone_ventures/
+  [8/8] BluePeak Engineering   MSA          18 clauses  OK     -> /output/bluepeak_engineering/
+
+Validation: 0 unsubstituted variables found
+Output:     8 Markdown files, 8 PDF files
+```
+
+Each output directory contains the rendered contract in both formats, along with a metadata file that records which clause versions were used, making it easy to audit contracts months later.
+
 ### 4. Add version tracking and diff capability
 
 Implement a change tracking system so the firm can see exactly what changed between contract versions.
@@ -52,3 +73,10 @@ Implement a change tracking system so the firm can see exactly what changed betw
 ## Real-World Example
 
 The consulting firm migrated their three divergent clause libraries into one canonical collection of 35 clauses. The paralegal who used to spend 2-3 hours assembling each contract now runs a single generation command with client data from their CRM export. Contract generation time dropped from 2.5 hours average to 8 minutes. The conflicting clause problem disappeared entirely because every contract pulls from the same versioned source. In the first month, they generated 18 contracts with zero clause inconsistencies, compared to an average of 2-3 inconsistency issues per month under the old manual process.
+
+## Tips
+
+- Keep clause files in a Git repository so every edit is tracked and attributable. This creates a built-in audit trail that legal teams value during compliance reviews.
+- Use semantic variable names like [[Liability Cap Amount]] instead of generic placeholders like [[var_7]]. This makes templates readable by non-technical staff.
+- Run a quarterly clause review where partners flag outdated language. Versioned clauses mean updates propagate to all future contracts automatically without touching old ones.
+- Export the variable list for each template type as a standalone spreadsheet that the intake team can fill out when onboarding new clients, reducing back-and-forth between sales and legal.

@@ -40,7 +40,34 @@ Analyze slow aggregation pipelines using explain output and index intersection t
 
 > Optimize this MongoDB aggregation pipeline that computes weekly activity summaries from the user_events collection (12M documents). The pipeline groups by userId and eventType, counts events per week, and sorts by total count. It currently takes 8 seconds. Show me the explain output, identify which stages are causing full collection scans, and suggest indexes and pipeline restructuring.
 
-The MongoDB skill identifies that the `$match` stage at the beginning is not using an index because the date range filter comes after a `$lookup`. Restructuring the pipeline to filter by date first (with a compound index on `{createdAt: 1, userId: 1, eventType: 1}`) reduces the documents entering the pipeline from 12 million to 340,000, dropping execution time to 450ms.
+The explain output reveals exactly where performance breaks down:
+
+```text
+MongoDB Aggregation Explain — user_events (12M docs)
+======================================================
+Stage 1: $lookup (user_profiles)
+  → COLLSCAN on user_profiles (52K docs) — no index on userId
+  → Time: 1,240ms
+
+Stage 2: $match (createdAt >= 7 days ago)
+  → COLLSCAN on user_events — $match after $lookup cannot use index
+  → Documents scanned: 12,000,000
+  → Documents matched: 340,000
+  → Time: 5,890ms
+
+Stage 3: $group (by userId, eventType)
+  → In-memory sort exceeded 100MB limit, spilling to disk
+  → Time: 870ms
+
+TOTAL: 8,000ms
+
+FIX: Move $match before $lookup, add compound index
+  → db.user_events.createIndex({ createdAt: 1, userId: 1, eventType: 1 })
+  → Scans reduced: 12M → 340K documents
+  → Estimated time after fix: 450ms
+```
+
+Restructuring the pipeline to filter by date first (with a compound index on `{createdAt: 1, userId: 1, eventType: 1}`) reduces the documents entering the pipeline from 12 million to 340,000, dropping execution time to 450ms.
 
 ### 3. Design cross-system index strategy
 
@@ -61,3 +88,10 @@ The benchmark confirms that the changes are stable under load, not just fast on 
 ## Real-World Example
 
 A project management SaaS with 50,000 users was considering a database infrastructure upgrade from $800/month to $2,400/month to handle growing query latency. Instead, a single optimization pass found 4 missing PostgreSQL indexes, 6 unused indexes to drop, 2 MongoDB aggregation pipelines that needed restructuring, and 3 MongoDB compound indexes that eliminated collection scans. The billing dashboard query dropped from 4.2 seconds to 180ms. The activity summary aggregation went from 8 seconds to 450ms. Average API response time across the platform decreased from 1.8 seconds to 340ms. The infrastructure upgrade was cancelled, saving $19,200 annually, and the optimized databases handled 3x more concurrent users on the same hardware.
+
+## Tips
+
+- Always check for unused indexes before adding new ones. Every index speeds up reads but slows down writes. Dropping 6 unused PostgreSQL indexes can improve write throughput by 10-15%.
+- In MongoDB, the order of fields in a compound index matters. Put the equality match field first, then the range filter, then the sort field. The wrong order forces a full index scan instead of a prefix scan.
+- Run EXPLAIN ANALYZE (PostgreSQL) or explain with executionStats (MongoDB) on every slow query before guessing at fixes. The execution plan shows the actual bottleneck, which is often different from what you expect.
+- Schedule a quarterly index audit. As query patterns shift with new features, previously useful indexes become dead weight and new queries lack the indexes they need.

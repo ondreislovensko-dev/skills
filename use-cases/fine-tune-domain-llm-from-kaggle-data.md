@@ -49,6 +49,30 @@ Set up a parameter-efficient training run that fits within GPU memory constraint
 
 > Fine-tune Llama-3.1-8B on the training JSONL using QLoRA. Use rank 64, alpha 128, target all linear layers. Train for 3 epochs with cosine schedule, batch size 4 with gradient accumulation of 8, learning rate 2e-4. Evaluate every 500 steps and save the best checkpoint by validation loss.
 
+During training, the console output tracks loss and evaluation metrics at each checkpoint:
+
+```text
+[2025-10-14 09:12:03] Training configuration:
+  Base model:       meta-llama/Llama-3.1-8B
+  Quantization:     4-bit (NF4, double quant)
+  LoRA rank:        64, alpha: 128
+  Target modules:   q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj
+  Trainable params: 167,772,160 / 8,030,261,248 (2.09%)
+  GPU memory:       14.2 GB / 24.0 GB (A100)
+
+Step   Train Loss   Val Loss   Val Accuracy   Time
+----   ----------   --------   ------------   --------
+500       1.842      1.614       0.719        12m 04s
+1000      0.923      0.812       0.841        24m 11s
+1500      0.614      0.597       0.887        36m 18s
+2000      0.481      0.524       0.904        48m 22s
+2500      0.392      0.498       0.916        60m 30s
+3000      0.341      0.487       0.921        72m 38s  ← best checkpoint
+
+Best model saved at step 3000 (val_loss: 0.487)
+Adapter size: 142 MB
+```
+
 The PEFT skill configures 4-bit quantization so the 8B model fits in 16GB VRAM, applies LoRA adapters to attention and MLP layers, and sets up the Trainer with gradient checkpointing to minimize memory usage. Training produces a 150MB adapter file rather than a full 16GB model copy.
 
 ### 4. Evaluate and merge the adapter
@@ -58,6 +82,8 @@ After training completes, evaluate on the held-out validation set and merge the 
 > Evaluate the fine-tuned model on the validation set. Show me accuracy, F1 score per triage category, and a confusion matrix. Then merge the adapter into the base model and save it in GGUF format for Ollama deployment.
 
 The evaluation reveals per-category performance so you can spot where the model struggles. Merging produces a standalone model file ready for inference without needing the PEFT library at runtime.
+
+If per-category F1 scores are uneven, investigate the training data distribution first. Kaggle medical datasets often over-represent common conditions and under-represent rare but critical ones. Upsampling minority classes or adding a weighted loss function during training can close the gap without requiring more data.
 
 ## Real-World Example
 

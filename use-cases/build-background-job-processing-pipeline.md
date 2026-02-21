@@ -36,11 +36,28 @@ Move all slow operations out of the request/response cycle into background jobs.
 
 The API endpoint returns a 202 Accepted with a job ID immediately. The client polls a status endpoint or receives a WebSocket event when the job completes.
 
+The queue dashboard shows job throughput and failure rates:
+
+```text
+BullMQ Queue Status
+====================
+Queue               Active    Waiting    Completed (24h)    Failed (24h)    DLQ
+file-processing     2/3       14         1,847              3               1
+media-transcoding   2/2       8          312                7               2
+webhook-handling    4/10      0          23,491             12              0
+email-sending       1/5       0          4,208              0               0
+
+Retry Policy: exponential backoff (1s, 4s, 16s), max 3 attempts
+Dead Letter Queue: jobs moved after 3 failures, retained 7 days
+```
+
 ### 2. Handle file uploads with validation
 
 Accept large files without blocking the API server.
 
 > Build a file upload endpoint that accepts files up to 500MB. Validate file types (images: jpg/png/webp, video: mp4/mov, documents: pdf). Stream uploads directly to S3 instead of buffering in memory. After upload completes, enqueue a processing job that generates thumbnails for images and extracts metadata. Reject files that fail MIME type verification.
+
+The upload endpoint uses multipart streaming so memory usage stays flat regardless of file size. A 500MB video upload consumes the same 50MB of server memory as a 2MB image because the stream pipes directly from the request body to S3. The response includes a job ID that the client uses to poll for processing status or subscribe to a WebSocket channel for real-time updates.
 
 ### 3. Process webhooks reliably
 
@@ -57,3 +74,10 @@ Convert uploaded videos to multiple formats and resolutions for streaming.
 ## Real-World Example
 
 A video course platform was losing uploads because their synchronous processing hit the 30-second request timeout on files larger than 20MB. After implementing the job queue pipeline, uploads completed in 2-3 seconds regardless of file size because files streamed directly to S3. Transcoding ran in the background, with students receiving a notification when their video was ready. Stripe webhook reliability went from 94% to 99.97% because the endpoint returned 200 immediately instead of processing the payment logic synchronously. The dead letter queue caught 12 failed transcoding jobs in the first week -- corrupted video files that would have previously disappeared silently, leaving students confused about their missing uploads.
+
+## Tips
+
+- Set different concurrency limits per queue based on resource intensity. Transcoding is CPU-heavy (limit to 2), while webhook processing is IO-bound and can run 10 or more concurrently.
+- Always store the original uploaded file in S3 before enqueuing processing jobs. If transcoding fails, you can re-enqueue without asking the user to upload again.
+- Build a dead letter queue dashboard early. Reviewing failed jobs weekly reveals patterns -- corrupted files, unsupported codecs, or rate limit hits from external APIs -- that inform better validation and retry strategies.
+- Use webhook idempotency keys (Stripe's event ID, GitHub's delivery ID) as the BullMQ job ID to get automatic deduplication for free.

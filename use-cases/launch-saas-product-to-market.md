@@ -50,7 +50,35 @@ A launch is not one day -- it is a pre-launch, launch day, and post-launch seque
 
 > Create a 6-week launch plan. We have a 400-person waitlist, $2,000 budget, and access to 3 podcast hosts in the sales tech space. Target: 500 signups in week one.
 
-The agent delivers a week-by-week calendar: waitlist warming emails in weeks 1-2, podcast recording in week 3, Product Hunt and Hacker News submissions on launch day in week 4, follow-up content and retargeting in weeks 5-6. Each tactic includes expected reach, conversion estimates, and dependencies.
+The agent delivers a week-by-week calendar with projected reach at each phase:
+
+```text
+6-WEEK LAUNCH PLAN
+====================
+
+PHASE 1: PRE-LAUNCH (Weeks 1-3)
+  Week 1  Send waitlist teaser email #1 ("something is coming")
+          Expected: 62% open rate, build anticipation
+  Week 2  Send waitlist email #2 (early access offer for referrals)
+          Expected: 40-80 referral signups from 400-person list
+  Week 3  Record 3 podcast episodes (air dates: weeks 4-6)
+          Draft Product Hunt listing, recruit 20 upvoters
+
+PHASE 2: LAUNCH (Week 4)
+  Tuesday  Product Hunt submission at 12:01 AM PT
+           Waitlist email #3 ("we are live — get your early access")
+           Twitter thread + LinkedIn post
+           Budget: $800 on targeted Twitter ads to PH listing
+           Target: 300-500 signups on day one
+
+PHASE 3: POST-LAUNCH (Weeks 5-6)
+  Week 5  Podcast episode #1 airs, Hacker News Show HN post
+          Budget: $1,200 on retargeting ads to PH and HN visitors
+  Week 6  Podcast episodes #2-3 air, case study from early users
+          Email sequence to convert free signups to paid
+```
+
+Each tactic includes expected reach, conversion estimates, and dependencies. The plan front-loads waitlist activation so launch day has built-in momentum rather than starting from zero.
 
 ### 4. Prepare launch day assets and messaging
 

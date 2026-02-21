@@ -39,7 +39,36 @@ Set up pg_dump with compression, encryption, and upload to S3.
 
 > Configure automated PostgreSQL backups for our production database (450 GB). Run a full pg_dump every night at 2 AM UTC, compress with gzip, encrypt with GPG using our backup key, and upload to the S3 bucket. Also set up WAL archiving for point-in-time recovery. Verify each backup by checking the file size against a minimum threshold and comparing row counts.
 
-The backup script runs pg_dump with `--format=custom` for parallel restore capability, compresses the output (450 GB to ~60 GB), encrypts it, and streams directly to S3 without writing to local disk. The WAL archiving enables recovery to any point in time, not just the nightly snapshot.
+The backup script streams directly to S3 without writing to local disk:
+
+```bash
+#!/bin/bash
+# backup-postgres.sh — runs nightly via cron at 02:00 UTC
+set -euo pipefail
+
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+BUCKET="s3://acme-db-backups/postgres"
+MIN_SIZE_MB=50000  # 50 GB minimum expected for 450 GB database
+
+pg_dump --format=custom --compress=6 --jobs=4 \
+  --dbname="$DATABASE_URL" \
+  | gpg --encrypt --recipient backup@acme.com \
+  | aws s3 cp - "${BUCKET}/full_${TIMESTAMP}.dump.gpg"
+
+# Verify upload size
+SIZE=$(aws s3 ls "${BUCKET}/full_${TIMESTAMP}.dump.gpg" | awk '{print $3}')
+SIZE_MB=$((SIZE / 1048576))
+
+if [ "$SIZE_MB" -lt "$MIN_SIZE_MB" ]; then
+  echo "ALERT: Backup is ${SIZE_MB}MB, expected at least ${MIN_SIZE_MB}MB"
+  curl -X POST "$SLACK_WEBHOOK" -d '{"text":"Backup size anomaly detected"}'
+  exit 1
+fi
+
+echo "Backup complete: ${SIZE_MB}MB uploaded to ${BUCKET}/full_${TIMESTAMP}.dump.gpg"
+```
+
+The WAL archiving runs continuously alongside the nightly dumps, enabling recovery to any point in time, not just the nightly snapshot.
 
 ### 3. Add MongoDB backup automation
 
@@ -60,3 +89,10 @@ Untested backups are not backups. The weekly restore test catches a corruption i
 ## Real-World Example
 
 Nadia's team discovers their backup strategy has two critical gaps: backups stored on the same disk as the database, and no MongoDB backups at all. She sets up encrypted off-site backups to S3 with lifecycle policies that keep costs under $15/month for 450 GB of PostgreSQL and 120 GB of MongoDB data. The automated restore test catches a silent backup corruption three weeks in. When a developer accidentally deletes a production table six months later, the team restores from the nightly backup and replays WAL logs to recover everything up to 30 seconds before the deletion. Total downtime: 22 minutes.
+
+## Tips
+
+- Store backups in a different cloud region than your database. A regional outage that takes down both your database and its backups defeats the purpose.
+- Test restores every week, not every quarter. Automated restore tests cost pennies in compute and catch corruption that sits silently for months.
+- Use `--format=custom` with pg_dump for parallel restore capability. A 450 GB database restores in 45 minutes with 4 parallel jobs versus 3 hours with a single-threaded SQL dump.
+- Set a minimum file size threshold on every backup. A 0-byte or suspiciously small backup is worse than no backup because it creates a false sense of security.

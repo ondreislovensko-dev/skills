@@ -42,7 +42,30 @@ Consistency matters more than perfection. A calendar removes the daily decision 
 
 > Create a 30-day content calendar for Instagram (4 Reels, 3 carousels, 2 Stories per week) and TikTok (5 videos per week). Theme: productivity tips for remote teams. Include hooks for each post.
 
-The agent produces a day-by-day calendar with specific hooks like "Stop doing standups wrong" and "The 2-minute rule that saved our remote team 5 hours/week." Each post has a format, hook, key talking points, and a CTA tailored to the platform.
+The agent produces a day-by-day calendar with specific hooks and formats for each platform:
+
+```text
+WEEK 1 — Content Calendar
+===========================
+
+Mon  Instagram Reel     "Stop doing standups wrong"           CTA: Save this
+     TikTok Video       "Your standup is wasting 5hrs/week"   CTA: Follow for pt 2
+
+Tue  Instagram Carousel "5 async tools that replaced meetings" CTA: Share with team
+     TikTok Video       "This one Slack setting changed everything" CTA: Try it now
+
+Wed  Instagram Story    Poll: "How many meetings today? 0-2 / 3-5 / 6+"
+     TikTok Video       "POV: you just cancelled all recurring meetings" CTA: Stitch this
+
+Thu  Instagram Reel     "The 2-minute rule for remote teams"  CTA: Link in bio
+     TikTok Video       "Reply to @user: how we do standups async" CTA: Comment yours
+
+Fri  Instagram Carousel "Monday.com vs Notion for remote teams" CTA: Save for later
+     TikTok Video       "Remote team fails compilation"        CTA: Duet with yours
+     Instagram Story    Q&A: "Ask me about remote workflows"
+```
+
+Each post has a format, hook, key talking points, and a CTA tailored to the platform. The calendar alternates between educational content (tutorials, tool comparisons) and relatable content (fails, POV sketches) to maintain engagement variety.
 
 ### 3. Generate post copy and hashtag sets
 

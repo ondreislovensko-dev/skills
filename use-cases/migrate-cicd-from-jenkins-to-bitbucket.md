@@ -33,7 +33,7 @@ Document all 42 Jenkins jobs and identify patterns, dependencies, and custom scr
 
 > Analyze our Jenkins server and document every pipeline job. For each job, extract: trigger conditions, environment variables, build steps, post-build actions, and downstream dependencies. Group them by type (build, test, deploy, scheduled) and flag any jobs that haven't run in 90+ days.
 
-The audit reveals 42 jobs, but only 28 are active. Eight jobs haven't triggered in over six months and reference decommissioned services. Six jobs are cron-based maintenance tasks (database cleanup, log rotation, report generation). The remaining 28 break down into 12 build-and-test pipelines, 10 deployment pipelines, and 6 scheduled tasks.
+The audit reveals 42 jobs, but only 28 are active. Eight jobs haven't triggered in over six months. Six are cron-based maintenance tasks. The remaining 28 break down into 12 build-and-test pipelines, 10 deployment pipelines, and 6 scheduled tasks.
 
 ### 2. Design the Bitbucket Pipelines structure
 
@@ -41,7 +41,48 @@ Create a standardized bitbucket-pipelines.yml template for each project type.
 
 > Convert our 28 active Jenkins jobs to Bitbucket Pipelines. Create three pipeline templates: one for Node.js services (build, lint, test, deploy), one for Python services (build, test, security scan, deploy), and one for infrastructure repos (terraform validate, plan, apply). Use parallel steps where possible, set up caching for node_modules and pip, and configure deployment environments (dev, staging, production) with manual approval gates for production.
 
-Each template fits in under 80 lines of YAML compared to the 200+ line Jenkinsfiles. Parallel test steps cut pipeline duration by 40%. Bitbucket's built-in deployment tracking shows which commit is running in each environment without a custom dashboard.
+The Node.js service template covers the most common pattern across the team's repositories:
+
+```yaml
+# bitbucket-pipelines.yml — Node.js service template
+image: node:20
+definitions:
+  caches:
+    npm: $HOME/.npm
+  steps:
+    - step: &build
+        name: Build
+        caches: [npm]
+        script: [npm ci, npm run build]
+        artifacts: [dist/**]
+    - step: &test
+        name: Test
+        caches: [npm]
+        script: [npm ci, npm run lint, npm run test -- --coverage]
+pipelines:
+  branches:
+    main:
+      - parallel:
+          - step: *build
+          - step: *test
+      - step:
+          name: Deploy Staging
+          deployment: staging
+          script:
+            - pipe: atlassian/ssh-run:0.8.1
+              variables: { SSH_USER: deploy, SERVER: staging.example.com,
+                COMMAND: "cd /app && ./deploy.sh $BITBUCKET_COMMIT" }
+      - step:
+          name: Deploy Production
+          deployment: production
+          trigger: manual
+          script:
+            - pipe: atlassian/ssh-run:0.8.1
+              variables: { SSH_USER: deploy, SERVER: prod.example.com,
+                COMMAND: "cd /app && ./deploy.sh $BITBUCKET_COMMIT" }
+```
+
+Each template fits in under 80 lines of YAML compared to the 200+ line Jenkinsfiles. Parallel test steps cut pipeline duration by 40%.
 
 ### 3. Migrate pipelines incrementally
 
@@ -57,7 +98,7 @@ Shut down the Jenkins server and archive its configuration for reference.
 
 > Export the final Jenkins configuration as XML for archival. Migrate the 6 scheduled maintenance tasks to Bitbucket Pipelines scheduled triggers. Verify all 28 pipelines are running successfully on Bitbucket, then decommission the Jenkins server. Set up Bitbucket pipeline status badges in each repository README.
 
-The Jenkins server's 4 vCPU, 16 GB instance is decommissioned, saving $85/month in hosting costs. Pipeline maintenance drops from 4-6 hours per month (plugin updates, disk cleanup, security patches) to near zero with the managed Bitbucket service.
+The Jenkins server is decommissioned, saving $85/month in hosting costs. Pipeline maintenance drops from 4-6 hours per month to near zero with the managed Bitbucket service.
 
 ## Real-World Example
 

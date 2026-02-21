@@ -42,7 +42,42 @@ Replace the single broad campaign with a cold, warm, and hot funnel structure.
 
 > Design a 3-stage Facebook ad funnel for our project management SaaS. Monthly budget: $4,000. Current CPA: $78, target: $35. Break down budget allocation, audiences, and creative approach for each stage.
 
-The agent structures the funnel: Stage 1 (cold, 40% budget) targets lookalike audiences with educational content -- a video ad showing the pain of disorganized project management. Stage 2 (warm, 35% budget) retargets video viewers and website visitors with product demos and customer testimonials. Stage 3 (hot, 25% budget) retargets pricing page visitors and trial abandoners with urgency-driven offers and social proof.
+The agent structures the funnel with clear budget allocation and audience definitions:
+
+```text
+3-STAGE FACEBOOK AD FUNNEL
+============================
+Monthly budget: $4,000  |  Target CPA: $35
+
+STAGE 1 — COLD (Awareness)
+  Budget:    $1,600/month (40%)
+  Audience:  1% lookalike of paying customers + interest targeting
+             (project management, Asana, Monday.com)
+  Size:      1.2M - 2.4M people
+  Creative:  45-sec video ad — "Why 67% of projects miss deadlines"
+  Objective: Video views (optimize for ThruPlay)
+  Target:    $0.03-0.06 per ThruPlay
+
+STAGE 2 — WARM (Consideration)
+  Budget:    $1,400/month (35%)
+  Audience:  75% video viewers + website visitors (180 days)
+             Exclude: trial signups, customers
+  Size:      15K - 40K people
+  Creative:  Product demo carousel + customer testimonial video
+  Objective: Traffic to trial signup page
+  Target:    $1.50-3.00 per landing page view
+
+STAGE 3 — HOT (Conversion)
+  Budget:    $1,000/month (25%)
+  Audience:  Pricing page visitors (30 days) + trial abandoners (14 days)
+             Exclude: active trial users, customers
+  Size:      800 - 2,000 people
+  Creative:  Dynamic ad showing browsed features + 14-day trial extension
+  Objective: Conversions (trial signup)
+  Target:    $25-35 per trial signup
+```
+
+Each stage uses a different optimization objective so Facebook's algorithm knows what to optimize for. Cold campaigns optimize for video views (cheap, broad reach), warm for traffic (qualified visitors), and hot for conversions (actual signups).
 
 ### 3. Apply psychology to each funnel stage
 
@@ -64,6 +99,6 @@ The agent defines automated rules in Ads Manager for budget management, a weekly
 
 David spent $4,000/month on Facebook Ads for his team collaboration SaaS with a single prospecting campaign and a CPA of $78. He ran the three-skill workflow and restructured everything into a three-stage funnel.
 
-The tracking overhaul revealed his pixel had been misconfigured for months -- it was counting page views as conversions, inflating his reported results. After fixing attribution, his actual CPA was $94, even worse than he thought. The funnel restructure allocated $1,600 to cold video ads (a 45-second demo showing project chaos turning into organized boards), $1,400 to retargeting website visitors with customer case studies, and $1,000 to pricing page retargeting with a 14-day trial extension offer.
+The tracking overhaul revealed his pixel had been misconfigured for months -- it was counting page views as conversions, inflating his reported results. After fixing attribution, his actual CPA was $94, even worse than he thought. The funnel restructure allocated $1,600 to cold video ads, $1,400 to retargeting website visitors with customer case studies, and $1,000 to pricing page retargeting with a 14-day trial extension offer.
 
-The psychology-driven creative made the biggest difference at the hot stage. Instead of "Start your free trial," the retargeting ad showed the exact features the visitor had browsed and used loss aversion framing: "Your competitors are shipping faster." After 45 days, CPA dropped from $94 to $31 -- below the $35 target. Stage 3 retargeting alone ran at a 6.2x ROAS. The same $4,000 monthly budget now generated 129 trial signups instead of 43, and David finally had clear attribution showing which funnel stage drove the most revenue.
+The psychology-driven creative made the biggest difference at the hot stage. Instead of "Start your free trial," the retargeting ad showed features the visitor had browsed and used loss aversion framing. After 45 days, CPA dropped from $94 to $31 -- below the $35 target. Stage 3 retargeting alone ran at a 6.2x ROAS. The same $4,000 monthly budget now generated 129 trial signups instead of 43.

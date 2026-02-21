@@ -47,6 +47,30 @@ Users need to see past notifications, mark them as read, and clear them.
 
 > Set up notification persistence with a read/unread status per user. Store notifications in PostgreSQL with indexes for fast retrieval by user and timestamp. Implement cursor-based pagination for the notification feed. Add endpoints for mark-as-read (single and bulk), and an unread count that updates in real time via the WebSocket connection.
 
+The notification table schema is designed for fast retrieval by user with proper indexing:
+
+```sql
+CREATE TABLE notifications (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES users(id),
+    type        VARCHAR(50) NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    body        TEXT,
+    data        JSONB DEFAULT '{}',
+    read_at     TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_notifications_user_unread
+    ON notifications (user_id, created_at DESC)
+    WHERE read_at IS NULL;
+
+CREATE INDEX idx_notifications_user_feed
+    ON notifications (user_id, created_at DESC);
+```
+
+The partial index on unread notifications means the "unread count" query touches only rows that have not been read, keeping it fast even when a user has thousands of historical notifications. The JSONB `data` column stores type-specific payload (task ID, comment text, mentioned user) without requiring schema changes for each new notification type.
+
 ### 4. Handle edge cases and batching
 
 Prevent notification storms from flooding users.
@@ -56,3 +80,10 @@ Prevent notification storms from flooding users.
 ## Real-World Example
 
 A project management SaaS with 3,200 daily active users had a notification delay problem. Users received email notifications for task comments 5 minutes after they were posted. Teammates in different time zones would wait hours for responses because nobody knew a comment had been left. After building the real-time system, in-app notifications arrived in 180ms on average. The notification batching prevented a common complaint: when a popular task got 30 comments in a meeting, users received one summary notification instead of 30 separate pings. Notification engagement (users clicking on notifications) increased from 12% with email-only to 64% with in-app real-time delivery.
+
+## Tips
+
+- Use Redis pub/sub for real-time fan-out but do not rely on it for durability. If a server restarts during publish, the message is lost. Always write to PostgreSQL first, then publish to Redis as a notification channel.
+- Implement WebSocket heartbeats (ping/pong every 30 seconds) to detect stale connections. Without heartbeats, a user whose network drops will appear online until the TCP timeout fires minutes later.
+- Cap the notification history at 90 days or 1,000 records per user. Unbounded notification tables grow quickly and slow down feed queries even with proper indexing.
+- Test the reconnection flow thoroughly. When a user comes back online after hours, the client should fetch missed notifications via the REST API rather than expecting Redis to replay them.

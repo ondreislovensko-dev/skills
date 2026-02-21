@@ -31,6 +31,29 @@ Analyze the entire directory to build a manifest of file types, sizes, dates, an
 
 > Scan /data/projects/ recursively and classify all 14,000 files. Group them by: file type (video, audio, image, document, project file), creation date, detected client name from filename patterns, and file size. Output a manifest to /reports/file_manifest.csv with columns for path, type, size, date, and suggested destination folder.
 
+The scan produces a breakdown that reveals the scope of the disorganization:
+
+```text
+File Classification Report — /data/projects/
+=============================================
+Total files scanned: 14,012
+Total size:          2.31 TB
+
+By type:
+  Video  (.mp4, .mov, .mxf)     4,218 files    1.64 TB   (71.0%)
+  Audio  (.wav, .mp3, .aac)     1,837 files    142 GB    ( 6.0%)
+  Image  (.png, .jpg, .tiff)    4,102 files    189 GB    ( 8.0%)
+  Document (.pdf, .docx)          923 files      2.1 GB  ( 0.1%)
+  Project (.prproj, .aep, .blend) 614 files     38 GB    ( 1.6%)
+  Other / unclassified           2,318 files    308 GB   (13.3%)
+
+Duplicates detected:             1,804 files    341 GB
+Clients identified:              23 unique client names
+Date range:                      2024-01-14 to 2026-02-19
+```
+
+This report immediately shows that nearly 15% of the storage is consumed by duplicates and that over 2,300 files could not be classified by filename alone, meaning they will need manual triage or more aggressive pattern matching.
+
 ### 2. Define organization rules and folder structure
 
 Create a rule set that maps file classifications to a clean directory hierarchy.
@@ -52,3 +75,10 @@ Build a final index of the organized archive and report on space recovered from 
 ## Real-World Example
 
 The production company ran the pipeline on a Saturday morning. The scan identified 14,000 files totaling 2.3 TB, of which 1,800 were exact duplicates consuming 340 GB. After the dry-run review confirmed the moves looked correct, the batch processor reorganized everything into a clean client/year/project hierarchy in 18 minutes. The team recovered 340 GB of duplicate storage, and the editor who had been spending 15 minutes per day searching for files now finds anything in seconds using the searchable index.
+
+## Tips
+
+- Always run the dry-run step and review it before executing. Even well-tested rules can misclassify files when client naming conventions are inconsistent.
+- Hash-based duplicate detection (SHA-256) is reliable for exact matches but will not catch re-encoded videos. For video dedup, compare duration and resolution metadata instead.
+- Schedule the scan to run monthly on new files dropped into an inbox folder so the archive stays organized without manual intervention.
+- Back up the file manifest CSV before each run. If a move goes wrong, the manifest is your map for restoring the original layout.

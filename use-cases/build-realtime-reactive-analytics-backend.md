@@ -33,6 +33,33 @@ Set up a ClickHouse-based event pipeline that can ingest thousands of events per
 
 > Build a real-time analytics event ingestion service. Design the event schema for page_view, feature_used, error_occurred, and conversion_step events. Use ClickHouse with a MergeTree engine partitioned by day. Create a Node.js ingestion endpoint that batches events (flush every 500ms or 100 events) and writes to ClickHouse. Include materialized views for 1-minute and 1-hour rollups.
 
+The ClickHouse schema and materialized view setup looks like this:
+
+```sql
+CREATE TABLE events (
+    event_id     UUID DEFAULT generateUUIDv4(),
+    event_type   Enum8('page_view'=1, 'feature_used'=2,
+                        'error_occurred'=3, 'conversion_step'=4),
+    user_id      String,
+    session_id   String,
+    properties   String,  -- JSON payload
+    timestamp    DateTime64(3)
+) ENGINE = MergeTree()
+PARTITION BY toYYYYMMDD(timestamp)
+ORDER BY (event_type, user_id, timestamp)
+TTL timestamp + INTERVAL 90 DAY;
+
+-- 1-minute rollup for live dashboards
+CREATE MATERIALIZED VIEW events_1m_mv TO events_1m AS
+SELECT
+    toStartOfMinute(timestamp) AS minute,
+    event_type,
+    count()                    AS event_count,
+    uniqExact(user_id)         AS unique_users
+FROM events
+GROUP BY minute, event_type;
+```
+
 The materialized views pre-aggregate data so dashboard queries read from compact rollup tables instead of scanning millions of raw events. A "feature usage last 24 hours" query hits the 1-minute rollup table (1,440 rows) rather than the raw events table (potentially millions of rows).
 
 ### 2. Set up MongoDB for user and configuration data
@@ -58,6 +85,8 @@ Connect the three data stores so alerts fire on real-time data and historical tr
 > Create an alert evaluation pipeline: when ClickHouse materialized views detect a metric exceeding a threshold (like error rate above 5% in a 1-minute window), write the alert to Convex so it appears on dashboards instantly, and store the alert history in MongoDB with full context for post-incident review. Build a historical analysis query that joins ClickHouse aggregations with MongoDB user segments to answer questions like "which customer tier experienced the most errors last week."
 
 The three-tier architecture plays to each database's strengths. ClickHouse handles the analytical heavy lifting, MongoDB stores the rich contextual data, and Convex bridges everything to the frontend with reactive updates.
+
+When designing the alert evaluation pipeline, keep the ClickHouse materialized views as the source of truth for threshold detection. Polling ClickHouse every 5-10 seconds for anomaly checks is far cheaper than evaluating thresholds on every raw event. Reserve Convex mutations for user-visible state changes only, and let MongoDB handle the durable audit trail of every alert that fired, who acknowledged it, and what the resolution was.
 
 ## Real-World Example
 

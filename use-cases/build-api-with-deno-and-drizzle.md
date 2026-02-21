@@ -40,7 +40,40 @@ Write the schema in plain TypeScript -- no decorators, no codegen, no schema.pri
 
 > Define a Drizzle schema for a project management API with tables for users, projects, tasks, and comments. Use PostgreSQL with proper foreign keys, indexes on frequently queried columns, and created_at/updated_at timestamps. Generate the initial migration from the schema.
 
-The schema definition is a regular TypeScript file. Changing a column type is a one-line edit that immediately shows type errors everywhere the old type was used.
+The schema definition is a regular TypeScript file:
+
+```typescript
+import { pgTable, text, timestamp, uuid, integer, pgEnum } from "drizzle-orm/pg-core";
+
+export const taskStatus = pgEnum("task_status", ["todo", "in_progress", "done"]);
+
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const projects = pgTable("projects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  ownerId: uuid("owner_id").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const tasks = pgTable("tasks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  status: taskStatus("status").default("todo").notNull(),
+  projectId: uuid("project_id").references(() => projects.id).notNull(),
+  assigneeId: uuid("assignee_id").references(() => users.id),
+  position: integer("position").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+```
+
+Changing a column type is a one-line edit that immediately shows type errors everywhere the old type was used. Renaming `assigneeId` to `ownerId` triggers compiler errors in every query that references it, so you fix them before running the migration instead of discovering breakage at runtime.
 
 ### 3. Build type-safe CRUD endpoints
 
@@ -57,3 +90,10 @@ No Jest, no Vitest, no test configuration files.
 ## Real-World Example
 
 A two-person startup building a project management tool was spending more time fighting TypeScript configuration and Prisma's code generation than writing features. Prisma Client generation added 8 seconds to every CI build, and schema changes required running `prisma generate` locally before the editor would recognize new fields. They switched to Deno with Drizzle ORM and eliminated the codegen step entirely. Schema changes showed type errors instantly in the editor. The Deno permission system caught a malicious dependency in a transitive package that tried to read environment variables -- the process crashed with a permission error instead of leaking their database credentials.
+
+## Tips
+
+- Use `deno.json` tasks instead of a Makefile or package.json scripts. Tasks like `"dev": "deno run --watch --allow-net --allow-read=./data main.ts"` keep permission flags visible and consistent.
+- Run `deno test --coverage` to get built-in coverage reports without installing Istanbul or c8.
+- Drizzle migrations are plain SQL files, so they work with any migration tool or CI pipeline. You are not locked into Drizzle's CLI for applying them.
+- Start with the Deno permission flags locked down to exactly what the app needs. Add permissions only when the runtime errors tell you something is missing -- this is Deno's security model working as intended.

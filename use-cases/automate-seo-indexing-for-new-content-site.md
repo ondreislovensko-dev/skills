@@ -44,6 +44,32 @@ Use the Indexing API to notify Google about all new and updated pages in bulk.
 
 > Use google-indexing to submit all 215 page URLs (200 existing plus 15 new) to the Google Indexing API. Submit in batches of 50 with a 2-second delay between batches to respect rate limits. For pages that were updated after the crawl audit fixes, use the URL_UPDATED notification type. For new pages, use URL_UPDATED as well. Log each submission response to /reports/indexing_log.csv with timestamp, URL, and API response status.
 
+The indexing submission log captures the API response for each URL, making it easy to identify failures:
+
+```text
+google-indexing submit --urls /reports/all_urls.txt --batch-size 50 --delay 2s
+
+Batch 1/5: 50 URLs submitted
+  [200] https://docs.example.com/getting-started
+  [200] https://docs.example.com/api/authentication
+  [200] https://docs.example.com/guides/deployment
+  ...
+Batch 2/5: 50 URLs submitted
+  [200] https://docs.example.com/api/webhooks
+  [429] https://docs.example.com/api/rate-limits   (rate limited, queued for retry)
+  ...
+Batch 5/5: 15 URLs submitted (final batch)
+
+Summary:
+  Submitted:    215 URLs
+  Accepted:     212 (200 OK)
+  Rate limited:   3 (429, auto-retried after 60s, all succeeded)
+  Errors:         0
+  Log saved:    /reports/indexing_log.csv
+```
+
+The three rate-limited URLs were automatically retried after a 60-second backoff. All 215 URLs were accepted by the Indexing API on the first run.
+
 ### 4. Monitor indexing progress and resubmit failures
 
 Track which pages get indexed and resubmit any that remain unindexed after 48 hours.
@@ -53,3 +79,10 @@ Track which pages get indexed and resubmit any that remain unindexed after 48 ho
 ## Real-World Example
 
 A developer tools startup launched their docs site and saw only 17% of pages indexed after two weeks. After running the crawl audit, they discovered 23 pages had accidental noindex tags from a staging environment config that carried over to production, and 41 pages had duplicate title tags making Google unsure which to index. They fixed those issues, scaffolded 15 new pages targeting high-volume keywords, and submitted all 215 URLs via the Indexing API. Within 72 hours, 204 of 215 pages were indexed. Organic search traffic went from 120 to 890 weekly visits within the first month.
+
+## Tips
+
+- Run the crawl audit before submitting URLs. Submitting pages that have noindex tags or broken canonical URLs wastes your daily Indexing API quota and can delay indexing of valid pages.
+- The Google Indexing API has a daily quota of 200 URL notifications per property. Plan your batch submissions accordingly and prioritize high-value pages if you exceed the limit.
+- Schedule a weekly re-check of the indexing status for your full URL set. Google can drop pages from its index if they return errors or if crawl budget is reallocated.
+- Meta descriptions under 160 characters perform best in search results. Longer descriptions get truncated, which reduces click-through rates.

@@ -41,6 +41,26 @@ Use log analysis to find recurring errors and performance degradation.
 
 > Analyze the last 7 days of production logs. Find the top 10 recurring error patterns, identify services with increasing error rates, and flag any log patterns that correlate with the three customer-reported outages last week. Show me the error timeline overlaid with deployment events.
 
+The log analyzer produces a structured report ranking every recurring pattern by frequency and impact:
+
+```text
+LOG PATTERN ANALYSIS — Last 7 Days
+===================================
+
+Top Error Patterns (by frequency):
+#   Pattern                              Count    Services         Trend
+1   ConnectionPool exhausted             4,812    order-svc        +340% daily at 14:00
+2   Upstream timeout (5000ms)            3,291    payment-svc      Steady
+3   Retry storm (cascade)               2,877    payment,inventory Correlated w/ #2
+4   JSON parse error (null body)           841    gateway          Sporadic
+5   Certificate expiry warning             623    auth-svc         New this week
+
+Outage Correlation:
+  Mon 09:14  order-svc deploy → pattern #1 spike (pool size reduced in config)
+  Wed 14:02  batch job start  → pattern #1 + #2 cascade → customer reports
+  Fri 16:45  payment gateway 503 → pattern #2 + #3 → 12min full outage
+```
+
 The analysis reveals that 73% of errors come from just two sources: a retry storm between the payment and inventory services (one service timing out triggers cascading retries), and a database connection pool exhaustion that happens every day at 2 PM when a batch job runs. Both patterns were invisible when logs lived on individual servers.
 
 ### 3. Audit and optimize alert rules
@@ -58,6 +78,8 @@ Attach investigation steps to each remaining alert.
 > For each of the 12 remaining alert rules, create a runbook that includes: what the alert means in plain English, the first three diagnostic commands to run, likely root causes ranked by probability, and escalation contacts. Link each runbook to its alert in Grafana so the on-call engineer sees it immediately when paged.
 
 Every alert now has a clear path forward. When the "order completion rate below 99.5%" alert fires at 3 AM, the on-call engineer sees the runbook immediately: check payment gateway status, check database connection pool, check the inventory service error rate. No more staring at a vague alert trying to figure out where to start.
+
+Consider scheduling a monthly review of alert effectiveness. Track the ratio of alerts-to-incidents and the median time from alert to resolution. If an alert fires frequently but resolution always takes the same three steps, that is a candidate for automated remediation rather than human paging.
 
 ## Real-World Example
 

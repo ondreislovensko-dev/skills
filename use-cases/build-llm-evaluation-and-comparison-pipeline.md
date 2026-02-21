@@ -48,7 +48,26 @@ Execute the full evaluation suite and use LangSmith's dashboard to compare model
 
 > Run the evaluation graph against the full 150-case dataset. In LangSmith, create a comparison view showing per-model scores on: overall accuracy, edge-case accuracy, hallucination rate, average latency, p95 latency, and estimated cost per 1000 documents. Highlight any test cases where models disagree -- those are the most informative for understanding capability differences.
 
-The LangSmith traces reveal not just which model is best overall, but where each model fails. Model A might handle nested conditions perfectly but hallucinate on multi-jurisdiction cases, while Model B does the opposite. The disagreement analysis identifies the 15-20 test cases where model choice actually matters.
+The comparison dashboard produces a clear ranking across dimensions:
+
+```text
+LangSmith Evaluation — legal-doc-review-v2 (150 cases)
+=========================================================
+Metric                  GPT-4o    Claude Sonnet  Gemini Pro  Llama 70B
+Overall accuracy        91.3%     93.1%          88.4%       82.0%
+Edge-case accuracy      83.0%     89.2%          79.6%       71.4%
+Hallucination rate      4.7%      2.1%           6.3%        11.2%
+Avg latency (ms)        1,240     980            1,450       680
+p95 latency (ms)        2,890     2,100          3,410       1,200
+Cost per 1K docs        $12.40    $8.60          $7.20       $1.80
+
+Model disagreements: 23 of 150 cases (15.3%)
+  - Nested conditions:  Claude wins 8/11 disagreements
+  - Multi-jurisdiction: GPT-4o wins 6/7 disagreements
+  - Ambiguous liability: Models split evenly (5 cases)
+```
+
+The disagreement analysis identifies the 15-20 test cases where model choice actually matters. These disagreement cases become the most valuable part of the evaluation dataset for future prompt optimization.
 
 ### 4. Set up regression detection for ongoing monitoring
 
@@ -61,3 +80,10 @@ The automated pipeline catches the silent regressions that manual testing misses
 ## Real-World Example
 
 The legal tech startup ran their 150-case evaluation suite across GPT-4o, Claude Sonnet, Gemini 1.5 Pro, and Llama 3.1 70B. GPT-4o scored 91% overall, Claude Sonnet 93%, Gemini 88%, and Llama 70B 82%. But the edge-case breakdown told a different story: Claude scored 89% on nested conditions (vs GPT-4o's 83%), while GPT-4o outperformed on multi-jurisdiction cases (90% vs 85%). The team switched their primary model to Claude Sonnet for a projected $400/month savings (lower per-token cost at higher accuracy), kept GPT-4o as a fallback for the specific case types where it excels, and set up weekly LangSmith evaluations that have since caught two model-version regressions before they affected production users. Total monthly cost dropped from $1,200 to $780 while accuracy improved from 91% to 94%.
+
+## Tips
+
+- Overweight edge cases in your evaluation dataset (30-40% of cases) even though they represent a smaller fraction of production traffic. Edge cases are where models diverge most and where failures matter most.
+- Run evaluations with the exact same prompt and few-shot examples across all models. Differences in output should reflect model capability, not prompt tuning.
+- Track the disagreement cases separately over time. When a model update resolves a disagreement, it tells you the provider improved on that specific capability.
+- Set up regression alerts on both accuracy and cost. A model version update that improves accuracy but doubles latency or token usage may not be an overall win.

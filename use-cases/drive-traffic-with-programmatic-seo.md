@@ -50,7 +50,34 @@ Proper structured data makes comparison pages eligible for rich results -- star 
 
 > Add schema markup to our comparison page template. We want Product schema for each tool, FAQ schema for common questions, and Review schema for aggregate ratings.
 
-The agent generates JSON-LD templates with Product schema (name, description, pricing, rating), FAQPage schema (dynamically generated from comparison data), and AggregateRating schema. Each page gets unique structured data populated from the same database that generates the content, ensuring consistency between visible content and markup.
+The agent generates JSON-LD templates that populate dynamically from the comparison database:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is Monday.com or Asana better for marketing teams?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Monday.com scores higher for marketing teams due to built-in campaign tracking and visual timelines. Asana excels at task-level detail but lacks native marketing workflow templates."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Monday.com pricing compare to Asana in 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Monday.com starts at $9/seat/month (Basic), while Asana starts at $10.99/user/month (Starter). For a 15-person marketing team, Monday.com costs $135/month vs Asana at $164.85/month."
+      }
+    }
+  ]
+}
+```
+
+Each page gets unique structured data populated from the same database that generates the content, ensuring consistency between visible content and markup. The FAQ questions are generated from the most common search queries related to each tool pairing, so they match what users actually ask.
 
 ### 4. Audit generated pages before indexing
 

@@ -43,6 +43,37 @@ Set up LM Studio as a second inference engine running models that Ollama does no
 
 LM Studio handles models with long context windows (128K tokens) that Ollama struggles with, like processing entire documents or long email threads. The subagent pattern means each task gets a purpose-built worker with its own system prompt and output format.
 
+Once the router is running and processing requests, a typical routing log shows how traffic distributes across models:
+
+```text
+$ cat routing-report-2025-week-42.log
+
+WEEKLY ROUTING SUMMARY
+======================
+Total requests:  15,238
+Period:          Oct 14 - Oct 20, 2025
+
+Model                   Requests   Avg Latency   Est. Cost
+-------------------------------------------------------
+llama3.1:8b (Ollama)      6,412      320ms        $0.00
+qwen2.5-coder (Ollama)    2,187      410ms        $0.00
+phi-3-mini (LM Studio)    2,534      280ms        $0.00
+claude-sonnet (API)        4,105      890ms      $286.40
+-------------------------------------------------------
+TOTAL                     15,238                  $286.40
+
+Baseline (all GPT-4o):                          $1,219.04
+Savings this week:                                $932.64
+
+FALLBACK ANALYSIS
+  Triggered:     4,105 (26.9%)
+  Unnecessary:     328 (8.0% of fallbacks)
+  Top fallback reasons:
+    - Token count > 4000:       2,841
+    - Quality check failed:       936
+    - Unsupported output format:  328
+```
+
 ### 3. Build the model router with fallback chains
 
 Create a routing layer that inspects each request and sends it to the optimal model based on task type, complexity, and required quality level.
@@ -58,6 +89,8 @@ Track which models handle which tasks and compare quality scores to validate tha
 > Generate a weekly routing report showing: total requests per model, average latency per model, estimated cost savings vs sending everything to GPT-4o, and any requests that fell back to cloud APIs. Flag any task categories where local models are failing more than 10% of the time.
 
 The report identifies optimization opportunities. If 90% of code generation tasks succeed locally but 40% of long-form writing falls back to cloud, you know where to focus: either find a better local writing model or adjust the routing threshold.
+
+Over the first month, review the fallback analysis closely. Requests flagged as "unnecessary fallback" are cases where the local model would have produced acceptable output but the complexity heuristic was too conservative. Lowering the token-count threshold from 4,000 to 5,000 or relaxing the quality-check confidence score can shift another 5-10% of traffic to local models without degrading output quality.
 
 ## Real-World Example
 

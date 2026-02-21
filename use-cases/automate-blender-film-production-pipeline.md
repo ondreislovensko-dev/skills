@@ -40,6 +40,44 @@ Set up render automation so each scene is split into frame ranges and dispatched
 
 > Use blender-render-automation to configure our 4-node render farm. Split scene_017.blend (frames 1-240) into 4 chunks of 60 frames each, assign one chunk per machine, render at 4K with Cycles at 256 samples, and merge the output EXR sequences.
 
+The render farm configuration defines node capabilities, chunk assignment, and failure handling:
+
+```yaml
+# render_farm.yaml
+render_settings:
+  engine: cycles
+  resolution: [3840, 2160]
+  samples: 256
+  output_format: OPEN_EXR_MULTILAYER
+  color_depth: 32
+
+nodes:
+  - host: render-01.local
+    gpus: 2x RTX 4090
+    max_concurrent: 2
+  - host: render-02.local
+    gpus: 2x RTX 4090
+    max_concurrent: 2
+  - host: render-03.local
+    gpus: 1x RTX 4080
+    max_concurrent: 1
+  - host: render-04.local
+    gpus: 1x RTX 4080
+    max_concurrent: 1
+
+chunking:
+  strategy: frame_range
+  chunk_size: 60
+  priority: scene_complexity
+
+retry:
+  max_attempts: 3
+  on_failure: reassign_to_next_available
+  notify: pipeline@studio.local
+```
+
+The retry policy ensures that if a render node crashes mid-chunk (a common occurrence during overnight farm runs), the failed frames are automatically reassigned to the next available machine rather than silently producing gaps in the output sequence.
+
 ### 3. Assemble the final edit in the Video Sequence Editor
 
 Combine all rendered scene outputs into the final timeline with transitions, audio sync, and title cards.
@@ -55,3 +93,8 @@ Tie every step into a single Python script that watches for updated scene files 
 ## Real-World Example
 
 A three-person animation team used this pipeline for a 12-minute festival short. After the director requested color grading changes to 23 scenes on a Friday afternoon, the pipeline re-applied compositing nodes, re-rendered only the affected scenes across 4 machines overnight, and reassembled the final edit by Saturday morning. What would have been a week of manual rework was done in 9 hours with zero artist intervention.
+
+## Tips
+
+- Render to OpenEXR multilayer format instead of PNG. It preserves all compositing passes so color grading changes do not require a full re-render.
+- Set the chunking strategy to scene complexity rather than equal frame ranges. Heavy particle scenes need more time per frame than static dialogue shots.

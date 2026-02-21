@@ -49,6 +49,33 @@ Run comprehensive validation checks on every extracted value to catch extraction
 
 > Validate the extracted financial data. Check that: balance sheets balance (assets = liabilities + equity, within 0.01% tolerance), all currency values are numeric and positive where expected, no rows have null values in amount columns, year-over-year changes are within reasonable bounds (flag changes over 200%), and cross-reference totals between the income statement and balance sheet (net income should appear in both).
 
+The validator produces a structured report for each company file, flagging every issue by severity:
+
+```text
+VALIDATION REPORT — Acme Corp Q3 2025
+======================================
+Status: 3 errors, 5 warnings
+
+ERRORS:
+  [E01] Balance sheet imbalance (page 4, row 12)
+        Assets: $14,892,341   Liabilities+Equity: $14,829,341
+        Difference: $63,000 (0.42%) — exceeds 0.01% tolerance
+  [E02] Revenue mismatch (income stmt vs balance sheet)
+        Income statement total revenue:  $8,234,576
+        Balance sheet retained earnings delta: $8,234,567
+        Difference: $9 — likely transposed digit
+  [E03] Null value in amount column (page 6, row 8)
+        Field: "Other current liabilities" — blank cell
+
+WARNINGS:
+  [W01] YoY change exceeds 200%: R&D expenses $120K → $480K (+300%)
+  [W02] Negative value in "Accounts receivable": -$3,200
+  [W03] Currency symbol mismatch: page 3 uses "USD", page 5 uses "$"
+  ...
+
+Passed: 847 of 855 checks (99.1%)
+```
+
 The validator catches errors that manual review misses. A transposed digit in a $1,234,567 revenue figure becomes $1,234,576 -- a $9 difference that looks correct at a glance but fails the cross-reference check against the income statement total.
 
 ### 4. Generate the standardized output with an error report
@@ -58,6 +85,8 @@ Combine validated tables and metadata into the final standardized format, with a
 > Merge all validated extractions into a single Excel workbook with one sheet per company. Add a "Validation Results" sheet listing every warning and error found, grouped by company and severity. Flag any values that were auto-corrected (like removing extra spaces or fixing decimal alignment) so an analyst can verify them.
 
 The output workbook includes conditional formatting that highlights cells with validation warnings in yellow and errors in red, making it easy for an analyst to review the 5% of values that need attention rather than checking all 100%.
+
+For recurring clients who submit reports in the same format every quarter, save the extraction configuration as a template. This eliminates the table-detection calibration step on subsequent runs and improves accuracy because the extractor knows exactly where to find each table on each page.
 
 ## Real-World Example
 

@@ -36,6 +36,35 @@ Start with the modules that handle money, authentication, and data integrity.
 
 The generator produces tests covering edge cases that manual test writing often misses: empty carts, negative quantities, expired discount codes, and tax-exempt states.
 
+The test generator produces tests covering edge cases that manual writing often misses:
+
+```typescript
+// src/services/__tests__/checkout.test.ts
+describe("cart total calculation", () => {
+  it("applies percentage discount before tax", () => {
+    const cart = createCart([
+      { sku: "WIDGET-01", price: 29.99, quantity: 2 },
+      { sku: "GADGET-03", price: 49.99, quantity: 1 },
+    ]);
+    const total = calculateTotal(cart, { discount: { type: "percent", value: 15 } });
+    expect(total.subtotal).toBe(109.97);
+    expect(total.discount).toBe(16.50);
+    expect(total.taxable).toBe(93.47);
+  });
+
+  it("rejects negative quantities", () => {
+    expect(() => createCart([{ sku: "X", price: 10, quantity: -1 }]))
+      .toThrow("Quantity must be positive");
+  });
+
+  it("handles empty cart without crashing", () => {
+    const total = calculateTotal(createCart([]), {});
+    expect(total.subtotal).toBe(0);
+    expect(total.tax).toBe(0);
+  });
+});
+```
+
 ### 2. Set up API mocking with MSW
 
 Replace flaky network calls with deterministic mock responses that mirror real API behavior.
@@ -59,3 +88,10 @@ Catch visual and functional regressions automatically on every pull request.
 ## Real-World Example
 
 An e-commerce team was spending 4 hours per week debugging flaky tests that failed because the staging API was down or returned unexpected data. After setting up MSW, test suite reliability went from 78% to 99.6% pass rate. The test generator added 340 unit tests to previously untested modules in two days. Playwright E2E tests caught a CSS regression where the checkout button was hidden behind a banner on mobile Safari -- a bug that three rounds of manual QA had missed. The regression tester blocked a PR that accidentally changed the tax calculation rounding from banker's rounding to floor rounding, which would have undercharged tax on 12% of orders.
+
+## Tips
+
+- Generate unit tests for modules that handle money, authentication, and data integrity first. Bugs in those areas have the highest business impact.
+- Keep MSW handlers in a shared `mocks/` directory used by both the test runner and the local dev server. This guarantees the mock responses you test against match what developers see during development.
+- Use Playwright's `page.waitForLoadState("networkidle")` sparingly. Prefer waiting for specific elements to appear, which makes tests faster and less flaky.
+- Run regression screenshot comparisons on a consistent CI environment. Local screenshots will differ from CI due to font rendering and OS differences.

@@ -50,7 +50,29 @@ YouTube tutorials have a long shelf life. One good video can drive traffic for y
 
 > Plan 4 YouTube videos for the next month. Focus on searchable topics in database migrations. Include title, thumbnail concept, retention hooks, and chapter timestamps.
 
-The agent produces four video plans: "How to Migrate PostgreSQL to MySQL Without Downtime" (2,400 monthly searches), "5 Database Migration Mistakes That Will Cost You" (listicle format, high retention), "I Migrated 50 Million Rows Live -- Here's What Happened" (story format), and a tool comparison video. Each plan includes a click-worthy title, thumbnail text, a hook for the first 30 seconds, and a chapter structure optimized for retention.
+The agent produces detailed video plans with search data and retention structure:
+
+```text
+VIDEO 1 — "How to Migrate PostgreSQL to MySQL Without Downtime"
+================================================================
+Search volume:    2,400/month   |  Difficulty: Low
+Format:           Step-by-step tutorial (12-15 min)
+Thumbnail:        Split screen — PostgreSQL elephant / MySQL dolphin
+                  Text overlay: "ZERO DOWNTIME"
+
+Retention structure:
+  0:00-0:30   Hook: "Last month I migrated 50M rows with zero downtime.
+              Here is the exact process." (pattern interrupt)
+  0:30-2:00   Why this matters — the cost of downtime
+  2:00-5:00   Chapter 1: Schema compatibility mapping
+  5:00-9:00   Chapter 2: Dual-write setup and replication
+  9:00-11:00  Chapter 3: Cutover and verification
+  11:00-12:00 Recap + CTA: "Subscribe for the MySQL-to-Postgres video next week"
+
+End screen:       Link to related video + subscribe button
+```
+
+Each plan includes a click-worthy title, thumbnail text, a hook for the first 30 seconds, and a chapter structure optimized for retention. The search-focused titles target queries people actually type into YouTube, while the thumbnail and hook are designed to maximize click-through rate from browse and suggested feeds.
 
 ### 4. Generate cross-platform content from shared topics
 

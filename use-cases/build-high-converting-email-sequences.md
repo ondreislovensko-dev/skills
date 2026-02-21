@@ -34,7 +34,37 @@ Replace a linear drip with a branched sequence that responds to what users actua
 
 > Design a 14-day trial email sequence for our project management SaaS. Branch based on: activated (created a project), engaged (invited a team member), and dormant (no login after day 2). We need different paths for each segment.
 
-The agent produces a sequence map with 12 emails across three branches. Activated users get deepening emails about advanced features. Dormant users get re-engagement emails focused on the single quickest win. Engaged users (invited teammates) get emails about collaboration features and team pricing. Each email has a trigger condition, send delay, and goal.
+The agent produces a sequence map with 12 emails across three behavioral branches:
+
+```text
+BEHAVIORAL EMAIL SEQUENCE MAP — 14-Day Trial
+==============================================
+
+DAY 0 ── Welcome email (all users)
+           │
+DAY 2 ── Check: has user created a project?
+           │
+    ┌──────┴──────────────────────────────┐
+    NO (Dormant)                    YES (Activated)
+    │                                     │
+Day 3: "Your empty workspace          Day 3: "3 features to try
+        is waiting" (quick win)              next" (deepen usage)
+    │                                     │
+Day 5: "30-second setup video"       Day 5: Check: invited teammate?
+    │                                  │              │
+Day 8: "Teams like yours use it     YES (Engaged)   NO
+        for..." (social proof)        │              │
+    │                              Day 6: Collab   Day 6: "Invite your
+Day 11: Final re-engage or           features       team" nudge
+         sunset                       │              │
+                                   Day 10: Team    Day 10: Advanced
+                                     pricing        features
+                                      │              │
+                                   Day 13: Trial   Day 13: Trial ending
+                                     ending          (loss aversion)
+```
+
+Each email has a trigger condition, send delay, and goal. The branching ensures that a power user who has already invited three teammates never receives the "here is how to create a project" email meant for dormant users.
 
 ### 2. Apply psychology principles to each email
 

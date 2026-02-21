@@ -37,7 +37,39 @@ The agent parses logs and identifies that 12 IPs account for 40% of all traffic,
 
 > Set up Nginx rate limiting with three zones: a global zone of 100 req/s per IP, a strict zone of 10 req/s for /api/search, and a burst allowance of 20 for authenticated users. Use the leaky bucket algorithm.
 
-The agent generates the `limit_req_zone` directives and location blocks with proper burst and nodelay settings, plus a whitelist for monitoring IPs.
+The generated Nginx configuration uses separate rate zones per endpoint category:
+
+```nginx
+# /etc/nginx/conf.d/rate-limiting.conf
+
+# Zone definitions — 10m stores ~160,000 IPs
+limit_req_zone $binary_remote_addr zone=global:10m rate=100r/s;
+limit_req_zone $binary_remote_addr zone=search:10m rate=10r/s;
+limit_req_zone $http_x_api_key    zone=authenticated:10m rate=200r/s;
+
+# Whitelist monitoring and CI IPs
+geo $rate_limit_whitelist {
+    default         1;
+    10.0.0.0/8      0;  # internal monitoring
+    203.0.113.50/32 0;  # CI runner
+}
+
+server {
+    location /api/search {
+        limit_req zone=search burst=5 nodelay;
+        limit_req_status 429;
+        proxy_pass http://backend;
+    }
+
+    location /api/ {
+        limit_req zone=global burst=20 nodelay;
+        limit_req_status 429;
+        proxy_pass http://backend;
+    }
+}
+```
+
+The `nodelay` flag serves burst requests immediately instead of queuing them. The 429 status code tells clients they are rate-limited, which well-behaved clients use to back off automatically.
 
 ### 3. Add API gateway throttling
 
@@ -60,3 +92,10 @@ The agent runs graduated load tests and reports which layer caught each type of 
 ## Real-World Example
 
 A fintech startup's public API was being scraped by competitors, causing response times to spike to 3 seconds during business hours. They used the infra-rate-limiting skill to add Nginx rate zones (dropping 80% of scraper traffic before it hit the app), Kong throttling per API key tier, and Cloudflare rules for volumetric attacks. After deploying the three-layer setup, p99 latency dropped from 3.1 seconds to 180ms and their monthly bandwidth bill decreased by 35%. The application-level rate limiter now only handles per-user fairness logic, not abuse prevention.
+
+## Tips
+
+- Always test rate limits against staging with realistic traffic patterns before deploying to production. A misconfigured burst setting can block legitimate users during normal traffic spikes.
+- Return a `Retry-After` header with 429 responses so well-behaved clients know exactly when to retry instead of hammering the endpoint in a tight loop.
+- Log rate-limited requests with the IP, endpoint, and current rate so you can tune thresholds based on real data rather than guesswork.
+- Layer your limits from coarsest to finest: CDN catches volumetric abuse, Nginx catches per-IP abuse, API gateway enforces per-key quotas, and the application handles per-user fairness.

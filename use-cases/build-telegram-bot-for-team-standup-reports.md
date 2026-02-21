@@ -38,6 +38,38 @@ Compile all individual responses into a formatted summary posted to the team cha
 
 > Use template-engine to render a daily standup summary. Once all team members have responded (or been marked as "no update"), compile a summary grouped by team: Backend (4 people), Frontend (4 people), DevOps (2 people), and QA (2 people). Format each person's update as a bullet list under their name. Highlight any reported blockers in bold. Post the summary to the #standups group channel at 2 PM UTC.
 
+The bot posts a structured summary to the group channel that looks like this:
+
+```text
+Daily Standup -- Wednesday, Feb 18 2026
+========================================
+Responses: 11/12 (Maria: no update)
+
+BACKEND
+  Alex K.
+    Done: Finished order API pagination
+    Today: Start payment webhook retry logic
+    Blockers: None
+
+  Priya S.
+    Done: Fixed N+1 query on product listing
+    Today: Database migration for new user fields
+    Blockers: **Waiting on schema approval from DBA**
+
+FRONTEND
+  Jordan M.
+    Done: Shipped checkout redesign to staging
+    Today: A/B test setup for new checkout flow
+    Blockers: None
+  ...
+
+BLOCKERS REQUIRING ATTENTION (2):
+  1. Priya S. -- Waiting on schema approval from DBA
+  2. Tomas R. -- Staging environment down since Monday
+```
+
+The blockers section at the bottom surfaces items that need management attention without requiring anyone to scan through individual updates.
+
 ### 3. Compile weekly reports for stakeholders
 
 Aggregate standup data from the week into a stakeholder-friendly progress report.
@@ -53,3 +85,9 @@ Track participation rates and response patterns to identify engagement issues ea
 ## Real-World Example
 
 A 12-person distributed team deployed the standup bot on a Monday. By the end of the first week, participation jumped from 65% (manual approach) to 94% because the bot sent personal reminders. The manager stopped spending 45 minutes on Friday summaries entirely since the bot generates them automatically. After one month, the team identified that their QA engineer in Singapore was consistently reporting the same blocker (waiting on staging deployments) for 8 out of 20 standups, which led to a process change that gave QA self-service staging access. The weekly stakeholder report became the most-read document in the company's Slack because it was consistently formatted and always on time.
+
+## Tips
+
+- Send the standup prompt at 9 AM in each person's local timezone, not a single global time. A prompt at 2 AM is ignored; a prompt at the start of someone's workday gets answered immediately.
+- Limit each response field to 500 characters. This prevents the summary from being dominated by one person's essay and keeps updates scannable.
+- Store standup data for at least 90 days. Recurring blockers only become visible when you can look back across weeks to spot patterns.

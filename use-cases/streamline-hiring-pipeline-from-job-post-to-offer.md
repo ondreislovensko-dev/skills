@@ -39,6 +39,34 @@ Process the applicant pool against weighted criteria to surface the strongest ca
 
 > Use applicant-screening to evaluate 214 applications for the Senior Backend Engineer role. Score each resume against these weighted criteria: Python experience (25%), distributed systems (20%), relevant industry experience (15%), education (10%), open source contributions (10%), communication signals from cover letter (10%), and culture fit indicators (10%). Flag candidates who meet all hard requirements and rank them by overall score. Output the top 30 candidates to /hiring/backend-senior/shortlist.csv.
 
+The screening tool produces a ranked summary with scores broken down by criterion:
+
+```text
+Applicant Screening — Senior Backend Engineer
+==============================================
+Applications received: 214
+Hard requirements met:  68 (31.8%)
+Shortlisted (top 30):  30
+
+Rank  Name              Score  Python  DistSys  Industry  Edu  OSS  Comms  Culture
+  1   Sarah Chen        94.2   25/25   20/20    13/15     8/10 10/10  9/10   9.2/10
+  2   Marcus Rivera     91.8   25/25   18/20    14/15     9/10  8/10  9/10   8.8/10
+  3   Aisha Patel       89.5   23/25   19/20    12/15    10/10  9/10  8/10   8.5/10
+  4   David Kim         87.3   24/25   17/20    13/15     7/10 10/10  8/10   8.3/10
+  5   Elena Volkov      85.9   22/25   20/20    11/15     8/10  7/10  9/10   8.9/10
+ ...
+ 30   James Okonkwo     72.1   20/25   14/20    10/15     8/10  6/10  7/10   7.1/10
+
+Rejected (hard requirements not met): 146
+  - Insufficient Python experience (<3 years): 89
+  - No distributed systems background:        41
+  - Missing cover letter:                      16
+
+Output: /hiring/backend-senior/shortlist.csv
+```
+
+The rejection breakdown helps the recruiter understand whether the job posting is attracting the right applicant pool or needs adjustments to its requirements or distribution channels.
+
 ### 3. Analyze resume-to-role fit for shortlisted candidates
 
 Deeply compare each shortlisted candidate's experience against the specific role requirements.
@@ -54,3 +82,9 @@ Produce legally compliant offer letters with correct compensation, equity terms,
 ## Real-World Example
 
 The startup ran this pipeline for all 6 engineering roles. Job descriptions were generated in 30 minutes total instead of 3 days. The screening tool processed 1,180 total applications across all roles and shortlisted 142 candidates in under 2 hours, compared to the 80+ hours it would have taken to review manually. The HR manager reported that interview-to-offer conversion improved from 1-in-5 to 1-in-3 because better screening meant interviewers spent time with genuinely qualified candidates. All 6 positions were filled in 6 weeks instead of the expected 8, and offer letters were delivered same-day instead of the previous 3-day turnaround.
+
+## Tips
+
+- Calibrate screening weights by having the hiring manager manually score 10 resumes first, then adjust the automated weights until the tool's ranking matches the manager's intuition.
+- Keep the hard requirement threshold strict but the scoring flexible. A candidate with 4 years of Python but exceptional distributed systems experience should still surface above someone with exactly 5 years of Python and nothing else.
+- Generate both a full-length job description for the careers page and a condensed version for job boards. LinkedIn posts with descriptions under 300 words receive significantly more applications than longer ones.

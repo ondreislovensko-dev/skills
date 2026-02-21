@@ -40,7 +40,30 @@ Use Pulumi stacks to manage per-environment differences.
 
 > Create three Pulumi stacks (dev, staging, prod) with different sizing. Dev gets a t3.micro RDS and 1 Fargate task. Staging gets t3.small with 2 tasks. Production gets r6g.large Multi-AZ RDS with 4 tasks and autoscaling from 4 to 12. Add a stack reference so the monitoring stack can read outputs from the infrastructure stack.
 
-Each stack has its own config file with size parameters. The TypeScript code uses conditional logic and loops -- real programming constructs that eliminate the copy-paste modules common in HCL configurations.
+Each stack uses a config file that drives the TypeScript logic:
+
+```yaml
+# Pulumi.prod.yaml
+config:
+  aws:region: eu-central-1
+  infra:environment: production
+  infra:rds:
+    instanceClass: r6g.large
+    multiAz: true
+    backupRetentionDays: 14
+    allocatedStorage: 100
+  infra:ecs:
+    desiredCount: 4
+    minCount: 4
+    maxCount: 12
+    cpu: 1024
+    memory: 2048
+  infra:alb:
+    idleTimeout: 120
+    deletionProtection: true
+```
+
+The TypeScript code reads these values with `config.requireObject<RdsConfig>("rds")` and uses conditional logic and loops to generate resources. Adding a fourth environment is a new YAML file and `pulumi stack init`, not a copy of 2,000 lines of HCL.
 
 ### 3. Configure servers with Ansible playbooks
 
@@ -61,3 +84,10 @@ A Python inventory script queries `pulumi stack output --json` and generates hos
 ## Real-World Example
 
 Chen's platform team migrates their 8,000-line Terraform codebase to Pulumi over three sprints. The TypeScript compiler catches 23 configuration bugs during the migration that had been silently present in HCL -- wrong subnet references, missing IAM permissions, invalid CIDR ranges. Post-provisioning setup, which previously took 45 minutes of manual SSH and bash scripts per server, now runs automatically via Ansible in 6 minutes. When the team adds a fourth environment for load testing, the entire stack -- infrastructure and configuration -- deploys in 18 minutes with a single `git push`.
+
+## Tips
+
+- Use Pulumi component resources to encapsulate related infrastructure (VPC + subnets + NAT gateway) into a single reusable class. This is the TypeScript equivalent of Terraform modules but with full type checking.
+- Run `pulumi preview` in CI on every pull request. It shows exactly what will change without applying anything, and the TypeScript types guarantee the preview matches the apply.
+- Store Pulumi state in an S3 backend with locking, not the default Pulumi Cloud, if you need to keep infrastructure state in your own accounts.
+- Wire Pulumi stack outputs directly into Ansible inventory using a Python script that calls `pulumi stack output --json`. This eliminates the manual inventory file that drifts from reality.

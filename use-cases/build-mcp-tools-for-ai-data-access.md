@@ -40,7 +40,29 @@ Build a LangChain chain that converts natural language questions into structured
 
 > Create a LangChain chain that takes a natural language question about product analytics and translates it into the correct MCP tool call. Use a few-shot prompt with 10 example question-to-tool mappings. For SQL questions, generate the query using the database schema (provide the schema as context). For metric questions, map common terms to metric names ("signups" maps to "user.registration.completed", "conversion rate" maps to "funnel.step.completion"). Include a validation step that checks the generated SQL against the schema before executing.
 
-The LangChain layer acts as a translator between human intent and structured tool calls. Instead of asking "run this SQL," a product manager can ask "how many enterprise customers used the export feature last month?" and the chain generates the correct tool call with proper date ranges and filters.
+The translation layer converts natural language into structured tool calls:
+
+```text
+User: "How many enterprise customers used the export feature last month?"
+
+Chain reasoning:
+  1. Intent: count customers matching criteria (SQL query)
+  2. Tables: customers, feature_usage
+  3. Filters: plan = 'enterprise', feature = 'export', date range = last month
+  4. Generated tool call: query-analytics
+
+SQL: SELECT COUNT(DISTINCT c.id) AS enterprise_export_users
+     FROM customers c
+     JOIN feature_usage fu ON fu.customer_id = c.id
+     WHERE c.plan = 'enterprise'
+       AND fu.feature_name = 'export'
+       AND fu.used_at >= date_trunc('month', now() - interval '1 month')
+       AND fu.used_at < date_trunc('month', now());
+
+Result: { "enterprise_export_users": 147 }
+```
+
+Instead of asking "run this SQL," a product manager can ask the question in plain language and the chain generates the correct tool call with proper date ranges and filters.
 
 ### 3. Test tool calls with realistic queries
 
@@ -61,3 +83,10 @@ The query log doubles as a requirements document. After a month of use, the top 
 ## Real-World Example
 
 A 45-person SaaS company deployed an MCP analytics server connected to their PostgreSQL database and metrics API. Within the first week, 12 team members across product, marketing, and customer success connected it to Claude Desktop. The number of ad-hoc data requests in the analytics Slack channel dropped by 68% in the first month. Product managers who used to wait 2-4 hours for an analyst to answer a question now got answers in under 10 seconds. The query log revealed that "churn by plan" was asked 34 times in the first month -- leading the team to build a dedicated churn dashboard that eliminated the question entirely. The two analysts reclaimed roughly 16 hours per week, which they redirected toward building predictive models instead of answering repetitive data questions.
+
+## Tips
+
+- Always connect to a read-only database replica, never the primary. Even with SQL validation, a read replica guarantees no accidental writes and isolates analytics query load from production traffic.
+- Include the database schema as context in the LangChain few-shot prompt. Without schema awareness, the chain guesses table and column names and generates invalid SQL.
+- Log every query the MCP server executes. The query log becomes a requirements document for dashboards -- the 20 most frequent questions tell you exactly what reports to build next.
+- Start with 10 few-shot examples covering the most common question patterns, then expand to 25-30 based on the first month's query log. More examples improve accuracy on ambiguous questions.

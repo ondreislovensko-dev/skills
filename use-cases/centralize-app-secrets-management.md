@@ -47,7 +47,29 @@ Check for missing variables, type mismatches, and drift between environments.
 
 > Run env-manager validation across all 8 services. Check that every variable defined in development also exists in staging and production. Flag any production secrets that match development values (potential copy-paste mistakes). Verify that all URLs use HTTPS in production and that no secret values appear in application logs.
 
-The validation catches three production secrets still using development values -- a webhook URL pointing to localhost, a Sentry DSN for the dev project, and an S3 bucket name with "-dev" suffix. All three would have caused silent failures or data leaking to wrong environments.
+The validation report surfaces problems that would otherwise cause silent failures in production:
+
+```text
+Environment Validation Report
+===============================
+Service: payment-api
+
+CRITICAL — Production values matching development:
+  WEBHOOK_URL = http://localhost:3000/webhooks   (should be HTTPS production URL)
+  SENTRY_DSN  = https://abc@sentry.io/dev-proj   (points to dev Sentry project)
+  S3_BUCKET   = acme-uploads-dev                  (has -dev suffix)
+
+WARNING — Missing in production:
+  FEATURE_FLAG_URL  (defined in dev and staging, missing in prod)
+  LOG_LEVEL         (defined in dev, missing in staging and prod)
+
+WARNING — Protocol mismatch:
+  REDIS_URL uses redis:// in production (expected rediss:// for TLS)
+
+OK — 39 of 47 secrets validated across all environments
+```
+
+All three critical findings would have caused silent failures or data leaking to wrong environments.
 
 ### 4. Integrate Doppler into deployment pipelines
 
@@ -60,3 +82,10 @@ Developers run `doppler run -- npm start` locally, which injects secrets as envi
 ## Real-World Example
 
 Priya leads platform engineering at a fintech startup preparing for SOC 2 certification. The auditor flags their secret management as a critical finding -- secrets in git repos, no access logging, and no rotation policy. She migrates all 47 secrets to Doppler in two days, sets up access controls requiring two-person approval for production changes, and enables the audit log. The next password rotation takes 15 minutes instead of two days: change the value in Doppler, and every service picks it up on the next deploy. The SOC 2 auditor signs off on the secrets management control in the following review cycle.
+
+## Tips
+
+- Run the secret audit before migrating. You cannot centralize secrets you do not know exist, and the audit always finds credentials in places nobody expected.
+- Use Doppler's root config for shared secrets and override only per-environment differences. This eliminates the most common drift problem: updating a URL in production but forgetting staging.
+- Add a pre-commit hook that scans for secret patterns (API keys, connection strings, tokens) and blocks commits containing them. Tools like `gitleaks` or `trufflehog` integrate in seconds.
+- Schedule quarterly secret rotation even when there is no incident. Rotation rehearsal means the team knows the process cold when a real leak occurs.

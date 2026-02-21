@@ -50,7 +50,27 @@ Batch-writing removes the daily friction of staring at a blank LinkedIn editor.
 
 > Write 4 LinkedIn posts for week one. Post 1: a personal story about a data pipeline failure. Post 2: a carousel outline on evaluating data tools. Post 3: a contrarian take on real-time data. Post 4: a question post about team scaling.
 
-The agent produces four ready-to-publish posts. The story post opens with a specific hook ("At 2 AM on a Sunday, my phone rang. Our pipeline had silently dropped 40,000 records"), builds tension, delivers the lesson, and ends with a question to drive comments. Each post follows LinkedIn copywriting best practices: short paragraphs, one idea per line, and a hook in the first two lines visible before "see more."
+The agent produces four ready-to-publish posts with hooks optimized for the LinkedIn algorithm. Here is the structure for the story post:
+
+```text
+POST 1 — Story (Tuesday 7:30 AM EST)
+=====================================
+Hook: "At 2 AM on a Sunday, my phone rang.
+Our pipeline had silently dropped 40,000 records."
+
+Structure:
+  Line 1-2:  Specific, dramatic opening (visible before "see more")
+  Line 3-8:  Build tension — what happened, what was at stake
+  Line 9-12: The turning point — what they discovered
+  Line 13-16: The lesson — make it universal, not product-specific
+  Line 17-18: CTA question — "What is the worst data incident you have lived through?"
+
+Word count: 180-220 words
+Format: Text only (no links — LinkedIn suppresses link posts)
+Hashtags: #DataEngineering #DataPipelines #LessonsLearned
+```
+
+Each post follows LinkedIn copywriting best practices: short paragraphs, one idea per line, and a hook in the first two lines visible before "see more." The story format consistently outperforms feature announcements because it triggers emotional engagement and comment replies.
 
 ### 4. Set up lead tracking from LinkedIn activity
 

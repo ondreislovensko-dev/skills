@@ -48,6 +48,34 @@ External integrations need long-lived API tokens, not session cookies.
 
 > Our customers need API tokens to integrate with their CI/CD pipelines. Implement a JWT-based API token system alongside Clerk session auth. Tokens should be scoped to specific permissions (read:projects, write:deployments), have configurable expiration, and be revocable. Store token metadata in our database so we can audit usage and revoke compromised tokens.
 
+The token system stores metadata alongside scoped permissions:
+
+```typescript
+// POST /api/tokens — create a new API token
+const token = await jwt.sign({
+  sub: user.id,
+  org: organization.id,
+  scopes: ["read:projects", "write:deployments"],
+  jti: crypto.randomUUID(),  // unique token ID for revocation
+  exp: Math.floor(Date.now() / 1000) + (90 * 24 * 60 * 60), // 90 days
+}, process.env.JWT_SECRET);
+
+// Store metadata for audit and revocation
+await db.apiTokens.create({
+  tokenId: payload.jti,
+  userId: user.id,
+  orgId: organization.id,
+  scopes: ["read:projects", "write:deployments"],
+  expiresAt: new Date(payload.exp * 1000),
+  lastUsedAt: null,
+  revokedAt: null,
+});
+
+// Response: { token: "sk_live_eyJhbGci...", expiresAt: "2026-05-22T..." }
+```
+
+The middleware checks both Clerk session cookies (for browser requests) and Bearer tokens (for API integrations) on every request. Revoked tokens are rejected even if the JWT signature is valid, because the middleware checks the database revocation list.
+
 ### 4. Set up role-based access control
 
 Different users within an organization need different permission levels.
@@ -57,3 +85,10 @@ Different users within an organization need different permission levels.
 ## Real-World Example
 
 A developer tools startup needed authentication for their deployment platform. They started with Clerk to ship a working login in one afternoon, then added custom JWT tokens for the CLI tool that developers use to trigger deployments from their terminal. The JWT handler skill set up token scoping so a CI/CD token with `write:deployments` permission cannot access billing or team management. Six months later, with 3,000 users and Clerk costs approaching $500/month, they evaluated migrating to Lucia for the session-based flows while keeping JWT for API tokens. The auth-system-setup skill generated a migration plan that moved users over a weekend with zero downtime.
+
+## Tips
+
+- Start with a managed auth provider (Clerk, Auth0) if you have fewer than 5,000 users. The development time saved is worth more than the per-user cost at that scale.
+- Always store API token metadata in your database, not just the JWT. You need the ability to list active tokens, audit usage, and revoke compromised tokens without waiting for JWT expiration.
+- Scope API tokens as narrowly as possible. A token that can only `read:projects` limits the blast radius if it leaks in a CI log.
+- Plan your migration path before committing to a provider. Store user IDs in your own database from day one so you can switch auth providers without losing the user-to-data mapping.

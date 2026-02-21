@@ -45,6 +45,30 @@ Electron bundles Chromium, producing a 150MB+ installer. Tauri uses the OS webvi
 
 > Compare our Electron app against a Tauri equivalent. Show me the binary size difference, memory usage, and what code changes are needed to migrate. Our app uses SQLite via better-sqlite3 and the Notification API.
 
+The comparison reveals significant differences in resource usage:
+
+```text
+Desktop Framework Comparison — Inventory Scanner App
+=====================================================
+                          Electron 28       Tauri 2.1
+Installer size (macOS)    168 MB            7.4 MB
+Installer size (Windows)  154 MB            6.8 MB
+Installer size (Linux)    172 MB            8.1 MB
+RAM at idle               148 MB            42 MB
+RAM with 10k records      210 MB            67 MB
+Startup time              2.8s              0.6s
+SQLite support            better-sqlite3    tauri-plugin-sql
+Notification API          Electron native   tauri-plugin-notification
+Auto-update               electron-updater  tauri-plugin-updater
+
+Migration effort:
+  Frontend (React):       No changes needed
+  IPC bridge:             Rewrite 14 IPC handlers from Electron to Tauri commands
+  Native plugins:         Replace 3 npm packages with Tauri plugins
+  Build config:           New tauri.conf.json (replaces electron-builder.yml)
+  Estimated time:         3-4 days for one developer
+```
+
 Tauri's Rust backend replaces Node.js IPC with a command system. The frontend stays identical -- only the bridge layer changes.
 
 ### 4. Set up auto-updates and code signing
@@ -56,3 +80,10 @@ Ship updates without requiring users to manually download new versions.
 ## Real-World Example
 
 A logistics startup with 12 warehouses built their inventory scanner as a React web app. When two facilities lost internet during peak season, staff could not log scans for three hours, creating a backlog of 2,400 unprocessed items. The team used the electron skill to wrap the app with SQLite offline storage in two days. After validating the approach, they migrated to Tauri, cutting the installer from 168MB to 8MB. Warehouse managers no longer complain about download times on slow facility networks, and offline scans sync automatically when connectivity returns.
+
+## Tips
+
+- Start with Electron if your team has no Rust experience. The migration to Tauri is straightforward once the app architecture is stable, but debugging Rust compilation errors during initial development slows momentum.
+- Use context isolation and a preload script in Electron from day one. Retrofitting security after launch is far harder than building it in from the start.
+- Test auto-updates on all three platforms before shipping. macOS code signing behaves differently from Windows Authenticode, and Linux distributions handle updates through package managers rather than in-app updaters.
+- SQLite is the right offline storage for structured data, but consider using the filesystem directly for large binary assets like scanned images. Storing blobs in SQLite causes database bloat and slower backups.

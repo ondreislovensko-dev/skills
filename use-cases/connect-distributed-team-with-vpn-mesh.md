@@ -33,6 +33,38 @@ Create point-to-point WireGuard tunnels between offices and cloud regions.
 
 > Set up WireGuard site-to-site tunnels connecting our three locations: New York office (10.1.0.0/16), Berlin office (10.2.0.0/16), and AWS us-east-1 (10.3.0.0/16). Each tunnel should use dedicated WireGuard interfaces with persistent keepalives. Configure routing so each site can reach the other two subnets. Use pre-shared keys for post-quantum protection.
 
+The generated WireGuard configuration for the New York gateway looks like this:
+
+```ini
+# /etc/wireguard/wg-berlin.conf — New York to Berlin tunnel
+[Interface]
+Address = 10.100.0.1/30
+PrivateKey = <ny-private-key>
+ListenPort = 51820
+
+[Peer]
+# Berlin office gateway
+PublicKey = <berlin-public-key>
+PresharedKey = <psk-ny-berlin>
+AllowedIPs = 10.2.0.0/16, 10.100.0.2/32
+Endpoint = berlin-gw.example.com:51820
+PersistentKeepalive = 25
+
+# /etc/wireguard/wg-aws.conf — New York to AWS tunnel
+[Interface]
+Address = 10.100.1.1/30
+PrivateKey = <ny-private-key>
+ListenPort = 51821
+
+[Peer]
+# AWS us-east-1 gateway
+PublicKey = <aws-public-key>
+PresharedKey = <psk-ny-aws>
+AllowedIPs = 10.3.0.0/16, 10.100.1.2/32
+Endpoint = 54.82.xx.xx:51820
+PersistentKeepalive = 25
+```
+
 The three WireGuard tunnels form a full mesh between sites. Traffic between Berlin and AWS goes direct instead of routing through New York. Each tunnel operates at near-wire speed with 1-2ms overhead. The kernel-level implementation means the site-to-site links handle 1 Gbps without breaking a sweat.
 
 ### 2. Deploy Tailscale for developer mesh access
@@ -58,6 +90,8 @@ Track all VPN connections and detect anomalies.
 > Set up monitoring for the entire VPN infrastructure. Track WireGuard tunnel status and bandwidth between sites, Tailscale node connectivity and last-seen timestamps, and OpenVPN active sessions with data transfer. Alert when a site-to-site tunnel goes down, when a Tailscale node hasn't connected in 7 days (stale device), or when a contractor transfers more than 1 GB in a single session.
 
 The monitoring dashboard shows all three VPN layers in one view. The stale device alert catches a former employee's laptop that was never deprovisioned from Tailscale -- a common oversight that the automated check now prevents. WireGuard tunnel health checks catch a network change at the Berlin office before it impacts cross-site service communication.
+
+As the team grows, review Tailscale ACLs quarterly. New hires often get assigned default groups that may grant broader access than their role requires. Pair each ACL change with a peer review, just like a code change, to prevent access scope creep.
 
 ## Real-World Example
 

@@ -37,6 +37,33 @@ Create a bone mapping configuration that translates the mocap skeleton hierarchy
 
 > Create a bone mapping from our Rokoko mocap skeleton to our custom game character rig. The mocap uses names like "Hips", "Spine1", "LeftUpLeg" while our rig uses "root_bone", "spine_01", "thigh_L". Save the mapping as a reusable JSON config at /config/bone_map.json so it works for all 8 characters.
 
+The resulting bone mapping configuration defines each source-target pair along with axis corrections:
+
+```json
+{
+  "version": "1.0",
+  "source_rig": "Rokoko_Smartsuit",
+  "target_rig": "fighter_custom_v2",
+  "bone_map": [
+    { "source": "Hips",       "target": "root_bone",  "axis_remap": "XZY" },
+    { "source": "Spine1",     "target": "spine_01",   "axis_remap": null },
+    { "source": "Spine2",     "target": "spine_02",   "axis_remap": null },
+    { "source": "Neck",       "target": "neck_01",    "axis_remap": null },
+    { "source": "Head",       "target": "head",        "axis_remap": null },
+    { "source": "LeftUpLeg",  "target": "thigh_L",    "axis_remap": "XZY" },
+    { "source": "LeftLeg",    "target": "shin_L",     "axis_remap": null },
+    { "source": "LeftFoot",   "target": "foot_L",     "axis_remap": null },
+    { "source": "RightUpLeg", "target": "thigh_R",    "axis_remap": "XZY" },
+    { "source": "RightLeg",   "target": "shin_R",     "axis_remap": null },
+    { "source": "RightFoot",  "target": "foot_R",     "axis_remap": null }
+  ],
+  "scale_factor": 0.01,
+  "root_offset": [0.0, 0.0, 0.92]
+}
+```
+
+This mapping file is authored once and reused for every character in the project. The `axis_remap` field handles the common problem of hip and thigh bones having different axis conventions between the mocap suit and the game rig. The `scale_factor` converts from the centimeter units used by the mocap suit to the meter units in the game engine.
+
 ### 3. Batch retarget all 30 combat moves
 
 Process every BVH file through the bone mapping and apply per-clip adjustments automatically.
@@ -52,3 +79,10 @@ Fix common retargeting artifacts like foot sliding, interpenetration, and unnatu
 ## Real-World Example
 
 The studio recorded all 30 combat moves in a single 4-hour mocap session with two performers. Using the automated pipeline, they retargeted and cleaned all 30 animations onto their first character in under 13 hours total. Repeating the process for the remaining 7 characters took 3 hours each since the bone mapping and cleanup presets were reusable. The entire 8-character animation set that was estimated at 1,440 hours of hand animation was completed in approximately 34 hours of pipeline-assisted work.
+
+## Tips
+
+- Record mocap at the highest frame rate your suit supports (120fps+), then downsample. You cannot recover data lost at capture time, but you can always remove frames later.
+- Save bone mapping configs per mocap suit model, not per character. A Rokoko mapping works for any target rig; only the target side changes.
+- Run the cleanup pass on the retargeted animation, not the raw BVH. Fixing foot sliding before retargeting wastes effort because the retarget step introduces its own artifacts.
+- Keep raw BVH files archived separately from retargeted outputs. Directors frequently request re-retargeting months later with adjusted scale or root offsets.

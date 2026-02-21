@@ -49,7 +49,28 @@ Run inference on the validation set and analyze where the model succeeds and fai
 
 > Evaluate the trained model on the real-image validation set. Show mAP@0.5, mAP@0.5:0.95, precision, and recall per damage type. Generate a confusion matrix and show the 10 worst false positives and 10 worst false negatives so I can understand failure modes.
 
-The evaluation on real-only validation data shows whether synthetic augmentation helped or introduced artifacts. Typical failure modes include reflective tape being confused for water damage, and shadows being classified as crushed corners.
+After training completes, the evaluation script outputs per-class metrics on the real-image validation set:
+
+```text
+YOLOv8m Evaluation — Real Validation Set (160 images)
+=====================================================
+
+                  mAP@0.5   mAP@0.5:0.95   Precision   Recall
+all classes        0.891       0.674          0.883      0.856
+crushed_corner     0.934       0.721          0.912      0.908
+torn_side          0.872       0.648          0.867      0.831
+water_stain        0.861       0.629          0.853      0.819
+tape_failure       0.897       0.698          0.901      0.867
+
+Confusion Matrix (top misclassifications):
+  water_stain → tape_failure:    14 instances (reflective tape surface)
+  crushed_corner → background:    9 instances (shadow edges)
+  torn_side → crushed_corner:     6 instances (overlapping damage)
+
+Training time: 4h 12m on 1x A100 (100 epochs, best at epoch 74)
+```
+
+The evaluation on real-only validation data shows whether synthetic augmentation helped or introduced artifacts. Typical failure modes include reflective tape being confused for water damage, and shadows being classified as crushed corners. Reviewing the worst false positives helps prioritize the next round of synthetic data generation -- if reflective tape confusion is common, generate more synthetic images with prominent tape under varied lighting.
 
 ### 4. Optimize for edge deployment with TensorRT
 

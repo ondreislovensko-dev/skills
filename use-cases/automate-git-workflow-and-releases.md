@@ -41,6 +41,35 @@ Turn the structured commit history into a changelog grouped by version and categ
 
 > Generate a CHANGELOG.md from our git history. Group entries by version (from git tags), then by type: Features, Bug Fixes, Performance Improvements, and Breaking Changes. Include the commit scope, description, and a link to the PR. Start from tag v3.0.0 to the current HEAD.
 
+The generated changelog groups commits into scannable sections:
+
+```text
+# Changelog
+
+## v3.5.0 (2026-02-18)
+
+### Features
+- **billing**: Add proration for mid-cycle plan upgrades (#412)
+- **api**: Support cursor-based pagination on /orders endpoint (#408)
+- **ui**: Add dark mode toggle to dashboard settings (#405)
+
+### Bug Fixes
+- **auth**: Fix token refresh race condition causing 401 on concurrent requests (#410)
+- **billing**: Correct tax calculation for Canadian provinces (#407)
+
+### Performance
+- **api**: Reduce /products query time from 340ms to 45ms with composite index (#409)
+
+### Breaking Changes
+- **api**: Remove deprecated /v1/legacy-orders endpoint (#411)
+  Migration: Use /v2/orders with cursor pagination instead.
+
+## v3.4.2 (2026-02-04)
+...
+```
+
+Each entry links to the pull request, making it easy for support engineers to find the exact code change behind any release note.
+
 ### 3. Automate GitHub releases on merge to main
 
 Every merge to main that includes feat or fix commits should trigger a new release.
@@ -56,3 +85,10 @@ Automatically categorize pull requests and track progress toward release milesto
 ## Real-World Example
 
 A developer tools company with 6 engineers was spending 2 hours per release manually writing changelogs and release notes. After adopting git-commit-pro, the commit history became self-documenting within one sprint. The changelog generator produced a complete CHANGELOG.md covering 14 versions in under a minute. The automated GitHub release workflow shipped its first release with zero manual steps -- a developer merged a PR to main and three minutes later, v3.5.0 appeared on the releases page with categorized notes, linked PRs, and a migration guide for the one breaking change. Customer support now links to specific release notes instead of saying "it was fixed in a recent update."
+
+## Tips
+
+- Add the commit-msg hook to the repository's pre-commit config so it installs automatically for every developer. Relying on each person to install it manually means someone will skip it.
+- Use commit scopes that match your codebase modules, not arbitrary labels. If your repo has `src/auth/`, `src/billing/`, and `src/api/`, the scopes should be `auth`, `billing`, and `api`.
+- Include a "Breaking Changes" section in every release, even if it is empty. This trains readers to check for breaking changes and builds trust that the changelog is comprehensive.
+- Tag releases immediately after the changelog is generated to avoid a window where commits land between the changelog and the tag, creating drift.

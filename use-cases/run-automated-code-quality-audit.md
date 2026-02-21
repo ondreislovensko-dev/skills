@@ -35,11 +35,35 @@ Find the functions that are hardest to understand and most likely to contain bug
 
 The scanner reveals that 80% of the complexity is concentrated in three modules: billing (14 functions above threshold), permissions (8 functions), and the legacy import pipeline (6 functions).
 
+The scanner produces a ranked report like this:
+
+```text
+Complexity Hotspot Report — src/
+=================================
+Module              Functions > 15    Avg Complexity    Max Complexity
+billing/            14                23.4              41
+permissions/        8                 18.7              32
+import-pipeline/    6                 17.2              28
+notifications/      2                 16.1              19
+
+Top 5 Functions by Cyclomatic Complexity:
+  1. billing/invoice.ts:calculateLineItems()        complexity=41  lines=312
+  2. billing/discount.ts:applyStackedDiscounts()     complexity=38  lines=274
+  3. permissions/resolver.ts:evaluatePolicy()        complexity=32  lines=198
+  4. import-pipeline/csv.ts:parseLegacyFormat()      complexity=28  lines=245
+  5. import-pipeline/transform.ts:normalizeRows()    complexity=26  lines=189
+
+28 functions exceed threshold (complexity > 15)
+80% of high-complexity code concentrated in 3 of 22 modules
+```
+
 ### 2. Profile runtime performance issues
 
 Complexity does not always correlate with performance problems. A simple function called 10,000 times matters more than a complex function called once.
 
 > Review our API endpoints for performance issues. Check for N+1 database queries, missing indexes, synchronous operations that should be async, and memory leaks in long-running processes. Focus on the endpoints with the highest traffic: GET /api/orders, POST /api/checkout, and GET /api/products.
+
+The performance review uncovers that the checkout endpoint makes 47 database queries per request due to N+1 problems in the discount calculation loop. Each cart item triggers a separate query to check applicable discounts, then another to verify inventory. The orders listing endpoint does a sequential scan on a 2.3 million row table because the composite index on (order_date, status) was never created.
 
 ### 3. Assess overall code quality patterns
 
@@ -56,3 +80,10 @@ Combine all findings into an actionable remediation plan ordered by impact.
 ## Real-World Example
 
 A fintech team of eight engineers inherited a codebase where every sprint felt slower than the last. The code quality audit revealed that the billing module had an average cyclomatic complexity of 23 -- nearly double the industry threshold. The performance review found that the checkout endpoint was making 47 database queries per request due to N+1 problems in the discount calculation. The tech debt analyzer estimated the team was spending 15 hours per week working around accumulated debt. Armed with this data, the engineering manager secured two sprints of dedicated refactoring time. The team reduced checkout queries from 47 to 4, cut the billing module's complexity by 60%, and sprint velocity increased 25% in the following quarter.
+
+## Tips
+
+- Run the full audit quarterly, not just once. Codebases accumulate debt continuously, and a quarterly scan catches regressions before they compound.
+- Start with the complexity scan because it is the fastest to run and gives immediate visibility into where problems cluster.
+- Use the tech debt backlog output directly as sprint planning input. Prioritize items that overlap high complexity and high traffic -- those deliver the most improvement per hour invested.
+- Track the total number of functions above the complexity threshold over time as a health metric. It should decrease or hold steady sprint over sprint.

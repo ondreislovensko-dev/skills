@@ -40,6 +40,32 @@ Run every endpoint through happy path, error, and edge case scenarios.
 
 > Test all 34 endpoints in our API. For each endpoint, verify: correct HTTP status codes, response schema matches the OpenAPI spec, authentication is enforced on protected routes, validation rejects malformed input with helpful error messages, and pagination returns correct page sizes. Report failures as a summary table.
 
+The test runner produces a table showing pass/fail status for every endpoint and test category:
+
+```text
+API Test Results — 34 endpoints, 187 assertions
+=================================================
+Endpoint                    Status  Auth  Validation  Schema  Pagination
+GET    /api/v1/products     PASS    PASS  PASS        PASS    PASS
+POST   /api/v1/products     PASS    PASS  PASS        PASS    --
+GET    /api/v1/products/:id PASS    PASS  PASS        PASS    --
+PUT    /api/v1/products/:id PASS    PASS  PASS        PASS    --
+DELETE /api/v1/products/:id PASS    PASS  PASS        PASS    --
+GET    /api/v1/orders       PASS    PASS  PASS        PASS    PASS
+POST   /api/v1/orders       PASS    PASS  FAIL *      PASS    --
+GET    /api/v1/users        PASS    PASS  PASS        PASS    PASS
+POST   /api/v1/checkout     PASS    PASS  PASS        FAIL *  --
+...
+
+Summary: 183 passed, 4 failed
+  * POST /api/v1/orders     — empty body returns 500 instead of 400
+  * POST /api/v1/checkout   — response missing "currency" field in schema
+  * PUT  /api/v1/users/:id  — accepts invalid email format "not-an-email"
+  * GET  /api/v1/reports     — returns 200 without auth header (should be 401)
+```
+
+The four failures represent real bugs. The orders endpoint crashes on empty bodies instead of returning a validation error, and the reports endpoint is missing authentication middleware entirely.
+
 ### 3. Validate Stripe payment flows end-to-end
 
 Payment integrations have edge cases that only appear under specific conditions.
@@ -55,3 +81,10 @@ Automate doc generation and API testing so they run on every pull request.
 ## Real-World Example
 
 A payments platform had three partner companies struggling to integrate because the API docs showed v1 request formats while the live API had silently migrated to v2. The api-doc-generator produced accurate documentation in 20 minutes by reading the actual route definitions and Zod schemas. The api-tester discovered that 4 of 34 endpoints returned 500 errors on empty request bodies instead of 400 validation errors. The stripe-testing skill caught a critical bug: disputed charges were being processed as refunds, which meant the company was losing both the charge amount and the dispute fee. The total documentation and testing overhaul took two days and prevented an estimated $12,000 in monthly dispute losses.
+
+## Tips
+
+- Generate documentation on every pull request and diff it against the previous version. If an endpoint's request schema changed but the changelog was not updated, fail the CI check.
+- Test with realistic payloads, not minimal valid objects. An endpoint that accepts a product with a 3-character name might break when someone submits a 500-character name with Unicode characters.
+- For Stripe testing, always test the webhook signature verification path. A common bug is accepting webhooks without verifying the signature, which allows attackers to forge events.
+- Keep a separate test environment with its own Stripe test API keys. Sharing keys between developers causes test data collisions and flaky test results.
