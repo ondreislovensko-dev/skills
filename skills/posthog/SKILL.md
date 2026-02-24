@@ -1,6 +1,6 @@
 ---
 name: posthog
-category: analytics
+category: data-ai
 version: 1.0.0
 description: >-
   Open-source product analytics with PostHog — event tracking, funnels, cohorts,
@@ -20,7 +20,7 @@ compatibility:
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: analytics
+  category: data-ai
   tags: [posthog, analytics, product-analytics, session-replay, feature-flags]
 ---
 

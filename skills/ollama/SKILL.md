@@ -13,7 +13,7 @@ compatibility: 'Linux, macOS, Windows (GPU recommended)'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: ai
+  category: data-ai
   tags:
     - ollama
     - local-llm

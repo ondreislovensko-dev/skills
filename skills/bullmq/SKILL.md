@@ -12,7 +12,7 @@ compatibility: 'Node.js 16+ with Redis'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: backend
+  category: development
   tags:
     - bullmq
     - queue

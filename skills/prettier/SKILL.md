@@ -14,7 +14,7 @@ compatibility:
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: formatting
+  category: development
   tags:
     - formatting
     - code-style

@@ -13,7 +13,7 @@ compatibility: 'Node.js 16+, Docker (self-hosted), or Novu Cloud'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: backend
+  category: development
   tags:
     - novu
     - notifications

@@ -13,7 +13,7 @@ compatibility: 'Node.js 18+ (Linux, macOS, Windows)'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: scraping
+  category: development
   tags:
     - puppeteer
     - browser

@@ -13,7 +13,7 @@ compatibility: 'Node.js 18+ or Docker (any SQL database)'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: backend
+  category: development
   tags:
     - directus
     - cms

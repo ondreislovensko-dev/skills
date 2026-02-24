@@ -1,6 +1,6 @@
 ---
 name: plausible
-category: analytics
+category: data-ai
 version: 1.0.0
 description: >-
   Privacy-first web analytics with Plausible — lightweight script tag, no cookies,
@@ -19,7 +19,7 @@ compatibility:
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: analytics
+  category: data-ai
   tags: [plausible, analytics, privacy, web-analytics, gdpr]
 ---
 

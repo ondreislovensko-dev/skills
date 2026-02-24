@@ -13,7 +13,7 @@ compatibility: 'Node.js 18+, Python 3.8+ (any deployment platform)'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: backend
+  category: development
   tags:
     - inngest
     - background-jobs

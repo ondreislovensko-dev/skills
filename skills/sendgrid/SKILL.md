@@ -12,7 +12,7 @@ compatibility: 'Node.js 12+, Python 3.6+, any HTTP client'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: backend
+  category: development
   tags:
     - sendgrid
     - email

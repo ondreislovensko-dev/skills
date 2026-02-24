@@ -12,7 +12,7 @@ compatibility: 'Node.js 18+, Python 3.8+'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: ai
+  category: data-ai
   tags:
     - anthropic
     - claude

@@ -12,7 +12,7 @@ compatibility: 'Node.js 14+ (any platform)'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: scraping
+  category: development
   tags:
     - cheerio
     - html

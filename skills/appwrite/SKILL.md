@@ -13,7 +13,7 @@ compatibility: 'Docker (self-hosted) or Appwrite Cloud'
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: backend
+  category: development
   tags:
     - appwrite
     - baas

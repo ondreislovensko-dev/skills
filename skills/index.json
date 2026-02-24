@@ -196,6 +196,13 @@
       "tags": []
     },
     {
+      "name": "anthropic-sdk",
+      "slug": "anthropic-sdk",
+      "description": "Integrate Claude AI into applications with the Anthropic SDK. Use when a user asks to add Claude to an app, use Claude for text generation, build a chatbot with Claude, use Claude's long context window, implement tool use with Claude, stream Claude responses, use Claude for code generation, document analysis, or reasoning tasks. Covers Messages API, streaming, tool use, vision, system prompts, extended thinking, and batch processing.",
+      "category": "data-ai",
+      "tags": []
+    },
+    {
       "name": "apache-spark",
       "slug": "apache-spark",
       "description": "Process large-scale data with Apache Spark. Use when a user asks to process big data, run distributed computations, build ETL pipelines, perform data analysis at scale, or use PySpark for data engineering.",
@@ -273,6 +280,13 @@
         "hr",
         "candidates"
       ]
+    },
+    {
+      "name": "appwrite",
+      "slug": "appwrite",
+      "description": "Build backends with Appwrite — open-source Backend-as-a-Service. Use when a user asks to set up user authentication, manage a database without writing backend code, handle file storage and uploads, add realtime subscriptions, set up cloud functions, build a mobile or web app backend, replace Firebase with an open-source alternative, or self-host a BaaS platform. Covers auth, databases, storage, functions, realtime, and SDK integration for web, mobile, and server-side.",
+      "category": "development",
+      "tags": []
     },
     {
       "name": "archiver",
@@ -669,6 +683,13 @@
       ]
     },
     {
+      "name": "bullmq",
+      "slug": "bullmq",
+      "description": "Build job queues and background workers with BullMQ. Use when a user asks to set up a job queue, process tasks in the background, build a worker system, handle async processing, schedule recurring jobs, rate-limit API calls, process webhooks in a queue, or add reliable background processing to a Node.js app. Covers queues, workers, job scheduling, retries, rate limiting, priorities, events, and dashboard monitoring with Bull Board.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "bun",
       "slug": "bun",
       "description": "Assists with using Bun as an all-in-one JavaScript/TypeScript runtime, package manager, bundler, and test runner. Use when building HTTP servers, managing packages, running tests, or migrating from Node.js. Trigger words: bun, bun serve, bun install, bun test, bun build, javascript runtime, bun runtime.",
@@ -833,6 +854,13 @@
       "tags": []
     },
     {
+      "name": "cheerio",
+      "slug": "cheerio",
+      "description": "Parse and extract data from HTML with Cheerio. Use when a user asks to scrape static web pages, parse HTML files, extract data from HTML, build a web scraper for server-rendered pages, extract text or links from HTML documents, parse RSS/XML feeds, transform HTML content, or process HTML emails. Covers jQuery-style selectors, DOM traversal, text extraction, attribute parsing, and integration with HTTP clients for web scraping pipelines.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "chromadb",
       "slug": "chromadb",
       "description": "Assists with storing, searching, and managing vector embeddings using ChromaDB. Use when building RAG pipelines, semantic search engines, or recommendation systems. Trigger words: chromadb, chroma, vector database, embeddings, semantic search, similarity search, vector store, rag.",
@@ -903,6 +931,13 @@
         "react",
         "rbac"
       ]
+    },
+    {
+      "name": "clickhouse",
+      "slug": "clickhouse",
+      "description": "ClickHouse is a columnar OLAP database built for real-time analytical queries over massive datasets. It supports a familiar SQL interface with powerful aggregation functions, materialized views for pre-computed rollups, and high-throughput inserts that make it ideal for event tracking, time-series analytics, and ad-hoc exploration of billions of rows.",
+      "category": "data-ai",
+      "tags": []
     },
     {
       "name": "clickup",
@@ -1434,6 +1469,13 @@
       "tags": []
     },
     {
+      "name": "directus",
+      "slug": "directus",
+      "description": "Build backends and APIs with Directus headless CMS. Use when a user asks to create a headless CMS, build a content API without coding, set up a backend admin panel, create REST or GraphQL APIs from a database, manage content with roles and permissions, build a data platform with auto-generated APIs, or replace traditional CMS with a headless solution. Covers data modeling, auto-generated REST/GraphQL APIs, roles/permissions, flows (automation), file storage, and SDK integration.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "direnv",
       "slug": "direnv",
       "description": "Auto-load environment variables per directory with direnv. Use when a user asks to manage env vars per project, auto-switch configs between projects, or avoid manual .env loading.",
@@ -1506,6 +1548,13 @@
       "tags": []
     },
     {
+      "name": "docusaurus",
+      "slug": "docusaurus",
+      "description": "Build documentation websites with Docusaurus. Use when a user asks to create a documentation site, build a developer portal, set up API docs, create a knowledge base, add versioned documentation, build a static docs site with search, create a blog alongside docs, or migrate from GitBook or ReadTheDocs. Covers project setup, docs structure, versioning, custom pages, blog, Algolia search, MDX components, and deployment.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "docx",
       "slug": "docx",
       "description": "Generate Word documents programmatically with the docx library — create paragraphs, tables, images, headers, footers, numbered lists, and styled content. Use when tasks involve generating contracts, proposals, resumes, or any .docx output from application data in Node.js.",
@@ -1543,6 +1592,20 @@
         "typescript",
         "sql"
       ]
+    },
+    {
+      "name": "drizzle-studio",
+      "slug": "drizzle-studio",
+      "description": "Explore and manage databases with Drizzle Studio. Use when a user asks to browse database contents visually, inspect tables and data, run ad-hoc queries, manage database records through a GUI, debug database issues, or use a lightweight alternative to pgAdmin or DBeaver. Covers setup with Drizzle ORM, standalone usage, data browsing, filtering, and inline editing.",
+      "category": "data-ai",
+      "tags": []
+    },
+    {
+      "name": "duckdb",
+      "slug": "duckdb",
+      "description": "DuckDB is an in-process analytical database that runs embedded inside your application with zero external dependencies. It can query CSV, Parquet, and JSON files directly without loading them into tables first, making it ideal for local data exploration, ETL pipelines, and analytical workloads where spinning up a server is overkill.",
+      "category": "data-ai",
+      "tags": []
     },
     {
       "name": "dvc",
@@ -1636,6 +1699,13 @@
         "debugging",
         "triage"
       ]
+    },
+    {
+      "name": "eslint",
+      "slug": "eslint",
+      "description": "ESLint is the standard linting tool for JavaScript and TypeScript projects. It statically analyzes your code to find problems, enforce coding conventions, and catch bugs before they reach production. ESLint 9 introduced the flat config format, replacing the legacy `.eslintrc` system with a simpler, more composable `eslint.config.js` file. With a rich plugin ecosystem covering React, TypeScript, accessibility, and import ordering, ESLint is the backbone of code quality in modern web development.",
+      "category": "development",
+      "tags": []
     },
     {
       "name": "ethers-js",
@@ -1756,6 +1826,13 @@
         "experimentation",
         "deployment"
       ]
+    },
+    {
+      "name": "ffmpeg",
+      "slug": "ffmpeg",
+      "description": "Transcode, convert, edit, and process audio and video with FFmpeg. Use when a user asks to convert video formats (webm to mp4, mkv to mp4), extract audio from video, compress video files, trim or cut clips, concatenate videos, add subtitles, create thumbnails, apply filters, change resolution or bitrate, re-encode media, create GIFs from video, add watermarks, normalize audio, stream media, or build automated media processing pipelines.",
+      "category": "content",
+      "tags": []
     },
     {
       "name": "ffmpeg-video-editing",
@@ -1916,6 +1993,13 @@
       ]
     },
     {
+      "name": "gallery-dl",
+      "slug": "gallery-dl",
+      "description": "Download images and media galleries from websites with gallery-dl. Use when a user asks to download images from Instagram, Twitter/X, Reddit, Pixiv, DeviantArt, Danbooru, Tumblr, Flickr, ArtStation, or other image hosting sites, bulk download image galleries, archive artist portfolios, scrape images with metadata, download from image boards, save entire user profiles or tagged collections, or build image dataset pipelines.",
+      "category": "content",
+      "tags": []
+    },
+    {
       "name": "gcloud",
       "slug": "gcloud",
       "description": "Google Cloud CLI for managing GCP resources. Use when the user needs to work with Compute Engine, Cloud Storage, Cloud Functions, IAM, GKE, and other Google Cloud services from the terminal.",
@@ -2023,6 +2107,13 @@
       "tags": []
     },
     {
+      "name": "github-copilot",
+      "slug": "github-copilot",
+      "description": "GitHub Copilot is an AI-powered pair programming tool that integrates directly into your editor and terminal. It provides real-time code suggestions, natural language chat for explaining and refactoring code, slash commands for common operations, and workspace-aware agents that can reason across your entire codebase. Copilot accelerates development by turning intent into working code, reducing boilerplate, and helping developers navigate unfamiliar APIs and patterns.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "gobuster",
       "slug": "gobuster",
       "description": "Brute force directories, files, DNS subdomains, and virtual hosts with Gobuster. Use when a user asks to discover hidden endpoints, enumerate subdomains, find backup files, or perform web content discovery during penetration testing.",
@@ -2046,6 +2137,13 @@
       "name": "gradio",
       "slug": "gradio",
       "description": "Python library for building ML demo UIs with minimal code. Create interactive web interfaces for models with text, image, audio, and video inputs/outputs. Share demos via public links or deploy to Hugging Face Spaces.",
+      "category": "data-ai",
+      "tags": []
+    },
+    {
+      "name": "grafana",
+      "slug": "grafana",
+      "description": "Grafana is an open-source visualization and dashboarding platform that connects to dozens of data sources including Prometheus, PostgreSQL, ClickHouse, and Elasticsearch. It lets you build interactive dashboards with panels, set up alerting rules, and manage everything as code through JSON dashboard definitions and provisioning configuration.",
       "category": "data-ai",
       "tags": []
     },
@@ -2144,6 +2242,20 @@
       "tags": []
     },
     {
+      "name": "hotjar",
+      "slug": "hotjar",
+      "description": "User behavior analytics with Hotjar — heatmaps, session recordings, feedback widgets, and surveys. Covers script installation, JavaScript API for custom events and user attributes, survey API, integration with analytics platforms like Google Analytics and Mixpanel, and privacy controls. Use when tasks involve understanding how users interact with a page visually, debugging UX issues with session recordings, or collecting user feedback with surveys.",
+      "category": "data-ai",
+      "tags": [
+        "hotjar",
+        "heatmaps",
+        "session-recording",
+        "user-feedback",
+        "surveys",
+        "ux"
+      ]
+    },
+    {
       "name": "htmx",
       "slug": "htmx",
       "description": "htmx gives you access to AJAX, CSS transitions, WebSockets, and Server-Sent Events directly in HTML using attributes. It enables dynamic web UIs without writing JavaScript by letting any element issue HTTP requests and swap content into the DOM.",
@@ -2223,6 +2335,13 @@
         "cdn",
         "waf"
       ]
+    },
+    {
+      "name": "inngest",
+      "slug": "inngest",
+      "description": "Build reliable background jobs and workflows with Inngest. Use when a user asks to run background tasks, create event-driven workflows, build reliable job queues, set up step functions for long-running processes, schedule recurring jobs, handle webhook processing, build multi-step async workflows, add retries and error handling to background jobs, or replace BullMQ/Celery with a serverless-friendly alternative. Covers event sending, function definition, step orchestration, retries, scheduling, and fan-out patterns.",
+      "category": "development",
+      "tags": []
     },
     {
       "name": "inquirer",
@@ -2336,6 +2455,13 @@
         "pipelines",
         "automation"
       ]
+    },
+    {
+      "name": "jest",
+      "slug": "jest",
+      "description": "Jest is a comprehensive JavaScript testing framework built by Meta, designed for zero-configuration testing of JavaScript and TypeScript applications. It provides a complete ecosystem for unit testing, integration testing, and snapshot testing with built-in code coverage, mocking capabilities, and parallel test execution. Jest works seamlessly with React, Node.js, Angular, Vue, and virtually any JavaScript project, making it the most widely adopted testing framework in the ecosystem.",
+      "category": "development",
+      "tags": []
     },
     {
       "name": "jira",
@@ -2678,6 +2804,13 @@
       ]
     },
     {
+      "name": "loki",
+      "slug": "loki",
+      "description": "Loki is a horizontally scalable log aggregation system built by Grafana Labs. Unlike traditional log platforms that index the full text of every log line, Loki indexes only metadata labels, making it significantly cheaper to operate. It integrates natively with Grafana for querying and visualization, and uses LogQL — a query language inspired by PromQL — to filter, parse, and aggregate log streams.",
+      "category": "data-ai",
+      "tags": []
+    },
+    {
       "name": "loops",
       "slug": "loops",
       "description": "Send marketing and transactional emails with Loops. Use when a user asks to set up email marketing for a SaaS, create drip campaigns, send product update emails, or use a modern alternative to Mailchimp for startups.",
@@ -2798,6 +2931,13 @@
       ]
     },
     {
+      "name": "medusa",
+      "slug": "medusa",
+      "description": "Build headless e-commerce backends with Medusa.js. Use when a user asks to build an online store backend, create a headless e-commerce platform, set up product management and checkout, build a custom storefront, add payment processing to an e-commerce app, manage inventory and orders, or replace Shopify with an open-source alternative. Covers products, carts, orders, payments (Stripe), shipping, plugins, and Next.js storefront integration.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "meeting-notes",
       "slug": "meeting-notes",
       "description": "Transform raw meeting notes or transcripts into structured, actionable summaries. Use when a user asks to summarize meeting notes, organize a transcript, extract action items from a meeting, create meeting minutes, format discussion notes, or turn a call recording transcript into a summary.",
@@ -2809,6 +2949,13 @@
         "action-items",
         "transcripts"
       ]
+    },
+    {
+      "name": "meilisearch",
+      "slug": "meilisearch",
+      "description": "Add fast, typo-tolerant full-text search with Meilisearch. Use when a user asks to add search to an app, implement full-text search, set up a search engine, replace Elasticsearch with something simpler, add autocomplete or instant search, build a product catalog search, index documents for search, configure search relevancy, add faceted filtering, or deploy a self-hosted search engine. Covers indexing, querying, facets, filtering, sorting, multi-tenancy, and integration with Node.js, Python, and REST API.",
+      "category": "development",
+      "tags": []
     },
     {
       "name": "metabase",
@@ -2839,11 +2986,32 @@
       "tags": []
     },
     {
+      "name": "minio",
+      "slug": "minio",
+      "description": "Self-host S3-compatible object storage with MinIO. Use when a user asks to set up self-hosted object storage, create an S3-compatible API on their own server, store files without AWS, set up a private cloud storage, manage buckets and objects, configure storage for backups, host static assets, or replace AWS S3 with a self-hosted solution. Covers single-node and distributed deployment, bucket management, presigned URLs, lifecycle policies, and integration with apps via the S3 API.",
+      "category": "devops",
+      "tags": []
+    },
+    {
       "name": "mise",
       "slug": "mise",
       "description": "Manage tool versions and tasks with mise (formerly rtx). Use when a user asks to manage Node.js/Python/Go versions per project, replace nvm/pyenv/asdf, or define project-level tool requirements.",
       "category": "development",
       "tags": []
+    },
+    {
+      "name": "mixpanel",
+      "slug": "mixpanel",
+      "description": "Product analytics with Mixpanel — event tracking, funnels, retention analysis, user segmentation, and A/B testing. Covers JavaScript SDK for frontend tracking, server-side tracking with Node.js and Python, identity management, group analytics, and the Query API. Use when tasks involve tracking user behavior in web or mobile apps, building conversion funnels, analyzing retention curves, or running experiments.",
+      "category": "data-ai",
+      "tags": [
+        "mixpanel",
+        "analytics",
+        "product-analytics",
+        "funnels",
+        "retention",
+        "ab-testing"
+      ]
     },
     {
       "name": "mlflow",
@@ -3144,6 +3312,13 @@
       ]
     },
     {
+      "name": "novu",
+      "slug": "novu",
+      "description": "Build notification infrastructure with Novu. Use when a user asks to add notifications to an app, send emails and push notifications, build a notification center, manage notification preferences, set up multi-channel notifications (email, SMS, push, in-app, chat), create notification workflows, or build a notification system with templates and subscriber management. Covers providers (SendGrid, Twilio, FCM), workflows, templates, subscriber preferences, and the in-app notification center component.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "nuxt",
       "slug": "nuxt",
       "description": "Nuxt is a Vue.js meta-framework for building full-stack web applications with server-side rendering, static generation, and file-based routing. It includes Nitro server engine, auto-imports, and a powerful module ecosystem.",
@@ -3204,6 +3379,13 @@
       ]
     },
     {
+      "name": "ollama",
+      "slug": "ollama",
+      "description": "Run LLMs locally with Ollama. Use when a user asks to run AI models locally, self-host a language model, use LLaMA or Mistral on their machine, run offline AI, build a local chatbot, avoid sending data to cloud AI providers, generate text without API costs, fine-tune or customize local models, or set up a private AI inference server. Covers model management, API usage, Modelfile customization, GPU acceleration, and integration with LangChain and other frameworks.",
+      "category": "data-ai",
+      "tags": []
+    },
+    {
       "name": "ollama-local",
       "slug": "ollama-local",
       "description": "Run open-source LLMs locally with Ollama. Use when a user asks to run a local language model, install Ollama, use Llama locally, run Mistral or DeepSeek on their machine, set up local AI inference, create a custom Modelfile, or serve models via a local API. Covers installation, model management, API usage, and custom model creation.",
@@ -3247,6 +3429,13 @@
       "name": "onnx",
       "slug": "onnx",
       "description": "Open Neural Network Exchange format for model interoperability across frameworks. Export models from PyTorch, TensorFlow, and other frameworks to ONNX, optimize with ONNX Runtime, and deploy for cross-platform inference on CPU, GPU, and edge devices.",
+      "category": "data-ai",
+      "tags": []
+    },
+    {
+      "name": "openai-sdk",
+      "slug": "openai-sdk",
+      "description": "Integrate OpenAI APIs into applications. Use when a user asks to add GPT or ChatGPT to an app, generate text with OpenAI, build a chatbot, use GPT-4 or o1 models, generate embeddings, use function calling, stream chat completions, build AI features, moderate content, generate images with DALL-E, transcribe audio with Whisper API, or integrate any OpenAI model. Covers Chat Completions, Assistants API, function calling, embeddings, streaming, vision, DALL-E, Whisper, and moderation.",
       "category": "data-ai",
       "tags": []
     },
@@ -3597,6 +3786,20 @@
       "tags": []
     },
     {
+      "name": "plausible",
+      "slug": "plausible",
+      "description": "Privacy-first web analytics with Plausible — lightweight script tag, no cookies, GDPR-compliant by default. Self-host with Docker or use Plausible Cloud. Covers script installation, custom event goals, pageview filtering, the Stats API for programmatic access, and Google Search Console integration. Use when tasks involve adding website analytics without cookie banners, replacing Google Analytics with a privacy-friendly alternative, or querying traffic data via API.",
+      "category": "data-ai",
+      "tags": [
+        "plausible",
+        "analytics",
+        "privacy",
+        "web-analytics",
+        "gdpr",
+        "self-hosted"
+      ]
+    },
+    {
       "name": "playwright-testing",
       "slug": "playwright-testing",
       "description": "Write and maintain end-to-end tests with Playwright. Use when someone asks to \"add e2e tests\", \"test my web app\", \"set up Playwright\", \"write browser tests\", \"test login flow\", \"visual regression testing\", \"test across browsers\", or \"automate UI testing\". Covers test setup, page objects, authentication, API mocking, visual comparisons, and CI integration.",
@@ -3658,6 +3861,20 @@
       ]
     },
     {
+      "name": "posthog",
+      "slug": "posthog",
+      "description": "Open-source product analytics with PostHog — event tracking, funnels, cohorts, session replay, feature flags, and experimentation. Self-host with Docker or use PostHog Cloud. Covers JavaScript SDK for frontend tracking, Python SDK for backend events, autocapture configuration, custom event taxonomies, and funnel/retention analysis. Use when tasks involve adding product analytics, understanding user behavior, debugging UX with session replay, or rolling out features with feature flags.",
+      "category": "data-ai",
+      "tags": [
+        "posthog",
+        "analytics",
+        "product-analytics",
+        "session-replay",
+        "feature-flags",
+        "funnels"
+      ]
+    },
+    {
       "name": "postmark",
       "slug": "postmark",
       "description": "Send transactional emails with Postmark. Use when a user asks to send reliable transactional emails, improve email deliverability, use email templates with variables, or set up email sending for a SaaS app.",
@@ -3682,6 +3899,13 @@
       "slug": "prefect",
       "description": "Prefect is a modern workflow orchestration framework for Python data pipelines. Learn to define flows and tasks with decorators, handle retries and scheduling, create deployments, and monitor via the Prefect UI.",
       "category": "data-ai",
+      "tags": []
+    },
+    {
+      "name": "prettier",
+      "slug": "prettier",
+      "description": "Prettier is an opinionated code formatter that enforces a consistent style across your entire codebase. Unlike linters that flag problems for you to fix, Prettier rewrites your code automatically. It supports JavaScript, TypeScript, HTML, CSS, JSON, Markdown, YAML, and many other languages. By removing style debates from code review, Prettier lets teams focus on logic and architecture instead of arguing about tabs versus spaces or trailing commas.",
+      "category": "development",
       "tags": []
     },
     {
@@ -3769,6 +3993,13 @@
         "devops",
         "multi-cloud"
       ]
+    },
+    {
+      "name": "puppeteer",
+      "slug": "puppeteer",
+      "description": "Automate browsers and scrape dynamic websites with Puppeteer. Use when a user asks to scrape JavaScript-rendered pages, automate browser interactions, take screenshots of web pages, generate PDFs from URLs, test web UIs, fill out forms programmatically, crawl SPAs, extract data from dynamic sites, automate login flows, or build web scrapers that need a real browser. Covers headless Chrome, page navigation, DOM interaction, network interception, screenshots, PDF generation, and stealth techniques.",
+      "category": "development",
+      "tags": []
     },
     {
       "name": "puppeteer-pdf",
@@ -4110,6 +4341,13 @@
       "tags": []
     },
     {
+      "name": "restic",
+      "slug": "restic",
+      "description": "Back up and restore data with Restic. Use when a user asks to set up backups, create encrypted backups, back up to S3 or cloud storage, implement a backup strategy, restore files from backup, deduplicate backup storage, schedule automated backups, back up databases or servers, or set up offsite backups. Covers repository initialization, backup/restore operations, snapshot management, pruning, encryption, and multiple storage backends (local, S3, SFTP, B2, Azure, GCS).",
+      "category": "devops",
+      "tags": []
+    },
+    {
       "name": "resume-tailor",
       "slug": "resume-tailor",
       "description": "Optimize your resume for specific job applications by matching keywords and highlighting relevant experience. Use when a user asks to tailor a resume, optimize a CV for a job, match a resume to a job description, improve ATS compatibility, customize a resume for a specific role, or align experience with job requirements.",
@@ -4272,6 +4510,13 @@
       "tags": []
     },
     {
+      "name": "sendgrid",
+      "slug": "sendgrid",
+      "description": "Send transactional and marketing emails with SendGrid. Use when a user asks to send emails programmatically, set up transactional email delivery, send bulk marketing emails, manage email templates, track email opens and clicks, set up email authentication (SPF/DKIM/DMARC), handle bounces and unsubscribes, or build email infrastructure. Covers single and bulk sending, dynamic templates, email validation, webhooks, and deliverability setup.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "senior-computer-vision",
       "slug": "senior-computer-vision",
       "description": "Object detection, image segmentation, and visual AI. Use when a user asks to detect objects in images, segment images, run YOLO inference, build a computer vision pipeline, use Faster R-CNN or SAM, deploy a vision model with TensorRT, or perform image classification. Covers YOLO, SAM, Mask R-CNN, and TensorRT optimization.",
@@ -4335,6 +4580,13 @@
       "slug": "sharepoint",
       "description": "Build integrations with SharePoint Online for document management, site automation, and intranet development. Use when someone asks to \"integrate with SharePoint\", \"upload files to SharePoint\", \"manage SharePoint lists\", \"create SharePoint site\", \"automate SharePoint\", \"search SharePoint documents\", \"SharePoint API\", or \"SharePoint permissions\". Covers Graph API for sites, lists, document libraries, file operations, search, permissions, and SharePoint Framework (SPFx) development.",
       "category": "development",
+      "tags": []
+    },
+    {
+      "name": "sharp",
+      "slug": "sharp",
+      "description": "Process and transform images with Sharp for Node.js. Use when a user asks to resize images, convert image formats (WebP, AVIF, PNG, JPEG), compress images, crop or rotate photos, generate thumbnails, add watermarks, optimize images for web, batch process images, create responsive image variants, extract image metadata, or build image processing pipelines. Covers resizing, format conversion, compression, cropping, compositing, and metadata extraction.",
+      "category": "content",
       "tags": []
     },
     {
@@ -4743,6 +4995,13 @@
       ]
     },
     {
+      "name": "telegram-export",
+      "slug": "telegram-export",
+      "description": "Export and download Telegram chats, media, and channel content. Use when a user asks to export Telegram chat history, download media from Telegram channels or groups, archive Telegram conversations, backup Telegram messages, extract images or videos from Telegram, bulk download from Telegram channels, scrape Telegram content, or migrate Telegram data. Covers Telegram Desktop export, Telethon-based scripting, and TDLib approaches.",
+      "category": "content",
+      "tags": []
+    },
+    {
       "name": "template-engine",
       "slug": "template-engine",
       "description": "Auto-fill document templates with data. Use when a user asks to create a mail merge, fill templates with data, generate documents from a template, populate placeholders, bulk generate letters or invoices, or auto-fill forms from a spreadsheet. Supports any document format including DOCX, PDF, HTML, and plain text.",
@@ -4856,6 +5115,20 @@
       "tags": []
     },
     {
+      "name": "traefik",
+      "slug": "traefik",
+      "description": "Route traffic and manage TLS with Traefik reverse proxy. Use when a user asks to set up a reverse proxy, route traffic to Docker containers, auto-provision SSL certificates with Let's Encrypt, set up load balancing, configure HTTPS for multiple services, use a modern alternative to nginx for Docker, set up path-based or host-based routing, add middleware (rate limiting, auth, headers), or manage ingress for containerized applications.",
+      "category": "devops",
+      "tags": []
+    },
+    {
+      "name": "trigger-dev",
+      "slug": "trigger-dev",
+      "description": "Build reliable background jobs with Trigger.dev. Use when a user asks to run long-running tasks in the background, process webhooks reliably, build async job queues for serverless, schedule recurring tasks, run AI/LLM pipelines in the background, process file uploads asynchronously, or replace BullMQ or Celery with a serverless-native solution. Covers task definition, triggers, scheduling, retries, concurrency control, and integration with Next.js, Remix, and Express.",
+      "category": "development",
+      "tags": []
+    },
+    {
       "name": "triton",
       "slug": "triton",
       "description": "NVIDIA Triton Inference Server for deploying AI models at scale. Supports multiple frameworks (ONNX, TensorRT, PyTorch, TensorFlow), model ensembles, dynamic batching, model versioning, and GPU/CPU inference with high throughput and low latency.",
@@ -4900,6 +5173,13 @@
       "slug": "turso",
       "description": "Use Turso for edge SQLite databases. Use when a user asks to set up an edge database, use SQLite in production, replicate databases globally, or choose a serverless database for low-latency reads.",
       "category": "data-ai",
+      "tags": []
+    },
+    {
+      "name": "twilio",
+      "slug": "twilio",
+      "description": "Add SMS, voice calls, and WhatsApp messaging with Twilio. Use when a user asks to send SMS messages, make phone calls programmatically, add two-factor authentication via SMS, send WhatsApp messages, build an IVR system, set up phone number verification, receive incoming SMS, or build communication features into an app. Covers SMS, MMS, WhatsApp, Verify API (2FA), voice calls, and webhooks.",
+      "category": "development",
       "tags": []
     },
     {
@@ -5409,5 +5689,5 @@
     "productivity",
     "research"
   ],
-  "updatedAt": "2026-02-24T22:51:28.989Z"
+  "updatedAt": "2026-02-24T23:00:37.384Z"
 }

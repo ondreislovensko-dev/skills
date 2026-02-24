@@ -14,7 +14,7 @@ compatibility:
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: linting
+  category: development
   tags:
     - javascript
     - typescript

@@ -1,6 +1,6 @@
 ---
 name: hotjar
-category: analytics
+category: data-ai
 version: 1.0.0
 description: >-
   User behavior analytics with Hotjar — heatmaps, session recordings, feedback
@@ -19,7 +19,7 @@ compatibility:
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: analytics
+  category: data-ai
   tags: [hotjar, heatmaps, session-recording, user-feedback, surveys]
 ---
 

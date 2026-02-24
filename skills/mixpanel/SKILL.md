@@ -1,6 +1,6 @@
 ---
 name: mixpanel
-category: analytics
+category: data-ai
 version: 1.0.0
 description: >-
   Product analytics with Mixpanel — event tracking, funnels, retention analysis,
@@ -19,7 +19,7 @@ compatibility:
 metadata:
   author: terminal-skills
   version: 1.0.0
-  category: analytics
+  category: data-ai
   tags: [mixpanel, analytics, product-analytics, funnels, retention]
 ---
 
