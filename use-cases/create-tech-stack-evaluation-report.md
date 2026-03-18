@@ -17,28 +17,19 @@ Your team needs to pick a new database, frontend framework, or hosting provider.
 
 Use **web-research** to gather current benchmarks and community sentiment, **competitor-alternatives** to map the landscape, **data-analysis** to score options against your criteria, and **report-generator** to produce a professional evaluation document.
 
-```bash
-npx terminal-skills install web-research
-npx terminal-skills install competitor-alternatives
-npx terminal-skills install data-analysis
-npx terminal-skills install report-generator
-```
-
 ## Step-by-Step Walkthrough
 
 ### 1. Define your evaluation criteria
 
 Tell the agent what you're evaluating and what matters:
 
-```
-We need to choose a message queue for our event-driven architecture. Compare RabbitMQ, Apache Kafka, Amazon SQS, and Redis Streams. Our criteria: throughput (>50k msgs/sec), latency (<10ms p99), operational complexity, cost at our scale (500M messages/month), and ecosystem maturity.
-```
+> We need to choose a message queue for our event-driven architecture. Compare RabbitMQ, Apache Kafka, Amazon SQS, and Redis Streams. Our criteria: throughput (>50k msgs/sec), latency (<10ms p99), operational complexity, cost at our scale (500M messages/month), and ecosystem maturity.
 
-### 2. The agent researches each option
+### 2. Research each option
 
 The agent searches for recent benchmarks, documentation, pricing pages, and community discussions for each technology:
 
-```
+```text
 Research complete. Sources analyzed:
 - 12 benchmark articles (2024-2025)
 - Official documentation for all 4 options
@@ -49,7 +40,6 @@ Research complete. Sources analyzed:
 
 ### 3. Review the scoring matrix
 
-```
 Tech Stack Evaluation — Message Queue
 
 | Criteria              | Weight | Kafka  | RabbitMQ | SQS    | Redis Streams |
@@ -61,15 +51,12 @@ Tech Stack Evaluation — Message Queue
 | Ecosystem maturity    | 15%    | 9/10   | 8/10     | 7/10   | 5/10          |
 |                       |        |        |          |        |               |
 | **Weighted Score**    |        | **7.1**| **6.8**  | **7.2**| **7.2**       |
-```
 
 ### 4. Get the detailed recommendation
 
-```
-Give me the full recommendation with trade-offs for each option and your top pick for our use case.
-```
+> Give me the full recommendation with trade-offs for each option and your top pick for our use case.
 
-### 5. The agent delivers a structured report
+### 5. Generate the structured report
 
 The agent generates a complete evaluation document with an executive summary, detailed analysis per option, risk assessment, migration considerations, and a final recommendation with reasoning — ready to share with stakeholders.
 
@@ -91,34 +78,3 @@ Tomás is the engineering lead at a 30-person e-commerce startup. They've outgro
 - **Test with your actual data** — benchmarks from blog posts rarely match your specific workload
 - **Set a decision deadline** — evaluation paralysis is real; time-box the research to one week maximum
 - **Document the decision** — future team members will ask "why did we pick this?" and the evaluation report is your answer
-
-## Related Skills
-
-- [web-research](../skills/web-research/) -- Gather benchmarks, documentation, and community sentiment
-- [competitor-alternatives](../skills/competitor-alternatives/) -- Map technology landscape and alternatives
-- [data-analysis](../skills/data-analysis/) -- Score and rank options against weighted criteria
-- [report-generator](../skills/report-generator/) -- Produce professional evaluation documents
-
-### When to Re-Evaluate
-
-Tech stack decisions aren't permanent. Revisit the evaluation when:
-
-- Your scale increases by 10x
-- The chosen tool's maintenance burden exceeds expectations
-- A major new contender enters the market
-- Your team composition changes significantly
-- Licensing or pricing terms change unfavorably
-
-A lightweight quarterly review prevents lock-in from becoming a crisis.
-
-### Structuring the Decision Meeting
-
-The evaluation report is designed to make the decision meeting productive:
-
-- **Pre-read the report** — share 48 hours before the meeting so everyone arrives informed
-- **Focus discussion on trade-offs** — the report presents facts; the meeting is for judgment calls
-- **Time-box to 60 minutes** — with good data, decisions shouldn't take longer
-- **Assign a decision owner** — someone must have final say if consensus isn't reached
-- **Record the rationale** — document why you chose option X over Y for future reference
-
-The agent formats the report with an executive summary, detailed comparison, and recommendation section specifically to support this meeting flow.
