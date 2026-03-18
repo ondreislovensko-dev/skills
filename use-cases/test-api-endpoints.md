@@ -19,20 +19,13 @@ Use the **api-tester** skill to have your AI agent send requests to your API, va
 
 Install the skill:
 
-```bash
-npx terminal-skills install api-tester
-```
-
 ## Step-by-Step Walkthrough
 
-### 1. Tell the agent what to test
+### 1. Define what to test
 
-```
-Test the CRUD operations on our /api/products endpoint. The base URL is
-http://localhost:3000 and auth uses a Bearer token from the LOGIN_TOKEN env var.
-```
+> Test the CRUD operations on our /api/products endpoint. The base URL is http://localhost:3000 and auth uses a Bearer token from the LOGIN_TOKEN env var.
 
-### 2. The agent builds and sends requests
+### 2. Build and send requests
 
 It constructs requests for each operation (Create, Read, Update, Delete), chains them so the created resource ID is used in subsequent requests, and includes proper headers and auth.
 
@@ -46,7 +39,7 @@ Each response is checked for:
 
 ### 4. Results are reported clearly
 
-```
+```text
 API Test Suite: Products CRUD
 ==============================
 
@@ -88,9 +81,3 @@ A frontend developer is integrating a new third-party payment API. The documenta
 3. The agent adds the currency field and tries again: 200 OK
 4. The agent tests edge cases: invalid currency code (400), negative amount (400), amount over the limit (422)
 5. The developer now has a complete understanding of the API's validation rules and expected request format
-
-## Related Skills
-
-- [code-reviewer](../skills/code-reviewer/) -- Review the API implementation code
-- [docker-helper](../skills/docker-helper/) -- Set up the API server in a container for testing
-- [markdown-writer](../skills/markdown-writer/) -- Document the API endpoints

@@ -2,8 +2,8 @@
 title: "10 Terminal Skills That Save Hours Every Week"
 slug: top-skills-save-hours
 description: "Discover the most popular AI agent skills for documents, business, development, and research workflows."
-skill: null
-category: overview
+skills: [contract-review, pdf-analyzer, doc-parser, excel-processor, email-drafter, cv-builder, code-reviewer, frontend-design, content-writer, data-analysis]
+category: productivity
 tags: [productivity, automation, best-skills, claude-code, ai-agent]
 ---
 
@@ -16,12 +16,6 @@ You're using AI coding assistants like Claude Code, Codex, or Cursor — but you
 ## The Solution
 
 Install **Terminal Skills** — purpose-built capabilities that extend what your AI agent can do. Each skill is designed for a specific workflow and saves real time on real tasks.
-
-Install the CLI:
-
-```bash
-npm i -g terminal-skills
-```
 
 ## Top 10 Skills by Category
 
@@ -38,12 +32,12 @@ terminal-skills install contract-review
 **Use case:** Review an NDA before signing
 **Time saved:** 2 hours → 5 minutes
 
-#### 2. chat-with-pdf
+#### 2. pdf-analyzer
 
 Ask questions about any PDF document. Extract key information from 100-page reports in seconds.
 
 ```bash
-terminal-skills install chat-with-pdf
+terminal-skills install pdf-analyzer
 ```
 
 **Use case:** Find specific data in a quarterly report
@@ -163,34 +157,24 @@ terminal-skills install data-analysis
 
 ## Getting Started
 
-1. **Install the CLI:**
-   ```bash
-   npm i -g terminal-skills
-   ```
-
-2. **Search for skills:**
+1. **Search for skills:**
    ```bash
    terminal-skills search pdf
    ```
 
-3. **Install what you need:**
+2. **Install what you need:**
    ```bash
    terminal-skills install contract-review
    ```
 
-4. **Use with your AI agent:**
-   ```
-   > Review this NDA for red flags
-   > Extract all tables from report.pdf
-   > Draft a follow-up email to the client
-   ```
+3. **Use with your AI agent:**
+
+```text
+> Review this NDA for red flags
+> Extract all tables from report.pdf
+> Draft a follow-up email to the client
+```
 
 ## Browse All Skills
 
 These 10 skills are just the beginning. Browse 85+ skills at [terminalskills.io](https://terminalskills.io).
-
-## Related Skills
-
-- [voice-to-text](../skills/voice-to-text/) — Transcribe audio to text
-- [api-tester](../skills/api-tester/) — Test REST and GraphQL endpoints
-- [docker-helper](../skills/docker-helper/) — Build and debug Docker configurations
