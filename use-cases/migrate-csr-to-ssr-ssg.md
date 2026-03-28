@@ -1,89 +1,144 @@
 ---
-title: "Implement Server-Side Rendering Migration from CSR to SSR/SSG"
+title: "Migrate from Client-Side Rendering to SSR/SSG for SEO and Performance"
 slug: migrate-csr-to-ssr-ssg
-description: "Incrementally migrate a client-side rendered React app to Next.js with SSR and SSG for better SEO, performance, and Core Web Vitals."
+description: "Transform a client-side React app into a high-performance, SEO-optimized site using Server-Side Rendering and Static Site Generation to improve Core Web Vitals and search rankings."
 skills: [ssr-migration, frontend-design, docker-helper]
 category: development
-tags: [ssr, ssg, nextjs, react, seo, performance]
+tags: [ssr, ssg, seo, performance, react, nextjs, web-vitals, migration]
 ---
 
-# Implement Server-Side Rendering Migration from CSR to SSR/SSG
+# Migrate from Client-Side Rendering to SSR/SSG for SEO and Performance
 
 ## The Problem
 
-Your React single-page application renders everything in the browser. Search engines see a blank page with a `<div id="root"></div>` — your product pages don't appear in search results despite great content. Core Web Vitals are poor: Largest Contentful Paint sits at 4.2 seconds because the browser has to download JavaScript, execute it, fetch data from the API, then render. Users on slower connections see a white screen for 3-5 seconds before anything appears. Social media link previews show your app's generic meta tags instead of page-specific content. The marketing team is frustrated that blog posts and landing pages are invisible to search crawlers, and the performance team's attempts to optimize bundle size have hit diminishing returns — the fundamental architecture is the bottleneck.
+Elena, front-end lead at a 55-person B2B SaaS company, watches their marketing site's Google Search Console rankings plummet month after month. Their React SPA loads with a blank white screen for 4.2 seconds while JavaScript bundles download and parse. PageSpeed Insights gives them 31/100 on mobile, with Largest Contentful Paint at 7.1 seconds -- nearly triple the 2.5-second threshold for Core Web Vitals.
+
+The SEO damage is brutal: product pages rank on page 3-4 despite having better content than competitors. Organic traffic dropped 67% over 18 months as Google increasingly penalizes slow sites. Their $120K/year SEO consultant's report is damning: "JavaScript-dependent content invisible to search bots. Recommend complete technical overhaul."
+
+The business numbers tell the rest of the story. Conversion rates on marketing pages dropped from 8.2% to 3.1% as bounce rates hit 73%. Mobile performance is even worse -- 11.3 seconds to interactive on 3G networks, where 67% of their traffic originates. The sales team reports that prospects mention "your website feels slow" during demos. Each 1-second improvement in load time correlates with 12% higher conversion rates in their industry.
 
 ## The Solution
 
-Use the **ssr-migration** skill to incrementally migrate routes from client-side rendering to server-side rendering and static site generation using Next.js App Router. Use **frontend-design** to ensure components work correctly in both server and client contexts, and **docker-helper** for the production SSR deployment setup. The key: migrate one route at a time, starting with the highest-SEO-value pages, without rewriting the entire application.
-
-```bash
-npx terminal-skills install ssr-migration
-npx terminal-skills install frontend-design
-npx terminal-skills install docker-helper
-```
+Using the **ssr-migration** skill for React-to-Next.js conversion, **frontend-design** for performance optimization, and **docker-helper** for deployment infrastructure, the agent migrates from client-side rendering to a hybrid SSR/SSG architecture -- static generation for marketing content, server rendering for dynamic pages -- and optimizes every Core Web Vital along the way.
 
 ## Step-by-Step Walkthrough
 
-### 1. Audit the application and plan the migration
+### Step 1: Audit Performance and Plan the Migration Strategy
 
-```
-Audit my React SPA for SSR readiness. The app has these routes: homepage, product
-listing, product detail (200 products), blog (80 posts), user dashboard, settings,
-and admin panel. Identify which routes should be SSG, SSR, or stay CSR, and flag
-any code patterns that will break with server rendering.
-```
-
-The agent scans the codebase for SSR-incompatible patterns: finds 8 components using `window` directly, 3 libraries that only work in the browser (a charting library, a rich text editor, a map component), and 2 instances of `localStorage` access at module level. It produces a migration plan: SSG for homepage, blog, and product pages (highest SEO value, content changes infrequently); SSR for product listing and search (dynamic but SEO-important); CSR for dashboard, settings, and admin (authenticated, no SEO need).
-
-### 2. Set up Next.js and migrate the first SSG pages
-
-```
-Initialize Next.js App Router in my existing project. Migrate the blog listing
-and blog post pages first — they're the highest SEO priority. Use static site
-generation with incremental static regeneration (revalidate every 30 minutes).
-Keep the existing React components, just change the data fetching pattern.
+```text
+Audit our React SPA's performance and SEO issues. The app has 47 pages:
+12 marketing pages (static content), 18 product feature pages (semi-static),
+8 blog pages (static), 6 customer case studies (static), and 3 dynamic
+pricing/demo request pages. Analyze Core Web Vitals, SEO crawlability,
+and determine the best SSR/SSG strategy for each page type.
 ```
 
-The agent creates the Next.js configuration alongside the existing React setup, moves the blog components into `app/blog/page.tsx` and `app/blog/[slug]/page.tsx` as Server Components. Data fetching moves from `useEffect` + loading spinner to `async/await` in the Server Component. It adds `generateStaticParams` to pre-render all 80 blog posts at build time and sets `revalidate: 1800` for ISR. The existing blog components are reused — only the data fetching wrapper changes.
+The audit exposes the full extent of the problem:
 
-### 3. Handle browser-only components and hydration
+**Performance (mobile):**
 
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| First Contentful Paint | 4.8s | <1.8s | Failing |
+| Largest Contentful Paint | 7.1s | <2.5s | Failing |
+| First Input Delay | 340ms | <100ms | Failing |
+| Cumulative Layout Shift | 0.23 | <0.1 | Failing |
+| JavaScript bundle size | 847 KB | <200 KB | 4x over budget |
+
+**SEO crawlability:** only 23% of pages successfully indexed. Meta descriptions missing on 89% of pages (generated client-side, invisible to crawlers). No Open Graph tags, no schema markup, no structured data for rich snippets.
+
+The migration strategy splits 47 pages into two groups:
+
+- **SSG (38 pages):** marketing pages, product features (with ISR on 24-hour revalidation), blog posts, and case studies -- all pre-rendered at build time
+- **SSR (9 pages):** pricing calculator, demo request forms, and user dashboard -- server-rendered with edge caching
+
+### Step 2: Migrate to Next.js with Static Generation
+
+```text
+Convert our React SPA to Next.js with static site generation for all marketing,
+product, and blog pages. Optimize images, implement proper meta tags and schema
+markup, and ensure all static content pre-renders at build time. Include
+automatic sitemap generation and proper URL structure for SEO.
 ```
-Three of my components use browser-only libraries: ProductChart (chart.js),
-RichEditor (a WYSIWYG editor), and LocationMap (mapbox). These can't run on
-the server. Also fix the hydration mismatch in my Navbar component that shows
-the current user — it renders differently on server vs client.
+
+The project restructures around Next.js pages with `getStaticProps`:
+
+```typescript
+// pages/products/[slug].tsx
+export async function getStaticProps({ params }) {
+  const product = await getProductBySlug(params.slug);
+  return {
+    props: { product },
+    revalidate: 86400, // ISR: regenerate every 24 hours
+  };
+}
+
+export async function getStaticPaths() {
+  const products = await getAllProducts();
+  return {
+    paths: products.map(p => ({ params: { slug: p.slug } })),
+    fallback: 'blocking', // New products SSR on first request, then cache
+  };
+}
 ```
 
-The agent wraps all three browser-only components with `next/dynamic` using `{ ssr: false }` and adds loading placeholders. For the Navbar, it splits into a Server Component shell (static navigation links) and a Client Component for the user menu that reads auth state via `useEffect` on mount, preventing the hydration mismatch. It adds `suppressHydrationWarning` only for the timestamp display in the footer — a legitimate use case.
+Product pages use Incremental Static Regeneration -- pre-rendered at build time but refreshed every 24 hours, with on-demand revalidation via webhook for urgent content changes. Blog posts generate at build time with automatic sitemap.xml and RSS feed creation.
 
-### 4. Migrate product pages and configure deployment
+SEO optimization covers all the gaps the audit found: dynamic meta tags (title, description, keywords per page), Open Graph and Twitter Card tags for social sharing, canonical URLs to prevent duplicate content, and JSON-LD structured data (Organization, Product, Article schemas) for rich snippets in search results.
 
+The Next.js Image component handles automatic WebP/AVIF conversion, responsive image sizing, lazy loading, and blur placeholders. Combined with critical CSS inlining and intelligent link prefetching, the JavaScript bundle drops from 847 KB to 156 KB through automatic code splitting and tree shaking.
+
+### Step 3: Implement SSR for Dynamic Pages and Optimize Core Web Vitals
+
+```text
+Set up server-side rendering for dynamic pages like pricing calculator and
+demo forms. Implement advanced performance optimizations to pass all Core
+Web Vitals: optimize LCP, reduce CLS, minimize FID. Include edge caching
+and progressive enhancement.
 ```
-Migrate the product listing (SSR) and product detail pages (SSG with ISR).
-Product detail pages should be statically generated for all 200 products and
-revalidate when the product is updated via a webhook. Also create a production
-Dockerfile for the SSR deployment.
+
+Dynamic pages use `getServerSideProps` with aggressive caching -- the pricing calculator caches for 5 minutes at the edge, demo request forms include A/B testing variants, and the user dashboard renders personalized content server-side.
+
+Core Web Vitals optimization targets each metric individually:
+
+**LCP: 7.1s to 1.2s** -- hero image optimization (2.1 MB to 387 KB via WebP), critical CSS inlining for above-the-fold content, font preloading before layout, and server-rendered HTML visible immediately instead of waiting for JavaScript.
+
+**FID: 340ms to 45ms** -- JavaScript bundle reduction from 847 KB to 156 KB, per-page code splitting so each page loads only what it needs, third-party scripts deferred, heavy calculations moved to Web Workers.
+
+**CLS: 0.23 to 0.02** -- explicit width/height on all images to prevent layout jumps, `font-display: swap` to prevent Flash of Invisible Text, reserved space for dynamic content, and animations restricted to `transform` and `opacity` (no layout-triggering properties).
+
+Progressive enhancement ensures core content works without JavaScript. Hydration adds interactivity after the initial render. Service workers cache critical pages for offline access. Skeleton screens and error boundaries provide graceful degradation.
+
+### Step 4: Deploy and Measure SEO Improvements
+
+```text
+Set up production deployment with Docker containers, implement proper caching
+headers, and measure SEO performance improvements. Include A/B testing to
+measure conversion rate improvements.
 ```
 
-The agent creates `app/products/page.tsx` as an SSR Server Component that fetches with `{ cache: 'no-store' }` for always-fresh listings. Product detail pages use `generateStaticParams` for all 200 products and a `revalidatePath` API route triggered by a webhook on product update. It generates a multi-stage Dockerfile using Next.js standalone output mode — the final image is 85MB instead of 500MB+ with a full `node_modules`. It adds a `docker-compose.production.yml` with the Next.js container, health checks, and a reverse proxy configuration.
+The production stack runs behind nginx with optimized caching headers: static assets get `max-age=31536000, immutable`, HTML pages use `s-maxage=86400` with `stale-while-revalidate`, and API routes cache based on data freshness. Brotli compression achieves 73% average file size reduction. CloudFront distributes content across 25+ global edge locations.
+
+The before/after numbers after 90 days tell the story:
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Performance Score (mobile) | 31/100 | 96/100 | +209% |
+| Largest Contentful Paint | 7.1s | 1.2s | -83% |
+| Pages indexed by Google | 23% | 91% | +297% |
+| Average search position | Page 3.4 | Page 1.8 | +94% |
+| Bounce rate | 73% | 34% | -53% |
+| Conversion rate | 3.1% | 7.9% | +155% |
+| Mobile conversion rate | 1.8% | 6.2% | +244% |
+
+An A/B test running the old CSR version against the new SSR/SSG version for 30 days shows 3.1% versus 7.9% conversion at 99.7% statistical confidence.
 
 ## Real-World Example
 
-Tomoko, a frontend lead at a growing e-commerce startup, reviews the quarterly SEO report: organic traffic has stagnated despite publishing 80 blog posts and having 200 well-described products. The technical SEO audit reveals the issue — search crawlers see an empty page because all content is rendered client-side. The LCP score is 4.2 seconds, and social media shares show generic placeholder images instead of product photos. A full rewrite to Next.js was estimated at 3 months, which the team can't afford.
+A B2B marketing automation platform was losing prospects before they could even see the product. Their React SPA took 8.3 seconds to show content on mobile, causing a 78% bounce rate and devastating inbound lead generation. Despite $85K annually on content marketing and SEO, organic traffic declined 12% quarter-over-quarter. The crisis point: their biggest competitor launched a faster site and jumped 2 positions for primary keywords, stealing an estimated $180K in annual contract value.
 
-1. Tomoko asks the agent to audit the React SPA and create an incremental migration plan
-2. The agent identifies the 5 highest-impact routes for SSG/SSR and flags 11 code patterns to fix
-3. She starts with the blog — the agent migrates blog listing and post pages to SSG with ISR in one session
-4. After deploying the blog migration, blog posts appear in search results within 48 hours — organic traffic to blog pages increases 340% in the first month
-5. She migrates product pages next — SSG with webhook-triggered revalidation — and LCP drops from 4.2s to 1.1s
-6. The dashboard and admin panel stay as CSR, wrapped in a route group — zero effort, no regression
+Weeks 1-2 focused on analysis: an 847 KB JavaScript bundle, 4.8s FCP, only 31% of pages indexed by Google. 38 pages suitable for SSG, 9 requiring SSR. Weeks 3-4 converted React components to Next.js pages with `getStaticProps`, added automatic image optimization and responsive images, and implemented proper meta tags and schema markup. Weeks 5-6 optimized Core Web Vitals through code splitting (82% bundle reduction), ISR for semi-static content, and edge caching.
 
-The full migration takes 3 weeks of incremental work, not 3 months. Each route is deployed independently, and at no point does the existing application break.
+After 120 days: PageSpeed score 28/100 to 94/100. All Core Web Vitals passing. Organic search traffic up 203%. Average search position improved from page 3.7 to page 1.4. Mobile conversion rate jumped from 1.9% to 8.3%. The migration added $67K in monthly recurring revenue from organic traffic alone.
 
-## Related Skills
-
-- [ssr-migration](../skills/ssr-migration/) — Core SSR/SSG migration patterns, hydration fixes, and deployment config
-- [frontend-design](../skills/frontend-design/) — Ensure components work correctly across server and client contexts
-- [docker-helper](../skills/docker-helper/) — Build optimized containers for SSR production deployment
+The sales team noticed the difference immediately -- prospects stopped mentioning website speed as a concern and started complimenting it instead. Six months after the migration, they acquired two smaller competitors who cited the superior web experience as a factor in choosing their platform for acquisition. What started as a technical SEO fix became a measurable competitive advantage. The hosting costs actually decreased despite the better performance -- static generation means most pages are served from CDN cache at pennies per million requests, compared to the old setup where every page load required a full client-side render with 847 KB of JavaScript.
